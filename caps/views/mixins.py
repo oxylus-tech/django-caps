@@ -35,10 +35,9 @@ class ObjectDetailMixin(BaseObjectMixin):
     Note: user's reference is fetched from `get_object`, not `get_queryset`.
     """
 
-    lookup_field = "ref"
+    lookup_field = "uuid"
 
     def get_object(self):
         agents = self.get_agents()
-        ref = self.kwargs[self.lookup_field]
-        queryset = self.get_queryset()
-        return queryset.ref(agents, ref)
+        uuid = self.kwargs[self.lookup_field]
+        return self.get_queryset().ref(agents, uuid)

@@ -3,7 +3,7 @@ django-caps
 
 django-caps provides capability based object permission system for Django applications.
 This project is inspired by `Capn'Proto documentation <https://capnproto.org>`
- (`interesting paper <http://www.erights.org/elib/capability/ode/ode.pdf>).
+ (`interesting paper <http://www.erights.org/elib/capability/ode/ode.pdf>`).
 
 A capability is a permission provided for a specific object. It can be *derived* (shared) a limited amount of time. Users never directly access the targeted object, but through a *reference* that defines allowed capabilities for it.
 

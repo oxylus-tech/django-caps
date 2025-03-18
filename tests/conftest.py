@@ -56,6 +56,10 @@ def caps_names():
 
 
 @pytest.fixture
+def orphan_cap():
+    return Capability.objects.create(name="orphan", max_derive=1)
+
+@pytest.fixture
 def caps_3(caps_names):
     caps = [Capability(name=name, max_derive=2) for i, name in enumerate(caps_names)]
     Capability.objects.bulk_create(caps)

@@ -37,18 +37,18 @@ class TestCapabilitySet:
 
     def test_derive_caps_fail_missing_cap(self, caps_names, caps_set_3):
         with pytest.raises(PermissionDenied):
-            caps_set_3.derive_caps(caps_names + ["missing_one"])
+            caps_set_3.derive_caps(caps_names + ["missing_one"], raises=True)
 
     def test_derive_caps_fail_cap_not_derived(self, caps_names, caps_set_2):
         with pytest.raises(PermissionDenied):
             caps = caps_names[:-1] + [(caps_names[-1], 10)]
-            caps_set_2.derive_caps(caps)
+            caps_set_2.derive_caps(caps, raises=True)
 
     def test_derive_caps_fail_cant_derive(self, caps_names, caps_set_2):
-        caps = caps_set_2.derive_caps(caps_names)
+        caps = caps_set_2.derive_caps(caps_names, raises=True)
         set = CapabilitySet(caps)
         with pytest.raises(PermissionDenied):
-            set.derive_caps(caps_names)
+            set.derive_caps(caps_names, raises=True)
 
 
 #    def test_add(self):

@@ -1,6 +1,7 @@
 import copy
 
 import pytest
+from django.core.exceptions import PermissionDenied
 
 from .app.models import ConcreteReference
 from .conftest import assertCountEqual
@@ -57,6 +58,15 @@ class TestReference:
     def test_derive(self):
         raise NotImplementedError("test not done")
 
+    def test_can(self, refs_1, caps_1):
+        ref = refs_1[0]
+        assert all(ref.can(c.name) for c in caps_1)
+
+    def test_can_raises_permission_denied(self, refs_1, orphan_cap):
+        ref = refs_1[0]
+        with pytest.raises(PermissionDenied):
+            ref.can(orphan_cap.name, raises=True)
+
 
 @pytest.mark.django_db(transaction=True)
 class TestReferenceQuerySet:
@@ -96,4 +106,20 @@ class TestReferenceQuerySet:
             query = ConcreteReference.objects.refs(agent, set(ref.uuid for ref in refs if ref.receiver != agent))
             assert not query.exists(), "agent: " + str(agent.ref)
 
+    def test_action(self, refs, refs_2, caps_2):
+        action = caps_2[0].name
+        query = ConcreteReference.objects.action(caps_2[0])
+        assert all(r.can(action) for r in query)
+
+    def test_action_should_return_empty(self, refs, orphan_cap):
+        assert not ConcreteReference.objects.action(orphan_cap.name)
+        
+    def test_actions(self, refs, refs_2, caps_2):
+        query = ConcreteReference.objects.actions(c.name for c in caps_2)
+        for cap in caps_2:
+            assert all(r.can(cap.name) for r in query)
+
+    def test_actions_should_return_empty(self, refs, orphan_cap):
+        assert not ConcreteReference.objects.actions([orphan_cap.name])
+        
     # TODO: bulk_create, bulk_update
