@@ -25,7 +25,7 @@ This package provides:
 - Capability based object permission system;
 - Django permission backend, views and mixins;
 - Django Rest Framework permissions, views, viewsets and serializers;
-- A user can have act under different profiles (agents);
+- A user can act under different profiles (agents);
 
 Models
 ......
