@@ -1,8 +1,9 @@
 django-caps
 ===========
 
-django-caps provides capability based permission system for django applications. This project is inspired by [Capn'Proto documentation](https://capnproto.org)
- ([interesting paper](http://www.erights.org/elib/capability/ode/ode.pdf)).
+django-caps provides capability based object permission system for Django applications.
+This project is inspired by `Capn'Proto documentation <https://capnproto.org>`
+ (`interesting paper <http://www.erights.org/elib/capability/ode/ode.pdf>).
 
 A capability is a permission provided for a specific object. It can be *derived* (shared) a limited amount of time. Users never directly access the targeted object, but through a *reference* that defines allowed capabilities for it.
 
@@ -24,7 +25,7 @@ This package provides:
 - Capability based object permission system;
 - Django permission backend, views and mixins;
 - Django Rest Framework permissions, views, viewsets and serializers;
-
+- A user can have act under different profiles (agents);
 
 Models
 ......
@@ -43,7 +44,7 @@ The current implementation provides the following models:
 Quickstart
 ----------
 
-Add django-caps to installed apps and add middleware
+Add django-caps to installed apps and add middleware:
 
 .. code-block:: python
 
@@ -61,6 +62,60 @@ Add django-caps to installed apps and add middleware
         # ...
     ]
 
+
+Create an object to be accessed:
+
+.. code-block:: python
+
+    # models.py
+    from django.db import models
+    from django.utils.translation import gettext_lazy as _
+
+    from caps.models import Object
+
+    class Post(Object):
+        title = models.CharField(_("Title"), max_length=64)
+        content = models.TextField(_("Content"))
+        created_at = models.DateTimeField(_("Date of creation"), auto_now_add=True)
+
+Basic example usage:
+
+.. code-block:: python
+
+    from django.contrib.auth.models import User
+
+    from caps.models import Agent
+    from .models import Post
+
+    # We assume the users already exists
+    user = User.objects.all()[0]
+    user_1 = User.objects.all()[1]
+
+    # Create agents (this is handled by middleware).
+    agent = Agent.objects.create(user=user)
+    agent_1 = Agent.objects.create(user=user)
+
+    # Create capabilities
+    capabilities = [
+        # Capability can be re-shared 10 times.
+        Capability(name="read", max_derive=10),
+        # These ones can not be shared
+        Capability(name="write"),
+        Capability(name="update"),
+    ]
+    # Capabilities are only created once per `name` and `max_derive`.
+    # This method is provided by django-caps.
+    Capability.objects.get_or_create_many(capabilities)
+
+    # Create the post
+    post = Post.objects.create(title="Some title", content="Some content")
+    ref = Post.Reference.create(agent, object, capabilities)
+
+    # Get the object
+    the_post = Post.objects.ref(agent, ref.uuid)
+
+    # This raises a DoesNotExist error
+    Post.objects.ref(agent_1, ref.uuid)
 
 
 Capability vs ACL permission systems
@@ -106,3 +161,5 @@ So... When to use what?
 
     - Capability-based systems are ideal for distributed, decentralized, and microservices-based environments, where flexibility, delegation, and security are key.
     - ACL-based systems are better suited for traditional enterprise IT environments, where strict identity-based access control is needed.
+
+    This however still can be usable for object permissions by providing references for groups instead of users.
