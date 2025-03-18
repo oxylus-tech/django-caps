@@ -117,6 +117,9 @@ Basic example usage:
     # This raises a DoesNotExist error
     Post.objects.ref(agent_1, ref.uuid)
 
+    # This create a new reference with only shareable capabilities
+    ref_1 = ref.derive(agent_1, capabilities)
+
 
 Capability vs ACL permission systems
 ------------------------------------
