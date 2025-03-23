@@ -68,13 +68,19 @@ class ObjectQuerySet(models.QuerySet):
         refs = self.models.Reference.objects.receiver(receiver)
         return self._select_references(refs)
 
-    def ref(self, receiver: Agent | Iterable[Agent], uuid: UUID) -> ObjectQuerySet:
-        """Return reference for provided receiver and ref."""
+    def ref(self, receiver: Agent | Iterable[Agent] | None, uuid: UUID) -> ObjectQuerySet:
+        """Return reference for provided receiver and ref.
+
+        Please refer to :py:meth:`ReferenceQuerySet.ref` for more information.
+        """
         refs = self.model.Reference.objects.refs(receiver, [uuid])
         return self._select_references(refs).get()
 
-    def refs(self, receiver: Agent | Iterable[Agent], uuids: Iterable[UUID]) -> ObjectQuerySet:
-        """Return references for provided receiver and refs."""
+    def refs(self, receiver: Agent | Iterable[Agent] | None, uuids: Iterable[UUID]) -> ObjectQuerySet:
+        """Return references for provided receiver and refs.
+
+        Please refer to :py:meth:`ReferenceQuerySet.refs` for more information.
+        """
         refs = self.model.Reference.objects.refs(receiver, uuids)
         return self._select_references(refs)
 

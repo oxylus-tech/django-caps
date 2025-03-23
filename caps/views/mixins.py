@@ -1,14 +1,16 @@
+from collections.abc import Iterable
+
 from caps.models import Agent
 
 
 __all__ = (
-    "BaseObjectMixin",
+    "ObjectMixin",
     "ObjectListMixin",
     "ObjectDetailMixin",
 )
 
 
-class BaseObjectMixin:
+class ObjectMixin:
     """Mixin providing functionalities to work with Object model."""
 
     all_agents: bool = False
@@ -17,11 +19,20 @@ class BaseObjectMixin:
     all user's assigned agents instead of only the current one.
     """
 
+    actions: str | Iterable[str] | None = None
+    """ Required action(s) in order to run the view. """
+
     def get_agents(self) -> Agent | list[Agent]:
         return self.request.agents if self.all_agents else self.request.agent
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if self.actions:
+            return queryset.actions(self.actions)
+        return queryset
 
-class ObjectListMixin(BaseObjectMixin):
+
+class ObjectListMixin(ObjectMixin):
     """List mixin used to retrieve Object list."""
 
     def get_queryset(self):
@@ -29,7 +40,7 @@ class ObjectListMixin(BaseObjectMixin):
         return super().get_queryset().receiver(agents)
 
 
-class ObjectDetailMixin(BaseObjectMixin):
+class ObjectDetailMixin(ObjectMixin):
     """Detail mixin used to retrieve Object detail.
 
     Note: user's reference is fetched from `get_object`, not `get_queryset`.

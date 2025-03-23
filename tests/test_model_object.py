@@ -14,6 +14,10 @@ __all__ = (
 )
 
 
+class Meta:
+    app_label = "tests.app"
+
+
 class TestObjectManager:
     def test_get_reference_class_from_attrs(self):
         result = ObjectBase.get_reference_class("test", (Object,), attrs={"Reference": Reference})
@@ -22,41 +26,35 @@ class TestObjectManager:
     def test_get_reference_class_from_attrs_fail_reference_not_subclass(self):
         with pytest.raises(ValueError):
             ObjectBase.get_reference_class(
-                "test",
+                "Test",
                 (Object,),
                 attrs={"Reference": object, "__module__": self.__module__},
             )
 
     def test_get_reference_class_from_bases(self):
         result = ObjectBase.get_reference_class(
-            "test",
+            "Test1",
             (
                 AbstractObject,
                 ConcreteObject,
             ),
-            attrs={"__module__": self.__module__},
+            attrs={"__module__": "tests.app"},
         )
         assert AbstractObject.Reference is not result, "result should not return an abstract class"
         assert ConcreteObject.Reference is result
 
     def test_new_with_reference(self):
-        class Meta:
-            app_label = "tests.caps"
-
         result = ObjectBase.__new__(
             ObjectBase,
-            "test",
+            "Test2",
             (ConcreteObject,),
-            {"__module__": self.__module__, "Meta": Meta},
+            {"__module__": "tests.app", "Meta": Meta},
         )
         assert issubclass(result, ConcreteObject)
         assert issubclass(result.Reference, Reference)
 
     def test_new_generate_reference(self):
-        class Meta:
-            app_label = "tests.caps"
-
-        result = ObjectBase.__new__(ObjectBase, "test", (Object,), {"__module__": self.__module__, "Meta": Meta})
+        result = ObjectBase.__new__(ObjectBase, "Test3", (Object,), {"__module__": "tests.app", "Meta": Meta})
         assert issubclass(result, Object)
         assert issubclass(result.Reference, Reference)
 

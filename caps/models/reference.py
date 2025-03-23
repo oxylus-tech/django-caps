@@ -35,22 +35,39 @@ class ReferenceQuerySet(models.QuerySet):
             return self.filter(receiver=agent)
         return self.filter(receiver__in=agent)
 
-    def ref(self, receiver: Agent | Iterable[Agent], uuid: uuid.UUID) -> ReferenceQuerySet:
+    def ref(self, receiver: Agent | Iterable[Agent] | None, uuid: uuid.UUID) -> ReferenceQuerySet:
         """Reference by uuid and receiver(s).
 
+        Note that :py:param:`receiver` is provided as first parameter in order to enforce its usage. It however can be ``None``: this only
+        should be used when queryset has already been filtered by receiver.
+
+        :param receiver: the agent that retrieving the reference.
+        :param uuid: the reference uuid to fetch.
         :yield DoesNotExist: when the reference is not found.
         """
-        return self.receiver(receiver).get(uuid=uuid)
+        if receiver:
+            self = self.receiver(receiver)
+        return self.get(uuid=uuid)
 
-    def refs(self, receiver: Agent | Iterable[Agent], uuids: Iterable[uuid.UUID]) -> ReferenceQuerySet:
-        """References by many uuid and receiver(s)."""
+    def refs(self, receiver: Agent | Iterable[Agent] | None, uuids: Iterable[uuid.UUID]) -> ReferenceQuerySet:
+        """References by many uuid and receiver(s).
+
+        Please refer to :py:meth:`ReferenceQuerySet.ref` for more information.
+
+        :param receiver: the agent that retrieving the reference.
+        :param uuids: an iterable of uuids to fetch
+        """
+        if receiver:
+            self = self.receiver(receiver)
         return self.receiver(receiver).filter(uuid__in=uuids)
 
-    def capability(self, receiver: Agent | Iterable[Agent], name: str) -> ReferenceQuerySet:
-        return self.receiver(receiver).filter(capability_set__name=name)
+    def action(self, name: str) -> ReferenceQuerySet:
+        return self.filter(capability_set__name=name)
 
-    def capabilities(self, receiver: Agent | Iterable[Agent], names: Iterable[str]) -> ReferenceQuerySet:
-        return self.receiver(receiver).filter(capability_set__name__in=names)
+    def actions(self, names: str | Iterable[str]) -> ReferenceQuerySet:
+        if isinstance(names, str):
+            return self.action(names)
+        return self.filter(capability_set__name__in=names)
 
     def bulk_create(self, objs, *a, **kw):
         for obj in objs:
