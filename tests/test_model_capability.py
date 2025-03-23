@@ -47,7 +47,6 @@ class TestCapability:
         expected = Capability(name="action", max_derive=12)
         values = (
             (expected.name, expected.max_derive),
-            [expected.name, expected.max_derive],
             Capability(name=expected.name, max_derive=expected.max_derive),
         )
         for value in values:

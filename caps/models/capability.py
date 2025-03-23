@@ -45,17 +45,47 @@ class CapabilityQuerySet(models.QuerySet):
 
 
 class Capability(models.Model):
-    """A single capability.
+    """A single capability providing authorization for executing a single action.
 
-    Provide permission for a specific action. Capability are stored as unique for each action/max_derive couple.
+    Capability can be derived a certain amount of times, which is specified by
+    :py:attr:`max_derive`. When this value is not specified (for exemple when
+    :py:meth:`derive` or :py:meth:`into`), it is always defaulted to 0 (thus disallowing
+    any further derivation).
+
+    Lets see what it does:
+
+    .. code-block:: python
+
+        cap = Capability(name="read", max_derive=2)
+
+        # providing no max_derive defaults to 0
+        cap_1 = cap.derive(0)
+        assert cap_1.max_derive == 0
+
+        # this raises PermissionDenied
+        cap_1.derive()
+
+        # max_derive reduced by 1
+        cap_1 = cap.derive()
+        assert cap_1.max_derive == 1
+
+        cap_2 = cap_1.derive()
+        assert cap_2.max_derive == 0
+    
+
+    Capability are stored as unique for each action/max_derive pair. When requiring
+    to create multiple capabilities, one should use queryset's
+    :py:meth:`~CapabilityQuerySet.get_or_create_many`.
     """
 
-    IntoValue: tuple[str, str] | list[str] | Capability | str
+    IntoValue: tuple[str, int] | Capability | str
     """Value types from which capability can be created from using class method
     `into()`."""
 
     name = models.CharField(_("Action"), max_length=32, db_index=True)
+    """ Action programmatic name. """
     max_derive = models.PositiveIntegerField(_("Maximum Derivation"), default=0)
+    """ Maximum allowed derivations. """
 
     objects = CapabilityQuerySet.as_manager()
 
@@ -74,7 +104,7 @@ class Capability(models.Model):
         Value formats: `name`, `(name, max_derive)`, `Capability`
         (returned as is in this case)
         """
-        if isinstance(value, (list, tuple)):
+        if isinstance(value, tuple):
             return cls(name=value[0], max_derive=value[1])
         if isinstance(value, Capability):
             return value
@@ -88,7 +118,13 @@ class Capability(models.Model):
 
     def derive(self, max_derive: None | int = None) -> Capability:
         """Derive a new capability from self (without checking existence in
-        database)."""
+        database).
+
+        :param max_derive: when value is None, it will based the value on self's \
+                py:attr:`max_derive` minus 1.
+        :return the new unsaved Capability.
+        :yield PermissionDenied: when Capability derivation is not allowed.
+        """
         if not self.can_derive(max_derive):
             raise PermissionDenied(__("can not derive capability {name}").format(name=self.name))
         if max_derive is None:

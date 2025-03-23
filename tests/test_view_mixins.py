@@ -20,24 +20,14 @@ def objects(db):
 
 
 @pytest.fixture
-def base_object_mixin(rf, agent):
+def object_mixin(rf, agent):
     request = rf.get("/test")
     setattr(request, "agent", agent)
-    mixin = mixins.BaseObjectMixin()
+    mixin = mixins.ObjectMixin()
     mixin.request = request
     return mixin
 
 
-class TestBaseObjectMixin:
-    def test_get_agents(self, base_object_mixin, agent):
-        assert base_object_mixin.get_agents() is agent
-
-
-class TestObjectListMixin:
-    def test_get_queryset(self):
-        pass
-
-
-class TestObjectDetailMixin:
-    def test_get_object(self):
-        pass
+class TestObjectMixin:
+    def test_get_agents(self, object_mixin, agent):
+        assert object_mixin.get_agents() is agent

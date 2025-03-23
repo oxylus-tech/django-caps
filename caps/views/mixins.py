@@ -1,12 +1,13 @@
 from collections.abc import Iterable
 
+
 from caps.models import Agent
 
 
 __all__ = (
     "ObjectMixin",
     "ObjectListMixin",
-    "ObjectDetailMixin",
+    "SingleObjectMixin",
 )
 
 
@@ -21,35 +22,55 @@ class ObjectMixin:
 
     actions: str | Iterable[str] | None = None
     """ Required action(s) in order to run the view. """
+    agents: Agent | list[Agent] | None = None
+    """ Agents fetched using :py:meth:`get_agents`. This is set by method
+    :py:meth:`get_queryset`.
+    """
 
     def get_agents(self) -> Agent | list[Agent]:
         return self.request.agents if self.all_agents else self.request.agent
 
+    def get_actions(self):
+        return self.actions
+
     def get_queryset(self):
         queryset = super().get_queryset()
-        if self.actions:
-            return queryset.actions(self.actions)
-        return queryset
+        if actions := self.get_actions():
+            queryset = queryset.actions(actions)
+
+        self.agents = self.get_agents()
+        return queryset.receiver(self.agents)
 
 
-class ObjectListMixin(ObjectMixin):
-    """List mixin used to retrieve Object list."""
-
-    def get_queryset(self):
-        agents = self.get_agents()
-        return super().get_queryset().receiver(agents)
-
-
-class ObjectDetailMixin(ObjectMixin):
+class SingleObjectMixin(ObjectMixin):
     """Detail mixin used to retrieve Object detail.
 
     Note: user's reference is fetched from `get_object`, not `get_queryset`.
     """
 
-    lookup_field = "ref"
+    lookup_url_kwargs = "uuid"
+    """ URL's kwargs argument used to retrieve reference uuid. """
 
     def get_object(self):
-        agents = self.get_agents()
-        ref = self.kwargs[self.lookup_field]
-        queryset = self.get_queryset()
-        return queryset.ref(agents, ref)
+        uuid = self.kwargs[self.lookup_field]
+        return self.get_queryset().ref(None, uuid)
+
+
+class ObjectListMixin(ObjectMixin):
+    actions = "list"
+
+
+class ObjectDetailMixin(SingleObjectMixin):
+    actions = "retrieve"
+
+
+class ObjectCreateMixin(SingleObjectMixin):
+    actions = "create"
+
+
+class ObjectUpdateMixin(SingleObjectMixin):
+    actions = "update"
+
+
+class ObjectDeleteMixin(SingleObjectMixin):
+    actions = "delete"

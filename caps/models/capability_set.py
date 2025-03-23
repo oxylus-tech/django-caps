@@ -12,7 +12,7 @@ __all__ = ("BaseCapabilitySet", "CapabilitySet")
 class BaseCapabilitySet:
     """Base class to handle set of capabilities."""
 
-    DeriveItems: Capability.IntoValue
+    DeriveItems: Iterable[Capability.IntoValue]
     """Type from which set can be derived from."""
     capabilities: Iterable[Capability] = None
 
@@ -40,18 +40,22 @@ class BaseCapabilitySet:
                 return False
         return True
 
-    def derive_caps(self, items: BaseCapabilitySet.DeriveItems = None) -> list[Capability]:
+    def derive_caps(self, items: BaseCapabilitySet.DeriveItems = None, raises: bool = False) -> list[Capability]:
         """Derive all capabilities from this set using provided optionnal
         iterator.
 
         If `items` is not provided, derive capabilities from self, without
         allowing them to be shared.
+
+        :param items: subset of capabilities to derive;
+        :param raises: whether to skip silently denied derivation or raises PermissionDenied 
         :return an array of saved Capability instances.
+        :yield PermissionDenied: on :py:param:`raises` on unallowed derivations.
         """
         if items is None:
             items = [r.derive(max_derive=0) for r in self.get_capabilities() if r.can_derive(0)]
         else:
-            items = self._derive_caps(self.get_capabilities(), items)
+            items = self._derive_caps(self.get_capabilities(), items, raises)
         return Capability.objects.get_or_create_many(items) if items else None
 
     # async def aderive_caps(self, items: DeriveItems = None)
@@ -66,7 +70,7 @@ class BaseCapabilitySet:
     #         items = self._derive_caps(self.get_capabilities(), items)
     #     return Capability.objects.get_or_create_many(items)
 
-    def _derive_caps(self, source: Iterable[Capability], items: BaseCapabilitySet.DeriveItems) -> list[Capability]:
+    def _derive_caps(self, source: Iterable[Capability], items: BaseCapabilitySet.DeriveItems, raises: bool = False) -> list[Capability]:
         """Derive capabilities using given dict of parents."""
         by_name = {r.name: r for r in source}
         derived, denied = [], []
@@ -78,7 +82,7 @@ class BaseCapabilitySet:
             else:
                 derived.append(item)
 
-        if denied:
+        if raises and denied:
             raise PermissionDenied(
                 __("Some capabilities can not be derived: {denied}").format(denied=", ".join(denied))
             )

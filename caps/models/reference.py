@@ -3,6 +3,7 @@ from __future__ import annotations
 import uuid
 from collections.abc import Iterable
 
+from django.core.exceptions import PermissionDenied
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -59,15 +60,15 @@ class ReferenceQuerySet(models.QuerySet):
         """
         if receiver:
             self = self.receiver(receiver)
-        return self.receiver(receiver).filter(uuid__in=uuids)
+        return self.filter(uuid__in=uuids)
 
     def action(self, name: str) -> ReferenceQuerySet:
-        return self.filter(capability_set__name=name)
+        return self.filter(capabilities__name=name)
 
     def actions(self, names: str | Iterable[str]) -> ReferenceQuerySet:
         if isinstance(names, str):
             return self.action(names)
-        return self.filter(capability_set__name__in=names)
+        return self.filter(capabilities__name__in=names)
 
     def bulk_create(self, objs, *a, **kw):
         for obj in objs:
@@ -167,6 +168,21 @@ class Reference(BaseCapabilitySet, models.Model):
 
     def get_capabilities(self) -> CapabilityQuerySet:
         return self.capabilities.all()
+
+    def can(self, action: str | list[str], raises=False) -> bool:
+        """
+        Return wether an action is allowed.
+
+        :param action: action(s) to check on
+        :param raises: raise PermissionDenied instead of returning False
+        :yield PermissionDenied: action is not allowed.
+        """
+        kw = {"name": action} if isinstance(action, str) else {"name__in": action}
+        if not self.capabilities.filter(**kw).exists():
+            if raises:
+                raise PermissionDenied(f"{action} is not allowed")
+            return False
+        return True
 
     def derive(
         self,
