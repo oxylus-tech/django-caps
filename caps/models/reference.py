@@ -6,7 +6,6 @@ from typing import Any
 
 from django.db import models
 from django.db.models import Q
-from django.contrib.auth.models import Permission
 from django.utils.translation import gettext_lazy as _
 
 from .agent import Agent
@@ -54,8 +53,8 @@ class ReferenceQuerySet(models.QuerySet):
     def emitter(self, agent: Agent | Iterable[Agent]) -> ReferenceQuerySet:
         """References for the provided emitter(s)."""
         if isinstance(agent, Agent):
-            return self.filter(origin__receiver=agent)
-        return self.filter(origin__receiver__in=agent)
+            return self.filter(Q(origin__receiver=agent) | Q(origin__isnull=True, receiver=agent))
+        return self.filter(Q(origin__receiver__in=agent) | Q(origin__isnull=True, receiver__in=agent))
 
     def receiver(self, agent: Agent | Iterable[Agent]) -> ReferenceQuerySet:
         """References for the provided receiver(s)."""
@@ -108,13 +107,13 @@ class ReferenceQuerySet(models.QuerySet):
 
         :param permissions: permissions to look for, same argument type as :py:meth:`.capability.CapabilityQuerySet.can`.
         """
-        if isinstance(permissions, (Permission, int, tuple)):
-            return self.can(permissions)
+        return self.filter(self.can_all_q(permissions))
 
-        q = Q()
-        for perm in permissions:
-            q &= Q(**CapabilityQuerySet.can_one_lookup(perm, "capability__permission__"))
-        return self.filter(q)
+    def can_all_q(self, permissions: CanMany | None) -> Q:
+        """Return Q lookup for all permissions."""
+        return self.model.Capability.objects.can_all_lookup(
+            permissions, "capability__permission__", model=self.model.get_object_class()
+        )
 
     def bulk_create(self, objs, *a, **kw):
         for obj in objs:
@@ -200,6 +199,11 @@ class Reference(CapabilitySet, models.Model, metaclass=ReferenceBase):
     def emitter(self):
         """Agent emitting the reference."""
         return self.origin.receiver if self.origin else self.receiver
+
+    @classmethod
+    def get_object_class(cls):
+        """Return related Object class."""
+        return cls.target.field.related_model
 
     @classmethod
     def create_root(cls, emitter: Agent, target: object, **kwargs) -> Reference:

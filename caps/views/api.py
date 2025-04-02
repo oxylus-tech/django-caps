@@ -1,6 +1,18 @@
 from rest_framework import generics, viewsets
 
+from ..models.capability import CanMany
 from . import mixins
+
+
+__all__ = (
+    "ObjectListAPIView",
+    "ObjectRetrieveAPIView",
+    "ObjectCreateAPIView",
+    "ObjectUpdateAPIView",
+    "ObjectDestroyAPIView",
+    "ViewSetMixin",
+    "ObjectViewSet",
+)
 
 
 class ObjectListAPIView(mixins.ObjectListMixin, generics.ListAPIView):
@@ -24,7 +36,14 @@ class ObjectDestroyAPIView(mixins.ObjectDeleteMixin, generics.DestroyAPIView):
 
 
 class ViewSetMixin(mixins.SingleObjectMixin):
-    actions = {
+    """
+    This is the base mixin handling permission check for django-caps.
+
+    It provides mapping between actions and specific permissions.
+
+    """
+
+    can: dict[str, CanMany] = {
         "list": ObjectListAPIView.actions,
         "retrieve": ObjectRetrieveAPIView.actions,
         "create": ObjectCreateAPIView.actions,
@@ -36,10 +55,12 @@ class ViewSetMixin(mixins.SingleObjectMixin):
     def get_action(self):
         return self.actions.get(self.action)
 
+    @classmethod
+    def get_can_all_q(cls, can: CanMany | None):
+        can = can or {}
+        defaults = {key: super(ViewSetMixin, cls).get_can_all_q(perms) for key, perms in cls.can.items()}
+        return {**defaults, **can}
 
-class GenericViewSet(ViewSetMixin, viewsets.GenericViewSet):
-    pass
 
-
-class ModelViewSet(ViewSetMixin, viewsets.ModelViewSet):
+class ObjectViewSet(ViewSetMixin, viewsets.ModelViewSet):
     pass

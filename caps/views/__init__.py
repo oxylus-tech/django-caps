@@ -1,5 +1,14 @@
 from .generics import ObjectListView, ObjectDetailView, ObjectCreateView, ObjectUpdateView, ObjectDeleteView
-from .api import ModelViewSet, GenericViewSet
+from .api import (
+    ObjectListAPIView,
+    ObjectRetrieveAPIView,
+    ObjectCreateAPIView,
+    ObjectUpdateAPIView,
+    ObjectDestroyAPIView,
+    ViewSetMixin,
+    ObjectViewSet,
+)
+
 
 __all__ = (
     "ObjectListView",
@@ -7,6 +16,13 @@ __all__ = (
     "ObjectCreateView",
     "ObjectUpdateView",
     "ObjectDeleteView",
-    "ModelViewSet",
-    "GenericViewSet",
+    "ObjectListAPIView",
+    "ObjectRetrieveAPIView",
+    "ObjectCreateAPIView",
+    "ObjectUpdateAPIView",
+    "ObjectDestroyAPIView",
+    "ViewSetMixin",
+    "ObjectViewSet",
+    #    "ModelViewSet",
+    #    "GenericViewSet",
 )

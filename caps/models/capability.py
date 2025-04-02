@@ -1,6 +1,7 @@
 from __future__ import annotations
 import inspect
 from collections.abc import Iterable
+import operator
 from typing import TypeAlias
 
 from django.core.exceptions import PermissionDenied
@@ -38,6 +39,42 @@ It is used by :py:meth:`CapabilityQuerySet.can`
 
 class CapabilityQuerySet(models.QuerySet):
     """Queryset and manager used by Capability models."""
+
+    def can(self, *args, **kwargs) -> CapabilityQuerySet:
+        """Filter using provided permission(s).
+
+        For parameters, look up to :py:meth:`can_many_lookup`.
+        """
+        return self.filter(self.can_q(*args, **kwargs))
+
+    @classmethod
+    def can_all_q(cls, *args, **kwargs):
+        """Shortcut to :py:meth:`can_many_lookup` with ``&`` operator."""
+        return cls.can_q(*args, op=operator.and_, **kwargs)
+
+    @classmethod
+    def can_q(
+        cls, permissions: CanMany | None, prefix: str = "permission__", model: type | None = None, op=operator.or_
+    ):
+        """
+        Return Q lookup for multiple permissions, joined using the provided operator.
+
+        It uses result of :py:meth:`can_one_lookup`.
+
+        :param permissions: the permissions to look for.
+        :param prefix: passed down to :py:meth:`can_one_lookup`.
+        :param model: passed down to :py:meth:`can_one_lookup`.
+        :param op: operator to use (default to `|`)
+        """
+        if isinstance(permissions, (Permission, int, tuple)):
+            return Q(**cls.can_one_lookup(permissions))
+
+        q = Q()
+        if permissions:
+            for perm in permissions:
+                q_ = Q(**cls.can_one_lookup(perm, "capability__permission__"))
+                q = op(q, q_)
+        return q
 
     @staticmethod
     def can_one_lookup(
@@ -77,22 +114,6 @@ class CapabilityQuerySet(models.QuerySet):
         else:
             raise ValueError(f"Invalid type for permission's content type: `{ct}`")
         return kwargs
-
-    def can(self, permissions: CanMany) -> CapabilityQuerySet:
-        """Filter using provided permission.
-
-        When permission is an iterable, it will perform an OR conditional statement
-        between all provided values.
-
-        :param permissions: permissions to filter.
-        """
-        if isinstance(permissions, (Permission, str, int, tuple)):
-            return self.filter(**self.can_one_lookup(permissions))
-
-        q = Q()
-        for perm in permissions:
-            q |= Q(**self.can_one_lookup(perm))
-        return self.filter(q)
 
     def initials(self):
         """Filter capabilities used as initial values of a Reference."""

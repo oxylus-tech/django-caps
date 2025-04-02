@@ -1,14 +1,11 @@
 from __future__ import annotations
 
-from collections.abc import Iterable
-from uuid import UUID
 
 from django.db import models
 from django.db.models import OuterRef, Prefetch, Subquery
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
-from .agent import Agent
 from .reference import Reference, ReferenceQuerySet
 from .nested import NestedBase
 
@@ -50,55 +47,21 @@ class ObjectBase(NestedBase):
 class ObjectQuerySet(models.QuerySet):
     """QuerySet for Objects."""
 
-    def receiver(self, receiver: Agent | Iterable[Agent]) -> ObjectQuerySet:
-        """Filter object for provided."""
-        refs = self.models.Reference.objects.receiver(receiver)
-        return self.with_refs(refs)
-
-    def ref(
-        self, receiver: Agent | Iterable[Agent] | None, uuid: UUID, refs: ReferenceQuerySet | None = None
+    def refs(
+        self,
+        refs: ReferenceQuerySet,
     ) -> ObjectQuerySet:
-        """Return reference for provided receiver and uuid.
+        """Return Objects for the provided references.
 
         This method annotates the Object with ``agent_reference_set`` whose value
         is set to relevant reference(s). This allows to use :py:attr:`reference` property.
 
-        Please refer to :py:meth:`ReferenceQuerySet.ref` for more information.
-
-        :param receiver: the reference's receiver
-        :param uuid: reference uuid
         :param refs: use this reference QuerySet
         """
-        if refs is None:
-            refs = self.model.Reference.objects
-        refs = refs.refs(receiver, [uuid])
-        return self.with_refs(refs).get()
-
-    def refs(
-        self,
-        receiver: Agent | Iterable[Agent] | None,
-        uuids: Iterable[UUID],
-        refs: ReferenceQuerySet | None = None,
-    ) -> ObjectQuerySet:
-        """Return references for provided receiver and uuids.
-
-        Please refer to :py:meth:`ref` and :py:meth:`ReferenceQuerySet.refs` for more information.
-
-        :param receiver: the reference's receiver
-        :param uuids: reference uuids
-        :param refs: use this reference QuerySet
-        """
-        if refs is None:
-            refs = self.model.Reference.objects
-        refs = refs.refs(receiver, uuids)
-        return self.with_refs(refs)
-
-    def with_refs(self, refs_queryset: models.QuerySet) -> ObjectQuerySet:
-        """Prefetch provided references. Add references prefetch for objects."""
         fk_field = self.model.Reference._meta.get_field("target")
         lookup = fk_field.remote_field.get_accessor_name()
-        prefetch = Prefetch(lookup, refs_queryset, "agent_reference_set")
-        refs = refs_queryset.filter(target=OuterRef("pk"))
+        prefetch = Prefetch(lookup, refs, "agent_reference_set")
+        refs = refs.filter(target=OuterRef("pk"))
         return (
             self.annotate(reference_id=Subquery(refs.values("id")[:1]))
             .filter(reference_id__isnull=False)
