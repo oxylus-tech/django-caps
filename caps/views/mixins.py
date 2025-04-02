@@ -1,7 +1,5 @@
-from collections.abc import Iterable
-
-
-from caps.models import Agent
+from .models import Agent, Object, Reference
+from .models.capability import CanMany
 
 
 __all__ = (
@@ -20,8 +18,8 @@ class ObjectMixin:
     all user's assigned agents instead of only the current one.
     """
 
-    actions: str | Iterable[str] | None = None
-    """ Required action(s) in order to run the view. """
+    agent: Agent | None = None
+    """ Current request's agent. """
     agents: Agent | list[Agent] | None = None
     """ Agents fetched using :py:meth:`get_agents`. This is set by method
     :py:meth:`get_queryset`.
@@ -30,16 +28,37 @@ class ObjectMixin:
     def get_agents(self) -> Agent | list[Agent]:
         return self.request.agents if self.all_agents else self.request.agent
 
-    def get_actions(self):
-        return self.actions
+    def get_queryset(self):
+        return super().get_queryset().receiver(self.agents)
+
+    def dispatch(self, request, *args, **kwargs):
+        self.agents = self.get_agents()
+        self.agent = request.agent
+        return super().dispatch(request, *args, **kwargs)
+
+
+class ObjectPermissionMixin:
+    can: CanMany
+    """ Capability permission(s) required to display the view.
+
+    A string with Permission codename. ContentType will be matched \
+    against current Capability's target :py:class:`.object.Object`.
+    """
+
+    def get_reference_queryset(self):
+        """Return queryset for references."""
+        if not hasattr(self, "_reference_queryset"):
+            # we cache reference queryset for permission lookup
+            query = self.model.Reference.objects
+            if self.can:
+                query = query.can_all(self.can)
+            else:
+                query = query.all()
+            setattr(self, "_reference_queryset", query)
+        return self._reference_queryset
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        if actions := self.get_actions():
-            queryset = queryset.actions(actions)
-
-        self.agents = self.get_agents()
-        return queryset.receiver(self.agents)
+        return super().get_queryset().refs(self.get_reference_queryset())
 
 
 class SingleObjectMixin(ObjectMixin):
@@ -65,7 +84,25 @@ class ObjectDetailMixin(SingleObjectMixin):
 
 
 class ObjectCreateMixin(SingleObjectMixin):
+    reference_class = None
+    """ Reference class (defaults to model's Reference). """
+
     actions = "create"
+
+    def get_reference_class(self):
+        """Return reference class used to create reference for object."""
+        cls = self.reference_class or getattr(self.model, "Reference", None)
+        if cls is None:
+            raise ValueError("There is no Reference class provided for this model nor this view.")
+        if not issubclass(cls, Reference):
+            raise ValueError("{cls} is not a Reference subclass.")
+        return cls
+
+    def create_reference(self, emitter: Agent, target: Object):
+        cls = self.get_reference_class()
+        ref = cls.objects.create_root(emitter, target)
+        setattr(object, "reference", ref)
+        return ref
 
 
 class ObjectUpdateMixin(SingleObjectMixin):

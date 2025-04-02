@@ -5,9 +5,6 @@ from . import mixins
 __all__ = ("ObjectListView", "ObjectDetailView", "ObjectCreateView", "ObjectUpdateView", "ObjectDeleteView")
 
 
-# Note: actions are aligned to rest_framework's ones.
-
-
 class ObjectListView(mixins.ObjectListMixin, generics.ListView):
     pass
 
@@ -18,6 +15,10 @@ class ObjectDetailView(mixins.ObjectDetailMixin, generics.DetailView):
 
 class ObjectCreateView(mixins.ObjectCreateMixin, generics.edit.CreateView):
     pass
+    # def form_valid(self, form):
+    # self.object = form.save()
+    # _reference = self.create_reference(self.agent, self.object)
+    # return get_success_url
 
 
 class ObjectUpdateView(mixins.ObjectUpdateMixin, generics.edit.UpdateView):

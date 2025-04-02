@@ -1,11 +1,12 @@
 from __future__ import annotations
-import functools
-import operator
+import inspect
 from collections.abc import Iterable
+from typing import TypeAlias
 
-from asgiref.sync import sync_to_async
 from django.core.exceptions import PermissionDenied
-from django.db import models, transaction
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
+from django.db import models
 from django.db.models import Q
 from django.utils.translation import gettext as __
 from django.utils.translation import gettext_lazy as _
@@ -13,50 +14,124 @@ from django.utils.translation import gettext_lazy as _
 __all__ = ("CapabilityQuerySet", "Capability")
 
 
+CanOne: TypeAlias = Permission | int | tuple[str, int | ContentType | type]
+"""
+Describe lookup for a capability's permission.
+
+It either can be:
+
+    - A Permission or a permission id;
+    - A tuple with Permission codename, and content type (id, \
+      ContentType instance, or model class);
+    - An action, that will be constructed with provided model, such as:
+      ``permission_codename = f"{action}_{model_name}"``.
+
+It is used by :py:meth:`CapabilityQuerySet.can`
+"""
+CanMany: TypeAlias = CanOne | Iterable[CanOne]
+"""
+Describe lookup value for multiple capabilities' description.
+
+It is used by :py:meth:`CapabilityQuerySet.can`
+"""
+
+
 class CapabilityQuerySet(models.QuerySet):
-    def _get_items_queryset(self, items: "Iterable[Capability]") -> models.QuerySet:
-        """Get or create capabilities from database."""
-        q_objects = (Q(name=r.name, max_derive=r.max_derive) for r in items)
-        query = functools.reduce(operator.or_, q_objects)
-        return self.filter(query)
+    """Queryset and manager used by Capability models."""
 
-    def get_or_create_many(self, items: Iterable[Capability]) -> models.Queryset:
-        """Retrieve capabilities from database, create it if missing.
+    @staticmethod
+    def can_one_lookup(
+        permission: CanOne, prefix: str = "permission__", model: type | None = None
+    ) -> dict[str, str | int]:
+        """Return lookup for one permission.
 
-        Subset's items are updated.
+        :param permission: to get lookup for.
+        :param prefix: prefix keys with this value.
+        :param model: model class to use when only action is provided.
+        :return lookup argument dictionnary.
+
+        :yield ValueError: on unsupported ``permission`` types.
+
         """
-        if not items:
-            return self.none()
+        if isinstance(permission, Permission):
+            return {f"{prefix}id": permission.id}
+        elif isinstance(permission, int):
+            return {f"{prefix}id": permission}
+        elif isinstance(permission, str):
+            ct = ContentType.objects.get_for_model(model)
+            return {
+                f"{prefix}codename": f"{permission}_{model._meta.model_name}",
+                f"{prefix}content_type": ct,
+            }
+        elif not isinstance(permission, tuple):
+            raise ValueError(f"Invalid type for permission: `{type(permission)}`")
 
-        queryset = self._get_items_queryset(items)
-        # force queryset to use a different cache, in order to return it
-        # unevaluated
-        names = {r.name for r in queryset.all()}
-        missing = (item for item in items if item.name not in names)
-        with transaction.atomic(queryset.db):
-            Capability.objects.bulk_create(missing)
-        return queryset
+        codename, ct = permission
+        kwargs = {f"{prefix}codename": codename}
+        if isinstance(ct, ContentType):
+            kwargs[f"{prefix}content_type"] = ct
+        elif inspect.isclass(ct) and issubclass(ct, models.Model):
+            kwargs[f"{prefix}content_type"] = ContentType.objects.get_for_model(ct)
+        elif isinstance(ct, int):
+            kwargs[f"{prefix}content_type_id"] = ct
+        else:
+            raise ValueError(f"Invalid type for permission's content type: `{ct}`")
+        return kwargs
 
-    # FIXME: awaits for django.transaction async support
-    async def aget_or_create_many(self, items: Iterable[Capability]) -> models.Queryset:
-        """Async version of `get_or_create_many`."""
-        func = sync_to_async(self.get_or_create_many)
-        return await func(items)
+    def can(self, permissions: CanMany) -> CapabilityQuerySet:
+        """Filter using provided permission.
+
+        When permission is an iterable, it will perform an OR conditional statement
+        between all provided values.
+
+        :param permissions: permissions to filter.
+        """
+        if isinstance(permissions, (Permission, str, int, tuple)):
+            return self.filter(**self.can_one_lookup(permissions))
+
+        q = Q()
+        for perm in permissions:
+            q |= Q(**self.can_one_lookup(perm))
+        return self.filter(q)
+
+    def initials(self):
+        """Filter capabilities used as initial values of a Reference."""
+        return self.filter(reference__isnull=True)
 
 
 class Capability(models.Model):
-    """A single capability providing authorization for executing a single action.
+    """A single capability providing permission for executing a single action.
 
-    Capability can be derived a certain amount of times, which is specified by
-    :py:attr:`max_derive`. When this value is not specified (for exemple when
-    :py:meth:`derive` or :py:meth:`into`), it is always defaulted to 0 (thus disallowing
-    any further derivation).
+    It is linked to an object by a :py:class:`~.reference.Reference`. The reference
+    is the entry point for user to address/access the object. The capability represent
+    what he can do.
+
+    This model is provided as abstract model whose implementation MUST provide
+    a ``reference`` foreign key to a :py:class:`~.reference.Reference` (reverse
+    relation: `capabilities`). The foreign key is nullable, ``None`` have special
+    meaning: it represents default assigned capabilities to newly created root Reference instances. They can be fetched using :py:meth:`CapabilityQuerySet.get_initials`.
+
+    See :py:class:`~.reference.Reference` documentation for more information.
+
+    It is recommanded to ``select_related`` permission in order to read
+    :py:attr:`name` and :py:attr:`codename`.
+
+    Derivation
+    ----------
+
+    Capability can derived: it means the permission is shared to another agent.
+    To be allowed to share, :py:attr:`max_derive` must be greater than 0. When sharing
+    only a lower value is allowed to the new capability's field.
 
     Lets see what it does:
 
     .. code-block:: python
 
-        cap = Capability(name="read", max_derive=2)
+        from models import MyObject
+
+        permission = Permission.objects.all().first()
+        cap = MyObject.Capability(permission=permission, max_derive=2)
+        #  `cap` is not saved, we don't core to provide a reference for this example.
 
         # providing no max_derive defaults to 0
         cap_1 = cap.derive(0)
@@ -71,72 +146,71 @@ class Capability(models.Model):
 
         cap_2 = cap_1.derive()
         assert cap_2.max_derive == 0
-    
-
-    Capability are stored as unique for each action/max_derive pair. When requiring
-    to create multiple capabilities, one should use queryset's
-    :py:meth:`~CapabilityQuerySet.get_or_create_many`.
     """
 
-    IntoValue: tuple[str, int] | Capability | str
-    """Value types from which capability can be created from using class method
-    `into()`."""
-
-    name = models.CharField(_("Action"), max_length=32, db_index=True)
-    """ Action programmatic name. """
+    permission = models.ForeignKey(Permission, models.CASCADE)
+    """ Related permission """
     max_derive = models.PositiveIntegerField(_("Maximum Derivation"), default=0)
     """ Maximum allowed derivations. """
 
     objects = CapabilityQuerySet.as_manager()
 
     class Meta:
-        unique_together = (("name", "max_derive"),)
-
-    @staticmethod
-    def get_name(model, action):
-        """Return capability name for a specific model and action."""
-        return model._meta.db_alias + "_" + action
+        abstract = True
+        unique_together = (("reference", "permission_id"),)
 
     @classmethod
-    def into(cls, value: Capability.IntoValue):
-        """Return a Capability based on value.
+    def get_reference_class(cls):
+        """Return related Reference class."""
+        return cls.reference.field.related_model
 
-        Value formats: `name`, `(name, max_derive)`, `Capability`
-        (returned as is in this case)
-        """
-        if isinstance(value, tuple):
-            return cls(name=value[0], max_derive=value[1])
-        if isinstance(value, Capability):
-            return value
-        if isinstance(value, str):
-            return cls(name=value, max_derive=0)
-        raise NotImplementedError("Provided values are not supported")
+    @classmethod
+    def get_object_class(cls):
+        """Return related Object class."""
+        return cls.get_reference_class().target.field.related_model
 
     def can_derive(self, max_derive: None | int = None) -> bool:
         """Return True if this capability can be derived."""
         return self.max_derive > 0 and (max_derive is None or max_derive < self.max_derive)
 
-    def derive(self, max_derive: None | int = None) -> Capability:
+    def derive(self, max_derive: None | int = None, reference=None, **kwargs) -> Capability:
         """Derive a new capability from self (without checking existence in
         database).
 
         :param max_derive: when value is None, it will based the value on self's \
                 py:attr:`max_derive` minus 1.
+        :param **kwargs: extra initial argument of the new Capability
         :return the new unsaved Capability.
+
         :yield PermissionDenied: when Capability derivation is not allowed.
         """
+        # disallowed values as they are provided by self.
+        if "permission" in kwargs or "permission_id" in kwargs:
+            raise ValueError("Providing `permission_id` or `permission` is forbidden.")
+
+        if reference:
+            if reference.target != self.reference.target:
+                raise ValueError("New capability's reference must target the same object as current one's.")
+            kwargs["reference"] = reference
+
         if not self.can_derive(max_derive):
-            raise PermissionDenied(__("can not derive capability {name}").format(name=self.name))
+            raise PermissionDenied(__("Can not derive capability {}").format(self))
         if max_derive is None:
             max_derive = self.max_derive - 1
-        return Capability(name=self.name, max_derive=max_derive)
+
+        if "permission" in self.__dict__:
+            kwargs["permission"] = self.permission
+        else:
+            kwargs["permission_id"] = self.permission_id
+
+        return type(self)(max_derive=max_derive, **kwargs)
 
     def is_derived(self, capability: Capability = None) -> bool:
         """Return True if `capability` is derived from this one."""
-        return self.name == capability.name and self.can_derive(capability.max_derive)
+        return self.permission_id == capability.permission_id and self.can_derive(capability.max_derive)
 
     def __str__(self):
-        return 'Capability(pk={}, name="{}", max_derive={})'.format(self.pk, self.name, self.max_derive)
+        return f"{type(self).__name__}(pk={self.pk}, permission={self.permission_id}, max_derive={self.max_derive})"
 
     def __contains__(self, other: Capability):
         """Return True if other `capability` is derived from `self`."""
@@ -147,4 +221,4 @@ class Capability(models.Model):
             return False
         if self.pk and other.pk:
             return self.pk == other.pk
-        return self.name == other.name and self.max_derive == other.max_derive
+        return self.permission_id == other.permission_id and self.max_derive == other.max_derive

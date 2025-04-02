@@ -2,19 +2,46 @@ from __future__ import annotations
 
 import uuid
 from collections.abc import Iterable
+from typing import Any
 
-from django.core.exceptions import PermissionDenied
 from django.db import models
+from django.db.models import Q
+from django.contrib.auth.models import Permission
 from django.utils.translation import gettext_lazy as _
 
 from .agent import Agent
-from .capability import Capability, CapabilityQuerySet
-from .capability_set import BaseCapabilitySet
+from .capability import Capability, CapabilityQuerySet, CanMany
+from .capability_set import CapabilitySet
+from .nested import NestedBase
 
 __all__ = (
     "ReferenceQuerySet",
     "Reference",
 )
+
+
+class ReferenceBase(NestedBase):
+    nested_class = Capability
+
+    @classmethod
+    def create_nested_class(cls, new_class, name, attrs={}):
+        """Provide `reference` ForeignKey on nested Capability model."""
+        return super(ReferenceBase, cls).create_nested_class(
+            new_class,
+            name,
+            {
+                "reference": models.ForeignKey(
+                    new_class,
+                    models.CASCADE,
+                    null=True,
+                    blank=True,
+                    db_index=True,
+                    related_name="capabilities",
+                    verbose_name=_("Reference"),
+                ),
+                **attrs,
+            },
+        )
 
 
 class ReferenceQuerySet(models.QuerySet):
@@ -39,7 +66,7 @@ class ReferenceQuerySet(models.QuerySet):
     def ref(self, receiver: Agent | Iterable[Agent] | None, uuid: uuid.UUID) -> ReferenceQuerySet:
         """Reference by uuid and receiver(s).
 
-        Note that :py:param:`receiver` is provided as first parameter in order to enforce its usage. It however can be ``None``: this only
+        Note that ``receiver`` is provided as first parameter in order to enforce its usage. It however can be ``None``: this only
         should be used when queryset has already been filtered by receiver.
 
         :param receiver: the agent that retrieving the reference.
@@ -62,13 +89,32 @@ class ReferenceQuerySet(models.QuerySet):
             self = self.receiver(receiver)
         return self.filter(uuid__in=uuids)
 
-    def action(self, name: str) -> ReferenceQuerySet:
-        return self.filter(capabilities__name=name)
+    def can(self, permissions: CanMany) -> ReferenceQuerySet:
+        """Filter references with the provided permission(s).
 
-    def actions(self, names: str | Iterable[str]) -> ReferenceQuerySet:
-        if isinstance(names, str):
-            return self.action(names)
-        return self.filter(capabilities__name__in=names)
+        This call :py:meth:`.capability.CapabilityQuerySet.can`, using the same parameters. Providing
+        multiple values will make an OR conditional.
+
+        If you want to filter based on AND please use :py:meth:`can_all`.
+
+        :param permissions: permissions to look for
+        """
+        query = self.model.Capability.objects.can(permissions)
+        return self.filter(capabilities__in=query).distinct()
+
+    def can_all(self, permissions: CanMany) -> ReferenceQuerySet:
+        """
+        Filter references with all the provided permissions.
+
+        :param permissions: permissions to look for, same argument type as :py:meth:`.capability.CapabilityQuerySet.can`.
+        """
+        if isinstance(permissions, (Permission, int, tuple)):
+            return self.can(permissions)
+
+        q = Q()
+        for perm in permissions:
+            q &= Q(**CapabilityQuerySet.can_one_lookup(perm, "capability__permission__"))
+        return self.filter(q)
 
     def bulk_create(self, objs, *a, **kw):
         for obj in objs:
@@ -78,20 +124,45 @@ class ReferenceQuerySet(models.QuerySet):
     # TODO: bulk_update -> is_valid()
 
 
-# TODO:
-# - merge existing references
-class Reference(BaseCapabilitySet, models.Model):
-    """Reference are set of capabilities targeting a specific object. There are two kind of reference:
+class Reference(CapabilitySet, models.Model, metaclass=ReferenceBase):
+    """Reference are the entry point to access an :py:class:`Object`.
+
+    Reference provides a set of capabilities for specific receiver.
+    The concrete sub-model MUST provide the ``target`` foreign key to an
+    Object.
+
+    There are two kind of reference:
 
     - root: the root reference from which all other references to object
-      are derived. Created from the `create()` class method.
+      are derived. Created from the :py:meth:`create` class method.
     - derived: reference derived from root or another derived. Created
-      from the `derive()` class method.
+      from the :py:meth:`derive` method.
 
     This class enforce fields validation at `save()` and `bulk_create()`.
 
+    Concrete Reference and Capability
+    ---------------------------------
+
     This model is implemented as an abstract in order to have a reference
-    specific to each model (see `Object` abstract model).
+    specific to each model (see :py:class:`Object` abstract model).
+
+    The related :py:class:`Capability` subclass is created at the same
+    time as the concrete implementing reference model. The same mechanism
+    also applies on :py:class:`Object` for Reference, as they both use
+    base metaclass :py:class:`NestedBase`. They thus can be customized
+    if required as this example shows:
+
+    .. code-block:: python
+
+        from caps.models import Reference, Capability
+
+        class MyReference(Reference):
+            class Capability(Capability):
+                reference = models.ForeignKey(MyReference, models.CASCADE, null=True, related_name="capabilities")
+                # custom code here...
+
+            target = models.ForeignKey(MyObject, models.CASCADE)
+
     """
 
     uuid = models.UUIDField(_("Reference"), default=uuid.uuid4, db_index=True)
@@ -110,9 +181,14 @@ class Reference(BaseCapabilitySet, models.Model):
     """Reference chain's current depth."""
     receiver = models.ForeignKey(Agent, models.CASCADE)
     """Agent receiving capability."""
-    target = models.ForeignKey("ConcreteObject", models.CASCADE)
-    """Reference's target."""
-    capabilities = models.ManyToManyField(Capability, verbose_name=_("Capability"))
+    # target = models.ForeignKey("ConcreteObject", models.CASCADE)
+    # """Reference's target."""
+    expiration = models.DateTimeField(
+        _("Expiration"),
+        null=True,
+        blank=True,
+        help_text=_("Defines an expiration date after which the reference is not longer valid."),
+    )
 
     objects = ReferenceQuerySet.as_manager()
 
@@ -126,22 +202,23 @@ class Reference(BaseCapabilitySet, models.Model):
         return self.origin.receiver if self.origin else self.receiver
 
     @classmethod
-    def create(
-        cls,
-        emitter: Agent,
-        target: object,
-        capabilities: Iterable[Capability],
-        **kw,
-    ) -> Reference:
+    def create_root(cls, emitter: Agent, target: object, **kwargs) -> Reference:
         """Create and save a new root reference with provided capabilities."""
-        if "origin" in kw:
+        if "origin" in kwargs:
             raise ValueError(
                 'attribute "origin" can not be passed as an argument to ' "`create()`: you should use derive instead"
             )
 
-        self = cls(receiver=emitter, target=target, **kw)
+        self = cls(receiver=emitter, target=target, **kwargs)
         self.save()
-        self.capabilities.add(*capabilities)
+
+        # clone initial capabilities
+        capabilities = list(self.Capability.objects.initials())
+        for cap in capabilities:
+            cap.reference = self
+            cap.pk = None
+
+        self.Capability.objects.bulk_create(capabilities)
         return self
 
     def is_valid(self, raises: bool = False) -> bool:
@@ -149,6 +226,7 @@ class Reference(BaseCapabilitySet, models.Model):
         values.
 
         :returns True if valid, otherwise raise ValueError
+        :yield ValueError: when reference is invaldi
         """
         if self.origin:
             # if self.origin.receiver != self.emitter:
@@ -169,49 +247,47 @@ class Reference(BaseCapabilitySet, models.Model):
     def get_capabilities(self) -> CapabilityQuerySet:
         return self.capabilities.all()
 
-    def can(self, action: str | list[str], raises=False) -> bool:
-        """
-        Return wether an action is allowed.
-
-        :param action: action(s) to check on
-        :param raises: raise PermissionDenied instead of returning False
-        :yield PermissionDenied: action is not allowed.
-        """
-        kw = {"name": action} if isinstance(action, str) else {"name__in": action}
-        if not self.capabilities.filter(**kw).exists():
-            if raises:
-                raise PermissionDenied(f"{action} is not allowed")
-            return False
-        return True
-
     def derive(
         self,
-        receiver: Agent,
-        items: BaseCapabilitySet.DeriveItems = None,
-        update: bool = False,
+        receiver: Agent | int,
+        items: CapabilitySet.Caps = None,
+        raises: bool = False,
+        defaults: dict[str, Any] = {},
+        **kwargs,
     ) -> Reference:
-        """Derive this `CapabilitySet` from `self`.
+        """Create a new reference derived from self.
 
-        :param Agent receiver: receiver of the new reference
-        :param DeriveItems items: if provided, only derive those capabilities
-        :param bool update: update existing reference if it exists
+        :param items: select capabilities to be derived.
+        :param raises: raises PermissionDenied error instead of silent it.
+        :param defaults: Capability instances' initial arguments.
+        :param **kwargs: initial arguments of the new set.
         """
-        subset = None
-        if update:
-            queryset = self.objects.filter(origin=self, receiver=receiver, target=self.target)
-            subset = queryset.first()
+        kwargs = self._get_derived_kwargs(receiver, kwargs)
+        obj = type(self).objects.create(**kwargs)
+        capabilities = self.derive_caps(items, raises=raises, defaults={**defaults, "reference": obj})
+        self.Capability.objects.bulk_create(capabilities)
+        return obj
 
-        capabilities = self.derive_caps(items)
-        if subset is None:
-            subset = type(self)(
-                origin=self,
-                depth=self.depth + 1,
-                receiver=receiver,
-                target=self.target,
-            )
-        subset.save()
-        subset.capabilities.add(*capabilities)
-        return subset
+    async def aderive(
+        self, items: CapabilitySet.Caps = None, raises: bool = False, defaults: dict[str, Any] = {}, **kwargs
+    ) -> Reference:
+        """Async version of :py:meth:`derive`."""
+        kwargs = self._get_derived_kwargs(kwargs)
+        obj = await type(self).objects.acreate(**kwargs)
+        capabilities = self.derive_caps(items, raises=raises, defaults={**defaults, "reference": obj})
+        await self.Capability.objects.abulk_create(capabilities)
+        return obj
+
+    def _get_derived_kwargs(self, receiver: int | Agent, kwargs):
+        """Return initial argument for a derived reference from self."""
+        r_key = "receiver_id" if isinstance(receiver, int) else "receiver"
+        return {
+            **kwargs,
+            r_key: receiver,
+            "depth": self.depth + 1,
+            "origin": self,
+            "target": self.target,
+        }
 
     def save(self, *a, **kw):
         self.is_valid(raises=True)

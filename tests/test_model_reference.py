@@ -1,10 +1,68 @@
 import copy
 
 import pytest
-from django.core.exceptions import PermissionDenied
 
-from .app.models import ConcreteReference
+from .app.models import Reference
 from .conftest import assertCountEqual
+
+
+@pytest.mark.django_db(transaction=True)
+class TestReferenceQuerySet:
+    def test_emitter(self, agents):
+        for agent in agents:
+            for ref in Reference.objects.emitter(agent):
+                assert agent == ref.emitter, "for agent {}, ref: {}, ref.emitter: {}".format(
+                    agent.ref, ref, ref.emitter.ref
+                )
+
+    def test_receiver(self, agents):
+        for agent in agents:
+            for ref in Reference.objects.receiver(agent):
+                assert agent == ref.receiver, "for agent {}, ref: {}, ref.receiver: {}".format(
+                    agent.uuid, ref, ref.receiver.uuid
+                )
+
+    def test_ref(self, refs):
+        assert all(ref == Reference.objects.ref(ref.receiver, ref.uuid) for ref in refs)
+
+    def test_ref_wrong_agent(self, refs, agents):
+        for ref in refs:
+            for agent in agents:
+                if ref.receiver == agent:
+                    continue
+                with pytest.raises(Reference.DoesNotExist):
+                    Reference.objects.ref(agent, ref.uuid)
+
+    def test_refs(self, agents, refs):
+        for agent in agents:
+            items = {ref.uuid for ref in refs if ref.receiver == agent}
+            query = Reference.objects.refs(agent, items).values_list("uuid", flat=True)
+            assertCountEqual(items, list(query), "agent: " + str(agent.ref))
+
+    def test_refs_wrong_agent(self, agents, refs):
+        for agent in agents:
+            query = Reference.objects.refs(agent, set(ref.uuid for ref in refs if ref.receiver != agent))
+            assert not query.exists(), "agent: " + str(agent.ref)
+
+
+#
+#    def test_action(self, refs, refs_2, caps_2):
+#        action = caps_2[0].name
+#        query = Reference.objects.action(caps_2[0])
+#        assert all(r.can(action) for r in query)
+#
+#    def test_action_should_return_empty(self, refs, orphan_cap):
+#        assert not Reference.objects.action(orphan_cap.name)
+#
+#    def test_actions(self, refs, refs_2, caps_2):
+#        query = Reference.objects.actions(c.name for c in caps_2)
+#        for cap in caps_2:
+#            assert all(r.can(cap.name) for r in query)
+#
+#    def test_actions_should_return_empty(self, refs, orphan_cap):
+#        assert not Reference.objects.actions([orphan_cap.name])
+#
+# TODO: bulk_create, bulk_update
 
 
 @pytest.mark.django_db(transaction=True)
@@ -14,8 +72,8 @@ class TestReference:
         assert refs[1].is_valid()
         assert refs[0].is_valid()
 
-    def test_is_valid_invalid_depth(self, refs_3, refs_1):
-        ref = copy.copy(refs_1[0])
+    def test_is_valid_invalid_depth(self, refs_3, refs_2):
+        ref = copy.copy(refs_2[0])
         ref.depth = refs_3[0].depth
 
         # with exception
@@ -43,83 +101,35 @@ class TestReference:
         ref.target = objects[1]
         assert not refs[2].is_derived(ref)
 
-    # caps: caps_3 (used by refs_3
-    def test_create(self, refs, agents, caps_3):
-        capabilities = list(refs[0].get_capabilities())
-        assert agents[0] == refs[0].emitter
-        assert agents[0] == refs[0].receiver
-        assert 0 == refs[0].depth
-        assertCountEqual(caps_3, capabilities)
+    def test_create_root(self, user_agent, object, caps_3):
+        ref = Reference.create_root(user_agent, object)
+        assert ref.receiver == ref.emitter == user_agent
+        assert ref.origin is None
+        assertCountEqual(
+            ref.capabilities.all().values("permission_id", "max_derive"),
+            [{"permission_id": c.permission_id, "max_derive": c.max_derive} for c in caps_3],
+        )
 
-    def test_create_fail_origin(self, agents, objects, caps_1, refs):
+    def test_create_root_raise_with_origin(self, user_agent, object, refs):
         with pytest.raises(ValueError):
-            ConcreteReference.create(agents[0], objects[1], caps_1, origin=refs[0])
+            Reference.create_root(user_agent, object, origin=refs[0])
 
-    def test_derive(self):
-        raise NotImplementedError("test not done")
+    def test_derive(self, ref, group_agent):
+        obj = ref.derive(group_agent)
+        assert obj.origin == ref
+        assert obj.depth == ref.depth + 1
+        assert obj.receiver == group_agent
+        assert obj.emitter == ref.receiver
+        assertCountEqual(
+            obj.capabilities.all().values_list("permission_id", flat=True),
+            ref.capabilities.all().values_list("permission_id", flat=True),
+        )
 
-    def test_can(self, refs_1, caps_1):
-        ref = refs_1[0]
-        assert all(ref.can(c.name) for c in caps_1)
-
-    def test_can_raises_permission_denied(self, refs_1, orphan_cap):
-        ref = refs_1[0]
-        with pytest.raises(PermissionDenied):
-            ref.can(orphan_cap.name, raises=True)
-
-
-@pytest.mark.django_db(transaction=True)
-class TestReferenceQuerySet:
-    def test_emitter(self, agents):
-        for agent in agents:
-            for ref in ConcreteReference.objects.emitter(agent):
-                assert agent == ref.emitter, "for agent {}, ref: {}, ref.emitter: {}".format(
-                    agent.ref, ref, ref.emitter.ref
-                )
-
-    def test_receiver(self, agents):
-        for agent in agents:
-            for ref in ConcreteReference.objects.receiver(agent):
-                assert agent == ref.receiver, "for agent {}, ref: {}, ref.receiver: {}".format(
-                    agent.uuid, ref, ref.receiver.uuid
-                )
-
-    def test_ref(self, refs):
-        assert all(ref == ConcreteReference.objects.ref(ref.receiver, ref.uuid) for ref in refs)
-
-    def test_ref_wrong_agent(self, refs, agents):
-        for ref in refs:
-            for agent in agents:
-                if ref.receiver == agent:
-                    continue
-                with pytest.raises(ConcreteReference.DoesNotExist):
-                    ConcreteReference.objects.ref(agent, ref.uuid)
-
-    def test_refs(self, agents, refs):
-        for agent in agents:
-            items = {ref.uuid for ref in refs if ref.receiver == agent}
-            query = ConcreteReference.objects.refs(agent, items).values_list("uuid", flat=True)
-            assertCountEqual(items, list(query), "agent: " + str(agent.ref))
-
-    def test_refs_wrong_agent(self, agents, refs):
-        for agent in agents:
-            query = ConcreteReference.objects.refs(agent, set(ref.uuid for ref in refs if ref.receiver != agent))
-            assert not query.exists(), "agent: " + str(agent.ref)
-
-    def test_action(self, refs, refs_2, caps_2):
-        action = caps_2[0].name
-        query = ConcreteReference.objects.action(caps_2[0])
-        assert all(r.can(action) for r in query)
-
-    def test_action_should_return_empty(self, refs, orphan_cap):
-        assert not ConcreteReference.objects.action(orphan_cap.name)
-        
-    def test_actions(self, refs, refs_2, caps_2):
-        query = ConcreteReference.objects.actions(c.name for c in caps_2)
-        for cap in caps_2:
-            assert all(r.can(cap.name) for r in query)
-
-    def test_actions_should_return_empty(self, refs, orphan_cap):
-        assert not ConcreteReference.objects.actions([orphan_cap.name])
-        
-    # TODO: bulk_create, bulk_update
+    def test__get_derived_kwargs(self, ref, group_agent):
+        assert ref._get_derived_kwargs(group_agent, {"a": 123}) == {
+            "a": 123,
+            "receiver": group_agent,
+            "depth": ref.depth + 1,
+            "origin": ref,
+            "target": ref.target,
+        }

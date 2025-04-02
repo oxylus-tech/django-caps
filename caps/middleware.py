@@ -41,7 +41,7 @@ class AgentMiddleware:
         if cookie:
             # we iterate over agents instead of fetching extra queryset
             # this keeps cache for further operations.
-            agent = next((r for r in agents if r.ref == cookie), None)
+            agent = next((r for r in agents if r.uuid == cookie), None)
             if agent:
                 return agent
 

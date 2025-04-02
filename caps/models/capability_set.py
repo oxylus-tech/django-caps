@@ -1,30 +1,43 @@
 from __future__ import annotations
 from collections.abc import Iterable
+from typing import Any
 
 from django.core.exceptions import PermissionDenied
+from django.contrib.auth.models import Permission
 from django.utils.translation import gettext as __
 
 from .capability import Capability
 
-__all__ = ("BaseCapabilitySet", "CapabilitySet")
+__all__ = ("CapabilitySet",)
 
 
-class BaseCapabilitySet:
-    """Base class to handle set of capabilities."""
+class CapabilitySet:
+    """Base class to handle set of capabilities.
 
-    DeriveItems: Iterable[Capability.IntoValue]
-    """Type from which set can be derived from."""
+    This class should not be used per se.
+    """
+
+    Capability: type[Capability] | Permission
+    """Capability class to use. It must be set in order to use CapabilitySet. """
+    Cap: int | tuple[int, int]
+    """
+    Capability information, as tuple of ``(permission_id, max_derive)`` or single permission
+    id (then ``max_derive is None``).
+    """
+    Caps: Iterable[CapabilitySet.Cap]
+    """ Many capability information. """
     capabilities: Iterable[Capability] = None
+    """ Capabilities contained in the CapabilitySet. """
 
     def get_capabilities(self) -> Iterable[Capability]:
         return self.capabilities
 
-    # TODO: test
-    def get_capability(self, name: str) -> Capability | None:
+    # FIXME: remove?
+    def get_capability(self, codename: str) -> Capability | None:
         """Get capability by name or None."""
-        return next((r for r in self.get_capabilities() if r.name == name), None)
+        return next((r for r in self.get_capabilities() if r.codename == codename), None)
 
-    def is_derived(self, other: BaseCapabilitySet) -> bool:
+    def is_derived(self, other: CapabilitySet) -> bool:
         """Return True if `capabilities` iterable is a subset of self.
 
         Set is a subset of another one if and only if:
@@ -32,55 +45,69 @@ class BaseCapabilitySet:
           (cf. `Capability.is_subset`)
         - there is no capability inside subset that are not in set.
         """
-        items = other.get_capabilities()
-        capabilities = {c.name: c for c in self.get_capabilities()}
-        for item in items:
-            capability = capabilities.get(item.name)
+        capabilities = {c.permission_id: c for c in self.get_capabilities()}
+        for item in other.get_capabilities():
+            capability = capabilities.get(item.permission_id)
             if not capability or not capability.is_derived(item):
                 return False
         return True
 
-    def derive_caps(self, items: BaseCapabilitySet.DeriveItems = None, raises: bool = False) -> list[Capability]:
-        """Derive all capabilities from this set using provided optionnal
-        iterator.
+    def create_capability(self, cap: CapabilitySet.Cap, **kwargs) -> CapabilitySet.Capability:
+        """Create a single (unsaved) capability.
 
-        If `items` is not provided, derive capabilities from self, without
-        allowing them to be shared.
-
-        :param items: subset of capabilities to derive;
-        :param raises: whether to skip silently denied derivation or raises PermissionDenied 
-        :return an array of saved Capability instances.
-        :yield PermissionDenied: on :py:param:`raises` on unallowed derivations.
+        :param cap: capability information
+        :param **kwargs: extra initial arguments
+        :return the new unsaved capability instance.
         """
-        if items is None:
-            items = [r.derive(max_derive=0) for r in self.get_capabilities() if r.can_derive(0)]
-        else:
-            items = self._derive_caps(self.get_capabilities(), items, raises)
-        return Capability.objects.get_or_create_many(items) if items else None
+        perm_id, kwargs = self.get_capability_kwargs(cap, {**kwargs, "reference": self})
+        return self.Capability(permission_id=perm_id, **kwargs)
 
-    # async def aderive_caps(self, items: DeriveItems = None)
-    #       -> list[Capability]:
-    #     """
-    #     Async version of `derive_caps`.
-    #     """
-    #     if items is None:
-    #         items = [r.derive(max_derive=0) for r in self.get_capabilities()
-    #                  if r.can_derive(0)]
-    #     else:
-    #         items = self._derive_caps(self.get_capabilities(), items)
-    #     return Capability.objects.get_or_create_many(items)
+    def create_capabilities(self, caps: CapabilitySet.Caps, **kwargs) -> list[CapabilitySet.Capability]:
+        """Create multiple capabilities based on descriptors.
 
-    def _derive_caps(self, source: Iterable[Capability], items: BaseCapabilitySet.DeriveItems, raises: bool = False) -> list[Capability]:
-        """Derive capabilities using given dict of parents."""
-        by_name = {r.name: r for r in source}
+        :param caps: capabilities' informations
+        :param **kwargs: extra initial arguments
+        :return a list of unsaved capabilities instances.
+        """
+        return [self.create_capability(cap, **kwargs) for cap in caps]
+
+    def derive_caps(
+        self, caps: CapabilitySet.Caps | None = None, raises: bool = False, defaults: dict[str, Any] = {}
+    ) -> list[Capability]:
+        """Derive capabilities from this set.
+
+        When `caps` is provided, it will only derive allowed derivations for declared capabilities.
+
+        When `caps` is not provided, it derives all allowed capabilities of the set.
+
+        The created capabilities are not saved to the db.
+
+        :param source: capabilities to derive
+        :param caps: specify which capabilities to derive
+        :param raises: if True, raise exception when there are denied derivation.
+        :param defaults: initial arguments to pass to all generated capabilities.
+        :return the list of derived capabilities.
+        :yield PermissionDenied: when there are unauthorized derivation and :py:param:`raises` is True.
+        """
+        if caps is None:
+            defaults = {"max_derive": 0, **defaults}
+            return [c.derive(**defaults) for c in self.get_capabilities() if c.can_derive(defaults["max_derive"])]
+
+        by_perm = {c.permission_id: c for c in self.get_capabilities()}
         derived, denied = [], []
-        for item in items:
-            item = Capability.into(item)
-            capability = by_name.get(item.name)
-            if not capability or not capability.is_derived(item):
-                denied.append(item.name)
-            else:
-                derived.append(item)
+        for cap in caps:
+            perm_id, kwargs = self.get_capability_kwargs(cap, defaults)
+            capability = by_perm.get(perm_id)
+            try:
+                if capability is None:
+                    raise PermissionDenied("")
+
+                # we always use Capability.derive in order to ensure custom
+                # implementations.
+                obj = capability.derive(**kwargs)
+                derived.append(obj)
+            except PermissionDenied:
+                denied.append(str(cap))
 
         if raises and denied:
             raise PermissionDenied(
@@ -88,24 +115,20 @@ class BaseCapabilitySet:
             )
         return derived
 
-
-class CapabilitySet(BaseCapabilitySet):
-    def __init__(self, capabilities: Iterable[Capability]):
-        self.capabilities = capabilities and list(capabilities) or []
-
-    def derive(self, items: BaseCapabilitySet.DeriveItems = None, **init_kwargs) -> CapabilitySet:
-        """Derive this `CapabilitySet` from `self`.
-
-        Dont save new capabilities of new subset.
+    def get_capability_kwargs(self, cap: CapabilitySet.Cap, defaults: dict[str, Any]) -> tuple[int, dict[str, Any]]:
         """
-        capabilities = self.derive_caps(items)
-        # capabilities = Capability.objects.bulk_create_many(capabilities)
-        return type(self)(capabilities, **init_kwargs)
+        From provided ``cap`` description, return a tuple with permission id and :py:meth:`Capability.derive` arguments.
 
-    async def aderive(self, items: Capability.DeriveItems = None, **init_kwargs) -> CapabilitySet:
-        """Async version of `derive`."""
-        capabilities = await self.aderive_caps(items)
-        # capabilities = await Capability.objects \
-        #                                .abulk_create_many(capabilities)
-        # capabilities = (r async for r in capabilities)
-        return type(self)(capabilities, **init_kwargs)
+        We return a tuple because permission id can not be provided
+        to the derive method.
+
+        :param cap: the capability descriptor;
+        :param **kwargs: extra arguments to pass down to the method;
+        """
+        if isinstance(cap, tuple):
+            perm_id, max_derive = cap
+        elif isinstance(cap, int):
+            perm_id, max_derive = cap, None
+        else:
+            raise ValueError(f"Invalid value for `cap`: {cap}")
+        return perm_id, {"max_derive": max_derive, **defaults}

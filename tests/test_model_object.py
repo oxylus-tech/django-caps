@@ -2,61 +2,9 @@
 # TestObjectQuerySet -> inherit from TestBaseReference
 import pytest
 
-from caps.models import Reference
-from caps.models.object import Object, ObjectBase
 
-from .app.models import AbstractObject, ConcreteObject
+from .app.models import ConcreteObject
 from .conftest import assertCountEqual
-
-__all__ = (
-    "TestObjectManager",
-    "TestObjectQuerySet",
-)
-
-
-class Meta:
-    app_label = "tests.app"
-
-
-class TestObjectManager:
-    def test_get_reference_class_from_attrs(self):
-        result = ObjectBase.get_reference_class("test", (Object,), attrs={"Reference": Reference})
-        assert Reference is result
-
-    def test_get_reference_class_from_attrs_fail_reference_not_subclass(self):
-        with pytest.raises(ValueError):
-            ObjectBase.get_reference_class(
-                "Test",
-                (Object,),
-                attrs={"Reference": object, "__module__": self.__module__},
-            )
-
-    def test_get_reference_class_from_bases(self):
-        result = ObjectBase.get_reference_class(
-            "Test1",
-            (
-                AbstractObject,
-                ConcreteObject,
-            ),
-            attrs={"__module__": "tests.app"},
-        )
-        assert AbstractObject.Reference is not result, "result should not return an abstract class"
-        assert ConcreteObject.Reference is result
-
-    def test_new_with_reference(self):
-        result = ObjectBase.__new__(
-            ObjectBase,
-            "Test2",
-            (ConcreteObject,),
-            {"__module__": "tests.app", "Meta": Meta},
-        )
-        assert issubclass(result, ConcreteObject)
-        assert issubclass(result.Reference, Reference)
-
-    def test_new_generate_reference(self):
-        result = ObjectBase.__new__(ObjectBase, "Test3", (Object,), {"__module__": "tests.app", "Meta": Meta})
-        assert issubclass(result, Object)
-        assert issubclass(result.Reference, Reference)
 
 
 class TestObjectQuerySet:

@@ -1,7 +1,7 @@
-django-caps
+Django-Caps
 ===========
 
-django-caps provides capability based object permission system for Django applications.
+Django-Caps provides capability based object permission system for Django applications.
 This project is inspired by `Capn'Proto documentation <https://capnproto.org>`
  (`interesting paper <http://www.erights.org/elib/capability/ode/ode.pdf>`).
 

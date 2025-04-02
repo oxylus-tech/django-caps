@@ -9,90 +9,99 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from .agent import Agent
-from .reference import Reference
+from .reference import Reference, ReferenceQuerySet
+from .nested import NestedBase
 
 __all__ = ("ObjectBase", "ObjectQuerySet", "Object")
 
 
-class ObjectBase(models.base.ModelBase):
+class ObjectBase(NestedBase):
     """Metaclass for Object model classes.
 
     It subclass Reference if no `Reference` member is provided.
     """
 
+    nested_class = Reference
+
+    def __new__(mcls, name, bases, attrs):
+        cls = super(ObjectBase, mcls).__new__(mcls, name, bases, attrs)
+        setattr(cls, "Capability", cls.Reference.Capability)
+        return cls
+
     @classmethod
-    def get_reference_class(cls, name, bases, attrs):
-        """Return the reference class to self."""
-        reference_class = attrs.get("Reference")
-        if not reference_class:
-            bases = (b for b in bases if hasattr(b, "_meta") and not b._meta.abstract)
-            items = (r for r in (getattr(b, "Reference", None) for b in bases) if issubclass(r, Reference))
-            reference_class = next(items, None)
-        elif not issubclass(reference_class, Reference):
-            raise ValueError("{} Reference member must be a subclass " "of `fox.caps.models.Reference`".format(name))
-        return reference_class
-
-    def __new__(cls, name, bases, attrs, **kwargs):
-        reference_class = cls.get_reference_class(name, bases, attrs)
-        new_class = super(ObjectBase, cls).__new__(cls, name, bases, attrs, **kwargs)
-        if new_class._meta.abstract:
-            return new_class
-
-        if reference_class is None:
-            meta_class = Reference.__class__
-            reference_class = meta_class.__new__(
-                meta_class,
-                name + "Reference",
-                (Reference,),
-                {
-                    "target": models.ForeignKey(
-                        new_class,
-                        models.CASCADE,
-                        db_index=True,
-                        related_name="reference_set",
-                        verbose_name=_("Target"),
-                    ),
-                    "__module__": new_class.__module__,
-                },
-            )
-            setattr(new_class, "Reference", reference_class)
-        return new_class
+    def create_nested_class(cls, new_class, name, attrs={}):
+        """Provide `target` ForeignKey on nested Reference model."""
+        return super(ObjectBase, cls).create_nested_class(
+            new_class,
+            name,
+            {
+                "target": models.ForeignKey(
+                    new_class,
+                    models.CASCADE,
+                    db_index=True,
+                    related_name="reference_set",
+                    verbose_name=_("Target"),
+                ),
+                **attrs,
+            },
+        )
 
 
-# TODO: tests
 class ObjectQuerySet(models.QuerySet):
     """QuerySet for Objects."""
 
     def receiver(self, receiver: Agent | Iterable[Agent]) -> ObjectQuerySet:
         """Filter object for provided."""
         refs = self.models.Reference.objects.receiver(receiver)
-        return self._select_references(refs)
+        return self.with_refs(refs)
 
-    def ref(self, receiver: Agent | Iterable[Agent] | None, uuid: UUID) -> ObjectQuerySet:
-        """Return reference for provided receiver and ref.
+    def ref(
+        self, receiver: Agent | Iterable[Agent] | None, uuid: UUID, refs: ReferenceQuerySet | None = None
+    ) -> ObjectQuerySet:
+        """Return reference for provided receiver and uuid.
+
+        This method annotates the Object with ``agent_reference_set`` whose value
+        is set to relevant reference(s). This allows to use :py:attr:`reference` property.
 
         Please refer to :py:meth:`ReferenceQuerySet.ref` for more information.
+
+        :param receiver: the reference's receiver
+        :param uuid: reference uuid
+        :param refs: use this reference QuerySet
         """
-        refs = self.model.Reference.objects.refs(receiver, [uuid])
-        return self._select_references(refs).get()
+        if refs is None:
+            refs = self.model.Reference.objects
+        refs = refs.refs(receiver, [uuid])
+        return self.with_refs(refs).get()
 
-    def refs(self, receiver: Agent | Iterable[Agent] | None, uuids: Iterable[UUID]) -> ObjectQuerySet:
-        """Return references for provided receiver and refs.
+    def refs(
+        self,
+        receiver: Agent | Iterable[Agent] | None,
+        uuids: Iterable[UUID],
+        refs: ReferenceQuerySet | None = None,
+    ) -> ObjectQuerySet:
+        """Return references for provided receiver and uuids.
 
-        Please refer to :py:meth:`ReferenceQuerySet.refs` for more information.
+        Please refer to :py:meth:`ref` and :py:meth:`ReferenceQuerySet.refs` for more information.
+
+        :param receiver: the reference's receiver
+        :param uuids: reference uuids
+        :param refs: use this reference QuerySet
         """
-        refs = self.model.Reference.objects.refs(receiver, uuids)
-        return self._select_references(refs)
+        if refs is None:
+            refs = self.model.Reference.objects
+        refs = refs.refs(receiver, uuids)
+        return self.with_refs(refs)
 
-    def _select_references(self, refs_queryset: models.QuerySet) -> ObjectQuerySet:
-        """Prefetch provided references Add references prefetch for objects."""
+    def with_refs(self, refs_queryset: models.QuerySet) -> ObjectQuerySet:
+        """Prefetch provided references. Add references prefetch for objects."""
         fk_field = self.model.Reference._meta.get_field("target")
         lookup = fk_field.remote_field.get_accessor_name()
-        prefetch = Prefetch(lookup, refs_queryset, "_agent_reference_set")
+        prefetch = Prefetch(lookup, refs_queryset, "agent_reference_set")
         refs = refs_queryset.filter(target=OuterRef("pk"))
         return (
             self.annotate(reference_id=Subquery(refs.values("id")[:1]))
-            .exclude(reference_id__isnull=True)
+            .filter(reference_id__isnull=False)
             .prefetch_related(prefetch)
         )
 
@@ -104,15 +113,17 @@ class Object(models.Model, metaclass=ObjectBase):
     `caps.models.Reference`) that is used as object's specific
     reference. If none is provided, a it will be generated automatically
     for concrete classes.
+
+    The ``Capability`` concrete model class will be set at creation, when
+    the related :py:class:`Reference` is created.
+
+    This provides:
+
+        - :py:class:`Reference` concrete model accessible from the :py:class:`Object` concrete subclass;
+        - :py:class:`Capability` concrete model accessible from the :py:class:`Object` concrete subclass;
     """
 
     objects = ObjectQuerySet.as_manager()
-
-    # _agent_reference_set = None
-    # """QuerySet of references matching current object for an agent.
-    #
-    # Provided by ObjectQuerySet's `ref()`, `refs()`, otherwise None.
-    # """
 
     class Meta:
         abstract = True
@@ -121,4 +132,5 @@ class Object(models.Model, metaclass=ObjectBase):
     def reference(self):
         """Return Reference to this object for receiver provided to
         ObjectQuerySet's `ref()` or `refs()`."""
-        return self._agent_reference_set and self._agent_reference_set[0] or None
+        ref_set = getattr(self, "agent_reference_set", None)
+        return ref_set and ref_set[0] or None
