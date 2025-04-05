@@ -61,6 +61,9 @@ class ViewSetMixin(mixins.SingleObjectMixin):
         defaults = {key: super(ViewSetMixin, cls).get_can_all_q(perms) for key, perms in cls.can.items()}
         return {**defaults, **can}
 
+    def get_reference_q(self):
+        return super().get_reference_q()[self.action]
+
 
 class ObjectViewSet(ViewSetMixin, viewsets.ModelViewSet):
     pass

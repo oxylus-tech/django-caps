@@ -1,4 +1,6 @@
-from .models import Agent, Object, Reference
+from django.db.models import Q
+
+from .models import Agent, Object, Reference, ReferenceQuerySet
 from .models.capability import CanMany
 
 
@@ -36,12 +38,12 @@ class ObjectMixin:
     def get_agents(self) -> Agent | list[Agent]:
         return self.request.agents if self.all_agents else self.request.agent
 
-    def get_reference_queryset(self):
+    def get_reference_queryset(self) -> ReferenceQuerySet:
         """Return reference queryset used to select objects."""
         return self.get_reference_class().object.receiver(self.agents)
 
     @classmethod
-    def get_reference_class(cls):
+    def get_reference_class(cls) -> type[Reference]:
         """Return reference class used to create reference for object."""
         if not cls.reference_class:
             try:
@@ -72,7 +74,7 @@ class ObjectPermissionMixin(ObjectMixin):
     """
 
     @classmethod
-    def get_can_all_q(cls, can: CanMany | None = None):
+    def get_can_all_q(cls, can: CanMany | None = None) -> Q:
         """Retun Permission q object.
 
         This is a class method because it is meaned to optimize reference lookup by caching at class level
@@ -81,12 +83,18 @@ class ObjectPermissionMixin(ObjectMixin):
         can = can or cls.can
         return cls.get_reference_class().objects.can_all_q(can)
 
-    def get_reference_queryset(self):
+    def get_reference_queryset(self) -> ReferenceQuerySet:
         """Return queryset for references."""
+        q = self.get_reference_q()
+        query = super().get_reference_queryset()
+        return query.filter(q) if q else query
+
+    def get_reference_q(self) -> Q|None:
+        """ """
         cls = type(self)
         if not hasattr(cls, "_permissions_q"):
             setattr(cls, "_permissions_q", cls.get_can_all_q())
-        return super().get_reference_queryset().filter(cls._permissions_q)
+        return cls._permissions_q
 
 
 class SingleObjectMixin(ObjectPermissionMixin):
@@ -98,7 +106,7 @@ class SingleObjectMixin(ObjectPermissionMixin):
     lookup_url_kwargs = "uuid"
     """ URL's kwargs argument used to retrieve reference uuid. """
 
-    def get_reference_queryset(self):
+    def get_reference_queryset(self) -> ReferenceQuerySet:
         uuid = self.kwargs[self.lookup_url_kwargs]
         return self.get_reference_queryset().filter(uuid=uuid)
 
@@ -117,7 +125,8 @@ class ObjectDetailMixin(SingleObjectMixin):
 class ObjectCreateMixin(SingleObjectMixin):
     can = "add"
 
-    def create_reference(self, emitter: Agent, target: Object):
+    def create_reference(self, emitter: Agent, target: Object) -> Reference:
+        """ Create a new root reference to the object """
         cls = self.get_reference_class()
         ref = cls.objects.create_root(emitter, target)
         setattr(object, "reference", ref)

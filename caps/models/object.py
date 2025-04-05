@@ -36,7 +36,7 @@ class ObjectBase(NestedBase):
                     new_class,
                     models.CASCADE,
                     db_index=True,
-                    related_name="reference_set",
+                    related_name="references",
                     verbose_name=_("Target"),
                 ),
                 **attrs,

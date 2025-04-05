@@ -212,6 +212,8 @@ class Reference(CapabilitySet, models.Model, metaclass=ReferenceBase):
             raise ValueError(
                 'attribute "origin" can not be passed as an argument to ' "`create()`: you should use derive instead"
             )
+        if target.references.exists():
+            raise ValueError(f"A reference already exists for this object.")
 
         self = cls(receiver=emitter, target=target, **kwargs)
         self.save()

@@ -114,6 +114,10 @@ class TestReference:
         with pytest.raises(ValueError):
             Reference.create_root(user_agent, object, origin=refs[0])
 
+    def test_create_root_raise_with_reference_already_present(self, user_agent, object, ref):
+        with pytest.raises(ValueError):
+            Reference.create_root(user_agent, object)
+
     def test_derive(self, ref, group_agent):
         obj = ref.derive(group_agent)
         assert obj.origin == ref
