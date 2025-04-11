@@ -6,6 +6,7 @@ from typing import Any
 
 from django.db import models
 from django.db.models import Q
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from .agent import Agent
@@ -107,15 +108,18 @@ class ReferenceQuerySet(models.QuerySet):
 
         :param permissions: permissions to look for, same argument type as :py:meth:`.capability.CapabilityQuerySet.can`.
         """
-        return self.filter(self.can_all_q(permissions))
+        for q in self.can_all_q(permissions):
+            self = self.filter(q)
+        return self
 
-    def can_all_q(self, permissions: CanMany | None) -> Q:
+    def can_all_q(self, permissions: CanMany | None) -> list[Q]:
         """Return Q lookup for all permissions."""
-        return self.model.Capability.objects.can_all_lookup(
-            permissions, "capability__permission__", model=self.model.get_object_class()
+        return CapabilityQuerySet.can_all_q(
+            permissions, "capabilities__permission__", model=self.model.get_object_class()
         )
 
     def bulk_create(self, objs, *a, **kw):
+        """Check that objects are valid when saving models in bulk."""
         for obj in objs:
             obj.is_valid()
         return super().bulk_create(objs, *a, **kw)
@@ -294,6 +298,17 @@ class Reference(CapabilitySet, models.Model, metaclass=ReferenceBase):
             "origin": self,
             "target": self.target,
         }
+
+    def get_absolute_url(self) -> str:
+        """
+        Return url to the related object.
+
+        :yield ValueError: when related object class has no `detail_url_name` provided.
+        """
+        url_name = self.target.detail_url_name
+        if not url_name:
+            raise ValueError("Missing attribute `detail_url_name` on target object.")
+        return reverse(url_name, kwargs={"uuid": self.uuid})
 
     def save(self, *a, **kw):
         self.is_valid(raises=True)

@@ -2,6 +2,7 @@ import pytest
 import unittest
 
 from django.contrib.auth.models import Group, User, Permission
+from django.test import RequestFactory
 
 from caps.models import Agent, CapabilitySet
 from .app.models import Capability, ConcreteObject, Reference
@@ -12,6 +13,16 @@ __all__ = ("assertCountEqual",)
 
 test_case = unittest.TestCase()
 assertCountEqual = test_case.assertCountEqual
+
+
+req_factory = RequestFactory()
+
+
+def init_request(req, agent, agents):
+    """Initialize request."""
+    setattr(req, "agent", agent)
+    setattr(req, "agents", agents)
+    return req
 
 
 # -- Agent

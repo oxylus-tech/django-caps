@@ -1,3 +1,4 @@
+from django.db.models import Q
 from rest_framework import generics, viewsets
 
 from ..models.capability import CanMany
@@ -19,7 +20,7 @@ class ObjectListAPIView(mixins.ObjectListMixin, generics.ListAPIView):
     pass
 
 
-class ObjectRetrieveAPIView(mixins.ObjectDetailMixin, generics.DetailAPIView):
+class ObjectRetrieveAPIView(mixins.ObjectDetailMixin, generics.RetrieveAPIView):
     pass
 
 
@@ -44,25 +45,19 @@ class ViewSetMixin(mixins.SingleObjectMixin):
     """
 
     can: dict[str, CanMany] = {
-        "list": ObjectListAPIView.actions,
-        "retrieve": ObjectRetrieveAPIView.actions,
-        "create": ObjectCreateAPIView.actions,
-        "update": ObjectUpdateAPIView.actions,
-        "destroy": ObjectDestroyAPIView.actions,
+        "list": ObjectListAPIView.can,
+        "retrieve": ObjectRetrieveAPIView.can,
+        "create": ObjectCreateAPIView.can,
+        "update": ObjectUpdateAPIView.can,
+        "destroy": ObjectDestroyAPIView.can,
     }
     """ Map of ViewSet actions to references' ones. """
 
-    def get_action(self):
-        return self.actions.get(self.action)
-
-    @classmethod
-    def get_can_all_q(cls, can: CanMany | None):
-        can = can or {}
-        defaults = {key: super(ViewSetMixin, cls).get_can_all_q(perms) for key, perms in cls.can.items()}
-        return {**defaults, **can}
-
-    def get_reference_q(self):
-        return super().get_reference_q()[self.action]
+    def get_can_all_q(self) -> list[Q]:
+        """ Return Q object for filtering reference on :py:attr:`can` attribute and current request action. """
+        cls = self.get_reference_class()
+        can = self.can and self.can.get(self.action)
+        return self._get_can_all_q(cls, can) if can else []
 
 
 class ObjectViewSet(ViewSetMixin, viewsets.ModelViewSet):

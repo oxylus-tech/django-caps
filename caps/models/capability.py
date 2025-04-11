@@ -1,7 +1,6 @@
 from __future__ import annotations
 import inspect
 from collections.abc import Iterable
-import operator
 from typing import TypeAlias
 
 from django.core.exceptions import PermissionDenied
@@ -15,19 +14,19 @@ from django.utils.translation import gettext_lazy as _
 __all__ = ("CapabilityQuerySet", "Capability")
 
 
-CanOne: TypeAlias = Permission | int | tuple[str, int | ContentType | type]
+CanOne: TypeAlias = Permission | str | int | tuple[str, ContentType | type]
 """
-Describe lookup for a capability's permission.
+Describe lookup for a capability's permission. It is used by :py:meth:`CapabilityQuerySet.can` and all related methods (:py:meth:`CapabilityQuerySet.can_one_lookup`, :py:meth:`CapabilityQuerySet.can_q`, etc.)
 
 It either can be:
 
     - A Permission or a permission id;
-    - A tuple with Permission codename, and content type (id, \
-      ContentType instance, or model class);
-    - An action, that will be constructed with provided model, such as:
-      ``permission_codename = f"{action}_{model_name}"``.
+    - A tuple with Permission action, and content type (ContentType instance, or model class);
+    - A single action combined with provided `model` argument.
 
-It is used by :py:meth:`CapabilityQuerySet.can`
+An action is the part of the Django's ``Permission.codename`` specifying a verb. Based on the provided model
+(or content type), the codename will be constructed as: ``permission_codename = f"{action}_{model_name}"``.
+
 """
 CanMany: TypeAlias = CanOne | Iterable[CanOne]
 """
@@ -38,42 +37,65 @@ It is used by :py:meth:`CapabilityQuerySet.can`
 
 
 class CapabilityQuerySet(models.QuerySet):
-    """Queryset and manager used by Capability models."""
+    """
+    Queryset and manager used by Capability models.
 
-    def can(self, *args, **kwargs) -> CapabilityQuerySet:
+    It provide `can` filter method + other utilities methods
+    in order to build up filter's lookups (used by :py:class:`~.reference.Reference`).
+    """
+
+    def can(self, permissions: CanMany | None) -> CapabilityQuerySet:
         """Filter using provided permission(s).
 
-        For parameters, look up to :py:meth:`can_many_lookup`.
+        Permissions provided as action string are matched with capability's concrete :py:class:`~.object.Object` model:
+
+        .. code-block::
+
+            # We assume: app.MyObject <- Reference <- Capability
+
+            # Look up for `app.view_myobject`.
+            query = Capability.objects.can("view")
+
+            # Look up for capabilities with an OR joint on permissions.
+            permission = Permission.objects.all().first()
+            query = Capability.objects.can((
+                'view',
+                # with an instance of permission
+                permission,
+                # with an action and some other model
+                ('change', SomeModel),
+            ))
+
+        :param permissions: the permissions to look for.
+        :yield: from :py:meth:`can_one_lookup`.
         """
-        return self.filter(self.can_q(*args, **kwargs))
+        return self.filter(self.can_q(permissions, model=self.model.get_object_class()))
 
     @classmethod
-    def can_all_q(cls, *args, **kwargs):
+    def can_all_q(cls, permissions: CanMany, prefix: str = "permission__", model: type | None = None) -> list[Q]:
         """Shortcut to :py:meth:`can_many_lookup` with ``&`` operator."""
-        return cls.can_q(*args, op=operator.and_, **kwargs)
+        if isinstance(permissions, (Permission, str, int, tuple)):
+            return [Q(**cls.can_one_lookup(permissions, prefix, model))]
+
+        return [Q(**cls.can_one_lookup(perm, prefix, model)) for perm in permissions]
 
     @classmethod
-    def can_q(
-        cls, permissions: CanMany | None, prefix: str = "permission__", model: type | None = None, op=operator.or_
-    ):
+    def can_q(cls, permissions: CanMany, prefix: str = "permission__", model: type | None = None) -> Q:
         """
-        Return Q lookup for multiple permissions, joined using the provided operator.
+        Return Q lookup for multiple permissions, joined using `|`.
 
         It uses result of :py:meth:`can_one_lookup`.
 
         :param permissions: the permissions to look for.
         :param prefix: passed down to :py:meth:`can_one_lookup`.
         :param model: passed down to :py:meth:`can_one_lookup`.
-        :param op: operator to use (default to `|`)
         """
-        if isinstance(permissions, (Permission, int, tuple)):
-            return Q(**cls.can_one_lookup(permissions))
+        if isinstance(permissions, (Permission, str, int, tuple)):
+            return Q(**cls.can_one_lookup(permissions, prefix, model))
 
         q = Q()
-        if permissions:
-            for perm in permissions:
-                q_ = Q(**cls.can_one_lookup(perm, "capability__permission__"))
-                q = op(q, q_)
+        for perm in permissions:
+            q |= Q(**cls.can_one_lookup(perm, prefix, model))
         return q
 
     @staticmethod
@@ -95,25 +117,19 @@ class CapabilityQuerySet(models.QuerySet):
         elif isinstance(permission, int):
             return {f"{prefix}id": permission}
         elif isinstance(permission, str):
-            ct = ContentType.objects.get_for_model(model)
-            return {
-                f"{prefix}codename": f"{permission}_{model._meta.model_name}",
-                f"{prefix}content_type": ct,
-            }
-        elif not isinstance(permission, tuple):
+            if model is None:
+                raise ValueError("You must provide a `model` when specifying a permission codename.")
+            action, ct = permission, ContentType.objects.get_for_model(model)
+        elif isinstance(permission, (tuple, list)):
+            action, ct = permission
+            if inspect.isclass(ct) and issubclass(ct, models.Model):
+                ct = ContentType.objects.get_for_model(ct)
+            elif not isinstance(ct, ContentType):
+                raise ValueError(f"Invalid type for permission (`{ct}`): it must be a ContentType or model class")
+        else:
             raise ValueError(f"Invalid type for permission: `{type(permission)}`")
 
-        codename, ct = permission
-        kwargs = {f"{prefix}codename": codename}
-        if isinstance(ct, ContentType):
-            kwargs[f"{prefix}content_type"] = ct
-        elif inspect.isclass(ct) and issubclass(ct, models.Model):
-            kwargs[f"{prefix}content_type"] = ContentType.objects.get_for_model(ct)
-        elif isinstance(ct, int):
-            kwargs[f"{prefix}content_type_id"] = ct
-        else:
-            raise ValueError(f"Invalid type for permission's content type: `{ct}`")
-        return kwargs
+        return {f"{prefix}codename": f"{action}_{ct.model}", f"{prefix}content_type": ct}
 
     def initials(self):
         """Filter capabilities used as initial values of a Reference."""

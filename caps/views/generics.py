@@ -1,28 +1,32 @@
-from django.views import generics
+from django.views import generic
+from django.http import HttpResponseRedirect
 
 from . import mixins
 
 __all__ = ("ObjectListView", "ObjectDetailView", "ObjectCreateView", "ObjectUpdateView", "ObjectDeleteView")
 
 
-class ObjectListView(mixins.ObjectListMixin, generics.ListView):
+class ObjectListView(mixins.ObjectListMixin, generic.ListView):
     pass
 
 
-class ObjectDetailView(mixins.ObjectDetailMixin, generics.DetailView):
+class ObjectDetailView(mixins.ObjectDetailMixin, generic.DetailView):
     pass
 
 
-class ObjectCreateView(mixins.ObjectCreateMixin, generics.edit.CreateView):
+class ObjectCreateView(mixins.ObjectCreateMixin, generic.edit.CreateView):
     def form_valid(self, form):
+        # we have to reimplement this method because create_root must
+        # be called before returning the success_url.
+        self.object = form.save()
         ref = self.create_reference(self.agent, self.object)
-        setattr(form.instance, "reference", ref)
-        return super().form_valid(form)
+        setattr(self.object, "reference", ref)
+        return HttpResponseRedirect(self.get_success_url())
 
 
-class ObjectUpdateView(mixins.ObjectUpdateMixin, generics.edit.UpdateView):
+class ObjectUpdateView(mixins.ObjectUpdateMixin, generic.edit.UpdateView):
     pass
 
 
-class ObjectDeleteView(mixins.ObjectDeleteMixin, generics.edit.DeleteView):
+class ObjectDeleteView(mixins.ObjectDeleteMixin, generic.edit.DeleteView):
     pass

@@ -92,8 +92,27 @@ class Object(models.Model, metaclass=ObjectBase):
         abstract = True
 
     @cached_property
-    def reference(self):
+    def reference(self) -> Reference:
         """Return Reference to this object for receiver provided to
         ObjectQuerySet's `ref()` or `refs()`."""
         ref_set = getattr(self, "agent_reference_set", None)
         return ref_set and ref_set[0] or None
+
+    detail_url_name = None
+    """ Provide url name used for get_absolute_url. """
+
+    def get_absolute_url(self) -> str:
+        """
+        Return absolute url to object based on :py:attr:`reference`.
+        It uses :py:attr:`detail_url_name` to do so.
+
+        This means that the object must have been fetched from db using
+        :py:meth:`ObjectQuerySet.refs`.
+
+        This method is a shortcut to related :py:class:`Reference.get_absolute_url`.
+
+        :yield ValueError: when :py:attr:`reference` or :py:attr:`detail_url_name` is missing.
+        """
+        if not self.reference:
+            raise ValueError("The Object instance MUST be fetched using `ObjectQuerySet.refs`")
+        return self.reference.get_absolute_url()

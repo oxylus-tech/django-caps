@@ -23,7 +23,11 @@ class TestCapabilityQuerySet:
             "permission__content_type": ct,
         }
 
-    def test_can_one_lookup_raise_invalid_permission_type(self):
+    def test_can_one_lookup_with_permission_codename_missing_model(self):
+        with pytest.raises(ValueError):
+            Capability.objects.can_one_lookup("view")
+
+    def test_can_one_lookup_raises_invalid_permission_type(self):
         with pytest.raises(ValueError):
             Capability.objects.can_one_lookup(b"12")
 
@@ -31,7 +35,7 @@ class TestCapabilityQuerySet:
         ct = ContentType.objects.all().first()
         assert Capability.objects.can_one_lookup(("test", ct)) == {
             "permission__content_type": ct,
-            "permission__codename": "test",
+            "permission__codename": f"test_{ct.model}",
         }
 
     def test_can_one_lookup_with_content_type_model(self):
@@ -39,17 +43,10 @@ class TestCapabilityQuerySet:
         model = ct.model_class()
         assert Capability.objects.can_one_lookup(("test", model)) == {
             "permission__content_type": ct,
-            "permission__codename": "test",
+            "permission__codename": f"test_{ct.model}",
         }
 
-    def test_can_one_lookup_with_content_type_id(self):
-        ct = ContentType.objects.all().first()
-        assert Capability.objects.can_one_lookup(("test", ct.id)) == {
-            "permission__content_type_id": ct.id,
-            "permission__codename": "test",
-        }
-
-    def test_can_one_lookup_with_raise_invalid_content_type(self):
+    def test_can_one_lookup_raises_invalid_content_type(self):
         with pytest.raises(ValueError):
             Capability.objects.can_one_lookup(("test", "invalid"))
 
@@ -60,6 +57,8 @@ class TestCapabilityQuerySet:
     def test_can_with_many_permissions(self, permissions, caps_3):
         caps = Capability.objects.can(permissions[0:1])
         assertCountEqual(caps, caps_3[0:1])
+
+    # TODO: can_q, can_all_q
 
     def test_initials(self, caps_3, user_agents):
         cap, *caps = caps_3

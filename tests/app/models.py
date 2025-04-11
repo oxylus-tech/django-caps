@@ -8,6 +8,8 @@ __all__ = ("ConcreteObject", "Reference", "Capability")
 class ConcreteObject(Object):
     """This class is used to test object agains't concrete class."""
 
+    detail_url_name = "concrete-detail"
+
     name = models.CharField(max_length=16)
 
 
