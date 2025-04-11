@@ -149,8 +149,8 @@ class TestSingleObjectMixin:
 
 
 @pytest.fixture
-def create_mixin(req, ref, perm):
-    return ObjectCreateMixin(can=perm, request=req, kwargs={"uuid": ref.uuid})
+def create_mixin(req, perm):
+    return ObjectCreateMixin(can=perm, request=req)
 
 
 @pytest.mark.django_db(transaction=True)
