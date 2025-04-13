@@ -12,7 +12,8 @@ __all__ = ("CapabilitySet",)
 
 
 class CapabilitySet:
-    """Base class to handle set of capabilities.
+    """
+    Base class to handle set of capabilities. It is one of the bases of :py:class:`Reference`.
 
     This class should not be used per se.
     """

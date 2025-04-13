@@ -49,19 +49,25 @@ class ObjectQuerySet(models.QuerySet):
 
     def refs(
         self,
-        refs: ReferenceQuerySet,
+        refs: ReferenceQuerySet | Reference,
     ) -> ObjectQuerySet:
         """Return Objects for the provided references.
 
         This method annotates the Object with ``agent_reference_set`` whose value
         is set to relevant reference(s). This allows to use :py:attr:`reference` property.
 
-        :param refs: use this reference QuerySet
+        :param refs: use this Reference QuerySet or instance
+        :return: the annotated queryset.
         """
+        if isinstance(refs, self.model.Reference):
+            refs = self.model.Reference.objects.filter(pk=refs.pk)
+
         fk_field = self.model.Reference._meta.get_field("target")
         lookup = fk_field.remote_field.get_accessor_name()
         prefetch = Prefetch(lookup, refs, "agent_reference_set")
         refs = refs.filter(target=OuterRef("pk"))
+
+        # FIXME: add filter reference__in=refs ?
         return (
             self.annotate(reference_id=Subquery(refs.values("id")[:1]))
             .filter(reference_id__isnull=False)

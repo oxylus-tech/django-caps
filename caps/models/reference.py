@@ -7,6 +7,7 @@ from typing import Any
 from django.db import models
 from django.db.models import Q
 from django.urls import reverse
+from django.utils import timezone as tz
 from django.utils.translation import gettext_lazy as _
 
 from .agent import Agent
@@ -50,6 +51,12 @@ class ReferenceQuerySet(models.QuerySet):
     class Meta:
         abstract = True
         unique_together = (("receiver", "target", "emitter"),)
+
+    def available(self, agent: Agent | Iterable[Agent] | None = None) -> ReferenceQuerySet:
+        """Return available references based on expiration and eventual user."""
+        if agent is not None:
+            self = self.receiver(agent)
+        return self.filter(Q(expiration__isnull=True) | Q(expiration__lt=tz.now()))
 
     def emitter(self, agent: Agent | Iterable[Agent]) -> ReferenceQuerySet:
         """References for the provided emitter(s)."""
@@ -137,7 +144,8 @@ class Reference(CapabilitySet, models.Model, metaclass=ReferenceBase):
     There are two kind of reference:
 
     - root: the root reference from which all other references to object
-      are derived. Created from the :py:meth:`create` class method.
+      are derived. Created from the :py:meth:`create` class method. It has no :py:attr:`origin`
+      and **there can be only one root reference per :py:class:`Object` instance.
     - derived: reference derived from root or another derived. Created
       from the :py:meth:`derive` method.
 
@@ -175,6 +183,7 @@ class Reference(CapabilitySet, models.Model, metaclass=ReferenceBase):
         models.CASCADE,
         blank=True,
         null=True,
+        related_name="derived",
         verbose_name=_("Source Reference"),
     )
     """Source reference in references chain."""
@@ -182,7 +191,7 @@ class Reference(CapabilitySet, models.Model, metaclass=ReferenceBase):
         _("Share Count"), default=0, help_text=_("The amount of time a reference can be re-shared.")
     )
     """Reference chain's current depth."""
-    receiver = models.ForeignKey(Agent, models.CASCADE)
+    receiver = models.ForeignKey(Agent, models.CASCADE, related_name="references")
     """Agent receiving capability."""
     # target = models.ForeignKey("ConcreteObject", models.CASCADE)
     # """Reference's target."""
@@ -211,13 +220,24 @@ class Reference(CapabilitySet, models.Model, metaclass=ReferenceBase):
 
     @classmethod
     def create_root(cls, emitter: Agent, target: object, **kwargs) -> Reference:
-        """Create and save a new root reference with provided capabilities."""
+        """Create and save a new root reference.
+
+        There can be only one root reference per object.
+
+        New capabilities will be created by cloning default ones (which are those without an assigned reference).
+
+        :param emitter: the owner of the object, as it is emitter of the root reference.
+        :param target: target :py:class:`.object.Object` instance.
+        :param **kwargs: Reference's initial arguments.
+        :return: the created root reference.
+        :yield ValueError: when ``origin`` is provided or a root reference already exists.
+        """
         if "origin" in kwargs:
             raise ValueError(
                 'attribute "origin" can not be passed as an argument to ' "`create()`: you should use derive instead"
             )
         if target.references.exists():
-            raise ValueError(f"A reference already exists for this object.")
+            raise ValueError("A reference already exists for this object.")
 
         self = cls(receiver=emitter, target=target, **kwargs)
         self.save()
@@ -239,6 +259,7 @@ class Reference(CapabilitySet, models.Model, metaclass=ReferenceBase):
         :yield ValueError: when reference is invaldi
         """
         if self.origin:
+            # FIXME
             # if self.origin.receiver != self.emitter:
             #    raise ValueError("origin's receiver and self's emitter are "
             #                     "different")

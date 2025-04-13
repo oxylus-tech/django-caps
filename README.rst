@@ -2,8 +2,7 @@ Django-Caps
 ===========
 
 Django-Caps provides capability based object permission system for Django applications.
-This project is inspired by `Capn'Proto documentation <https://capnproto.org>`
- (`interesting paper <http://www.erights.org/elib/capability/ode/ode.pdf>`).
+This project is inspired by `Capn'Proto documentation <https://capnproto.org>`_ (`interesting paper <http://www.erights.org/elib/capability/ode/ode.pdf>`_).
 
 A capability is a permission provided for a specific object. It can be *derived* (shared) a limited amount of time. Users never directly access the targeted object, but through a *reference* that defines allowed capabilities for it.
 
@@ -73,6 +72,8 @@ Create an object to be accessed:
 
     from caps.models import Object
 
+    # Create our example model. A Reference and Capability model will be
+    # generated and accessible from Post (Post.Reference, Post.Capability)
     class Post(Object):
         title = models.CharField(_("Title"), max_length=64)
         content = models.TextField(_("Content"))
@@ -82,7 +83,7 @@ Basic example usage:
 
 .. code-block:: python
 
-    from django.contrib.auth.models import User
+    from django.contrib.auth.models import User, Permission
 
     from caps.models import Agent
     from .models import Post
@@ -95,29 +96,23 @@ Basic example usage:
     agent = Agent.objects.create(user=user)
     agent_1 = Agent.objects.create(user=user)
 
-    # Create capabilities
-    capabilities = [
-        # Capability can be re-shared 10 times.
-        Capability(name="read", max_derive=10),
-        # These ones can not be shared
-        Capability(name="write"),
-        Capability(name="update"),
-    ]
-    # Capabilities are only created once per `name` and `max_derive`.
-    # This method is provided by django-caps.
-    Capability.objects.get_or_create_many(capabilities)
+    # Create allowed capabilities for Post
+    # Theses will be used as default ones for Post's root Reference
+    permissions = Permission.objects.all()[:3]
+    capabilities = [Post.Capability(permission=perm, max_derive=2) for perm in Permission]
 
-    # Create the post
+    Post.Capability.objects.bulk_create(capabilities)
+
+    # Create the post and the root reference
+    # Root reference: the original reference from which all other references
+    # are derived (created/shared).
     post = Post.objects.create(title="Some title", content="Some content")
-    ref = Post.Reference.create(agent, object, capabilities)
+    ref = Post.Reference.create_root(agent, object)
 
     # Get the object
-    the_post = Post.objects.ref(agent, ref.uuid)
+    the_post = Post.objects.refs(ref).first()
 
-    # This raises a DoesNotExist error
-    Post.objects.ref(agent_1, ref.uuid)
-
-    # This create a new reference with only shareable capabilities
+    # This create a new reference with only shareable capabilities (max_derive>0)
     ref_1 = ref.derive(agent_1, capabilities)
 
 

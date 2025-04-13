@@ -8,6 +8,9 @@ from .conftest import assertCountEqual
 
 @pytest.mark.django_db(transaction=True)
 class TestReferenceQuerySet:
+    def test_available(self):
+        raise NotImplementedError("")
+
     def test_emitter(self, agents):
         for agent in agents:
             for ref in Reference.objects.emitter(agent):

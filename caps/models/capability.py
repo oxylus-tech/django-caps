@@ -73,7 +73,13 @@ class CapabilityQuerySet(models.QuerySet):
 
     @classmethod
     def can_all_q(cls, permissions: CanMany, prefix: str = "permission__", model: type | None = None) -> list[Q]:
-        """Shortcut to :py:meth:`can_many_lookup` with ``&`` operator."""
+        """
+        Return a list of Q objects for each provided permissions, using : py:meth:`can_one_lookup`.
+
+        :param permissions: the permissions to look for.
+        :param prefix: passed down to :py:meth:`can_one_lookup`.
+        :param model: passed down to :py:meth:`can_one_lookup`.
+        """
         if isinstance(permissions, (Permission, str, int, tuple)):
             return [Q(**cls.can_one_lookup(permissions, prefix, model))]
 
@@ -82,9 +88,7 @@ class CapabilityQuerySet(models.QuerySet):
     @classmethod
     def can_q(cls, permissions: CanMany, prefix: str = "permission__", model: type | None = None) -> Q:
         """
-        Return Q lookup for multiple permissions, joined using `|`.
-
-        It uses result of :py:meth:`can_one_lookup`.
+        Return Q lookup for multiple permissions joined with `|`, using  :py:meth:`can_one_lookup`.
 
         :param permissions: the permissions to look for.
         :param prefix: passed down to :py:meth:`can_one_lookup`.
@@ -183,9 +187,11 @@ class Capability(models.Model):
 
         cap_2 = cap_1.derive()
         assert cap_2.max_derive == 0
+
+    **Note:** You'll more work over references for derivation than capabilities themselves.
     """
 
-    permission = models.ForeignKey(Permission, models.CASCADE)
+    permission = models.ForeignKey(Permission, models.CASCADE, related_name="capabilities")
     """ Related permission """
     max_derive = models.PositiveIntegerField(_("Maximum Derivation"), default=0)
     """ Maximum allowed derivations. """
@@ -217,7 +223,7 @@ class Capability(models.Model):
         :param max_derive: when value is None, it will based the value on self's \
                 py:attr:`max_derive` minus 1.
         :param **kwargs: extra initial argument of the new Capability
-        :return the new unsaved Capability.
+        :return: the new unsaved Capability.
 
         :yield PermissionDenied: when Capability derivation is not allowed.
         """

@@ -21,7 +21,15 @@ __all__ = (
 
 
 class ObjectMixin:
-    """Mixin providing functionalities to work with Object model."""
+    """
+    Base mixin providing functionalities to work with :py:class:`~caps.models.object.Object` model.
+
+    It provides:
+
+        - assign self's :py:attr:`agent` and :py:attr:`agents`
+        - queryset to available :py:class:`~caps.models.reference.Reference`.
+
+    """
 
     all_agents: bool = False
     """
@@ -48,7 +56,7 @@ class ObjectMixin:
 
     def get_reference_queryset(self):
         """Return reference queryset used to select objects."""
-        return self.get_reference_class().objects.receiver(self.agents)
+        return self.get_reference_class().objects.available(self.agents)
 
     def get_reference_class(self):
         """Return reference class used to create reference for object."""
@@ -74,6 +82,10 @@ class ObjectMixin:
 
 
 class ObjectPermissionMixin(ObjectMixin):
+    """
+    Mixin providing access filtering based on reference and user's permission, using :py:attr:`can` attribute.
+    """
+
     can: CanMany
     """ Capability permission(s) required to display the view.
 

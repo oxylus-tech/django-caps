@@ -1,18 +1,24 @@
 TODO
 ====
 
-- tests:
-
-    - CapabilityQuerySet.can*
-    - ReferenceQuerySet.can*
-    - mixins
-
 - views:
 
-    - mixins
-    - generic views + end to end (wrong agent, wrong perm)
-    - viewsets
+    - views for: Agent
+    - viewsets for: Reference, Capability
 
-- serializers
+- serializers:
+
+    - simple serializers
+    - full serializers (nested):
+
+        - Reference.capability
+        - Object.reference
+
+    - generate ModelSerializer based on provided object.
+
+- filtersets:
+
+    - for: Reference, Capability, Agent, Object
+
 - forms
 - admin

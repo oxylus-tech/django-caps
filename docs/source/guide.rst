@@ -1,7 +1,7 @@
 Guide
 =====
 
-Welcome to this guide that should help you to discover Oxylus. Although the project and documentation relatively joung, we'd be pleased to ear any feedback.
+Welcome to this guide that should help you to discover Django-Caps. Although the project and documentation relatively young, we'd be pleased to ear any feedback.
 
 
 .. toctree::
