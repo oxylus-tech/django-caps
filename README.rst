@@ -140,7 +140,7 @@ Example of Django-Caps' API usage:
 
     # Create agents (this is handled by middleware).
     agent = Agent.objects.create(user=user)
-    agent_1 = Agent.objects.create(user=user)
+    agent_1 = Agent.objects.create(user=user_1)
 
     # Create allowed capabilities for Post
     # Theses will be used as default ones for Post's root Reference

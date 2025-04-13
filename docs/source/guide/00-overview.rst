@@ -16,7 +16,7 @@ Django-Caps provides views that will use the provided scheme in order to grant u
 a concrete Reference is generated (accessible from subclass scope). The same occurs between Reference and Capability.
 This mechanism ensure different things:
 
-- The Reference and Capability models are associated to one object type, allowing reverse relations to be accessible (comparing for example over a solution using ContentType framework);
+- The Reference and Capability models are associated to one object type, allowing reverse relations to be accessible (comparing for example over a solution using ContentType framework). This also allows to joins table on SQL requests (thus prefetch values among other things);
 - This ensure clear segregation for references and capabilities per object type and reduce tables sizes;
 - We can exploit this mechanism for eg. default reference capabilities;
 
