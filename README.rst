@@ -12,6 +12,8 @@ In short, why use capabilities?
 - *Reduced risk of privilege escalation*
 - *Avoid direct access to database objects*
 
+More in the guide, :ref:`Capability vs ACL permission systems`.
+
 
 Overview
 --------
@@ -72,6 +74,9 @@ Create an object to be accessed:
 
     from caps.models import Object
 
+    __all__ = ("Post",)
+
+
     # Create our example model. A Reference and Capability model will be
     # generated and accessible from Post (Post.Reference, Post.Capability)
     class Post(Object):
@@ -79,7 +84,48 @@ Create an object to be accessed:
         content = models.TextField(_("Content"))
         created_at = models.DateTimeField(_("Date of creation"), auto_now_add=True)
 
-Basic example usage:
+Using views provided by caps, example of ``urls.py`` file:
+
+.. code-block:: python
+
+    from django.urls import path
+
+    from caps import views
+    from . import models
+
+    urlpatterns = [
+        path("/post/", views.ObjectListView.as_view(model=models.Post), name="post-list"),
+        path("/post/<uuid:uuid>/", views.ObjectDetailView.as_view(model=models.Post), name="post-detail"),
+        path("/post/create/", views.ObjectCreateView.as_view(model=models.Post), name="post-create"),
+        path(
+            "/post/update/<uuid:uuid>",
+            views.ObjectUpdateView.as_view(model=models.Post),
+            name="post-update",
+        ),
+    ]
+
+You can have custom views as:
+
+.. code-block:: python
+
+    from caps import views, viewsets
+    from . import models, serializers
+
+    __all__ = ("PostDetailView", "PostViewSet")
+
+
+    class PostDetailView(views.ObjectListView):
+        model = models.Post
+
+    # Example of viewset using DRF.
+    # assuming you have implemented serializer for Post
+    class PostViewSet(viewsets.ObjectViewSet):
+        model = models.Post
+        queryset = models.Post.objects.all()
+        serializer_class = serializers.PostSerializer
+
+
+Example of Django-Caps' API usage:
 
 .. code-block:: python
 
@@ -114,50 +160,3 @@ Basic example usage:
 
     # This create a new reference with only shareable capabilities (max_derive>0)
     ref_1 = ref.derive(agent_1, capabilities)
-
-
-Capability vs ACL permission systems
-------------------------------------
-
-#. Granular and Delegable Access Control
-
-    - In a capability-based system, access rights are directly assigned to objects (capabilities) rather than being centrally managed per resource.
-    - Advantage: Users can delegate access rights without requiring modifications to a central policy (e.g., passing a token or capability reference to another user).
-    - In contrast: ACLs require explicit permission modifications on the resource, which can be complex and require admin intervention.
-
-#. Reduced Need for a Central Authority
-
-    - Capabilities are typically self-contained (e.g., a token, key, or reference) and grant access upon presentation.
-    - Advantage: There is no need for continuous lookups in a central access control database.
-    - In contrast: ACL-based systems require checking a central list for each access attempt, which can create performance bottlenecks.
-
-#. Better Security Against Privilege Escalation
-
-    - Capabilities are unforgeable and granted explicitly to users or processes.
-    - Advantage: It prevents confused deputy attacks (where a process inadvertently misuses privileges granted by another entity).
-    - In contrast: ACLs check permissions based on identity, which can lead to privilege escalation through indirect means (e.g., exploiting a process with broad access).
-
-#. More Dynamic and Scalable Access Control
-
-    - Capability-based models are inherently distributed and flexible.
-    - Advantage: New permissions can be granted dynamically without modifying a central ACL.
-    - In contrast: ACLs require centralized policy updates and administrative overhead.
-
-#. Easier Revocation and Least Privilege Enforcement
-
-    - Capability-based models can revoke access by simply invalidating or expiring the capability.
-    - Advantage: Fine-grained control over individual access rights.
-    - In contrast: ACLs may require searching for all instances of a user’s permissions and modifying multiple entries.
-
-#. Better Fit for Decentralized or Distributed Systems
-
-    - Many modern cloud, containerized, and microservices architectures favor capabilities (e.g., bearer tokens, OAuth, API keys).
-    - Advantage: Eliminates reliance on a single access control authority, improving resilience.
-    - In contrast: ACLs are often tied to a centralized authentication and authorization model.
-
-So... When to use what?
-
-    - Capability-based systems are ideal for distributed, decentralized, and microservices-based environments, where flexibility, delegation, and security are key.
-    - ACL-based systems are better suited for traditional enterprise IT environments, where strict identity-based access control is needed.
-
-    This however still can be usable for object permissions by providing references for groups instead of users.

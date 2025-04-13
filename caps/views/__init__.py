@@ -23,6 +23,4 @@ __all__ = (
     "ObjectDestroyAPIView",
     "ViewSetMixin",
     "ObjectViewSet",
-    #    "ModelViewSet",
-    #    "GenericViewSet",
 )

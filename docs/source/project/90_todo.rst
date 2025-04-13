@@ -1,6 +1,16 @@
 TODO
 ====
 
+- models:
+
+    - CapabilitySet -> derive_caps arg to ease api usage
+
+- migrations/signal:
+
+    - Provide a way to specify default Capabilities which will be
+      created on migration.
+    - create an agent for each user and each group
+
 - views:
 
     - views for: Agent
