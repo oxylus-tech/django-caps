@@ -2,6 +2,7 @@ import inspect
 from functools import cache
 
 from django.db.models import Q
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import get_object_or_404
 
 from ..models import Agent, Object, Reference
@@ -17,6 +18,9 @@ __all__ = (
     "ObjectCreateMixin",
     "ObjectUpdateMixin",
     "ObjectDeleteMixin",
+    "ByUUIDMixin",
+    "AgentMixin",
+    "ReferenceMixin",
 )
 
 
@@ -124,7 +128,7 @@ class ObjectPermissionMixin(ObjectMixin):
 class SingleObjectMixin(ObjectPermissionMixin):
     """Detail mixin used to retrieve Object detail.
 
-    Note: user's reference is fetched from `get_object`, not `get_queryset`.
+    Note: user's reference is fetched from `get_reference_queryset`, not `get_queryset`.
     """
 
     lookup_url_kwargs = "uuid"
@@ -164,3 +168,27 @@ class ObjectUpdateMixin(SingleObjectMixin):
 
 class ObjectDeleteMixin(SingleObjectMixin):
     can = "delete"
+
+
+# ---- Other mixins
+class ByUUIDMixin:
+    """Fetch a model by UUID."""
+
+    lookup_url_kwargs = "uuid"
+    """ URL's kwargs argument used to retrieve reference uuid. """
+
+    def get_object(self):
+        return get_object_or_404(self.get_queryset(), uuid=self.kwargs[self.lookup_url_kwargs])
+
+
+class AgentMixin(ByUUIDMixin, PermissionRequiredMixin):
+    model = Agent
+
+
+class ReferenceMixin(ByUUIDMixin):
+    """Mixin used by Reference views and viewsets."""
+
+    def get_queryset(self):
+        # a user can view/delete only mixin for which he is
+        # either receiver or emitter.
+        return super().get_queryset().agent(self.request.agents)

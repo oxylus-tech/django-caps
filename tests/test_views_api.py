@@ -6,7 +6,7 @@ from .conftest import req_factory, init_request
 from .test_views_mixins import BaseMixin
 
 
-class ViewSetMixin(api.ViewSetMixin, BaseMixin):
+class ObjectViewSetMixin(api.ObjectViewSetMixin, BaseMixin):
     reference_class = Reference
 
 
@@ -18,11 +18,11 @@ def req(user_agent, user_agents):
 
 @pytest.fixture
 def viewset_mixin(req):
-    return ViewSetMixin(request=req)
+    return ObjectViewSetMixin(request=req)
 
 
 @pytest.mark.django_db(transaction=True)
-class TestViewSetMixin:
+class TestObjectViewSetMixin:
     def test_get_can_all_q(self, viewset_mixin):
         viewset_mixin.action = "list"
         assert viewset_mixin.get_can_all_q() == viewset_mixin._get_can_all_q(Reference, api.ObjectListAPIView.can)

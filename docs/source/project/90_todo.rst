@@ -13,18 +13,22 @@ TODO
 
 - views:
 
-    - views for: Agent
+    - views for: Agent (list, detail -> Permission required), Reference (list, detail, delete)
+    - Reference: derive
     - viewsets for: Reference, Capability
+
+- urls:
+
+    - get_object_urls:
+        - urls for the object
+        - urls for the object's reference
+    - get_reference_urls: provide urls for Reference class
+    - get_urls:
+        - detect existence of templates
 
 - serializers:
 
     - simple serializers
-    - full serializers (nested):
-
-        - Reference.capability
-        - Object.reference
-
-    - generate ModelSerializer based on provided object.
 
 - filtersets:
 

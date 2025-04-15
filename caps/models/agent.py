@@ -37,7 +37,7 @@ class Agent(models.Model):
     A user can impersonate multiple agent.
     """
 
-    ref = models.UUIDField(_("Reference"), default=uuid.uuid4)
+    uuid = models.UUIDField(_("Reference"), default=uuid.uuid4)
     """Public reference to agent."""
     user = models.ForeignKey(User, models.CASCADE, null=True, blank=True, verbose_name=_("User"))
     """Agent targets this user."""

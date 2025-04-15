@@ -7,12 +7,12 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from .reference import Reference, ReferenceQuerySet
-from .nested import NestedBase
+from .nested import NestedModelBase
 
 __all__ = ("ObjectBase", "ObjectQuerySet", "Object")
 
 
-class ObjectBase(NestedBase):
+class ObjectBase(NestedModelBase):
     """Metaclass for Object model classes.
 
     It subclass Reference if no `Reference` member is provided.

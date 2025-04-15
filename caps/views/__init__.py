@@ -5,8 +5,17 @@ from .api import (
     ObjectCreateAPIView,
     ObjectUpdateAPIView,
     ObjectDestroyAPIView,
-    ViewSetMixin,
     ObjectViewSet,
+)
+from .common import (
+    AgentDetailView,
+    AgentListView,
+    AgentCreateView,
+    AgentUpdateView,
+    AgentDeleteView,
+    ReferenceDetailView,
+    ReferenceListView,
+    ReferenceDeleteView,
 )
 
 
@@ -21,6 +30,13 @@ __all__ = (
     "ObjectCreateAPIView",
     "ObjectUpdateAPIView",
     "ObjectDestroyAPIView",
-    "ViewSetMixin",
     "ObjectViewSet",
+    "AgentDetailView",
+    "AgentListView",
+    "AgentCreateView",
+    "AgentUpdateView",
+    "AgentDeleteView",
+    "ReferenceDetailView",
+    "ReferenceListView",
+    "ReferenceDeleteView",
 )

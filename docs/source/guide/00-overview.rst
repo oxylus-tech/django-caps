@@ -24,9 +24,11 @@ This mechanism ensure different things:
 Reference
 ---------
 
+An Object is always accessed through a reference. An Object without a reference must not be accessible to the user. This also means that once when an object is returned through API, the reference MUST be provided.
+
 As told, a Reference provides a set of capabilities. Each capability grants two things: permission (access or action) and this permission to be share (or not).
 
-A Reference can be shared, which means that a new one will be created based one the current one. This creates a chains of parent-child references, ensuring control over the access. In Django-Caps, this process is called *derivation*, as a reference is *derived* from another one.
+A Reference can be shared, which means that a new one will be created based one the current one. This creates a chains of parent-child references, ensuring control over the accesses. In Django-Caps, this process is called *derivation*, as a reference is *derived* from another one.
 
 The first reference of this chain is the *root reference*. There only can be one reference for each object, which is owned by a single agent.
 
@@ -45,6 +47,20 @@ The first reference of this chain is the *root reference*. There only can be one
 
 
 The root reference will use the default capabilities as initial ones.
+
+
+Create and update references
+............................
+
+There are only two ways for user (through views or API) to create a Reference:
+
+- By creating a :py:class:`~caps.models.objects.Object`: the related view will ensure the root reference is created.
+- By derivating an already existing reference;
+
+It is assumed that once a Reference is created it can not be updated (nor its capabilities). This is in order to ensure the integrity of the whole chain of references. This is a current trade-off in Django-Caps that might change in the future even though it isn't planned.
+
+If a user wants to update a Reference (eg. add more capabilities), he should instead create a new reference and eventually delete the older one. We ensure that all derived references will be destroyed at the same time of a parent (by cascading).
+
 
 
 Capability

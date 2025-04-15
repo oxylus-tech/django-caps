@@ -10,10 +10,11 @@ from django.urls import reverse
 from django.utils import timezone as tz
 from django.utils.translation import gettext_lazy as _
 
+from caps.utils import get_lazy_relation
 from .agent import Agent
 from .capability import Capability, CapabilityQuerySet, CanMany
 from .capability_set import CapabilitySet
-from .nested import NestedBase
+from .nested import NestedModelBase
 
 __all__ = (
     "ReferenceQuerySet",
@@ -21,7 +22,7 @@ __all__ = (
 )
 
 
-class ReferenceBase(NestedBase):
+class ReferenceBase(NestedModelBase):
     nested_class = Capability
 
     @classmethod
@@ -55,14 +56,23 @@ class ReferenceQuerySet(models.QuerySet):
     def available(self, agent: Agent | Iterable[Agent] | None = None) -> ReferenceQuerySet:
         """Return available references based on expiration and eventual user."""
         if agent is not None:
-            self = self.receiver(agent)
+            self = self.agent(agent)
         return self.filter(Q(expiration__isnull=True) | Q(expiration__lt=tz.now()))
+
+    def agent(self, agent: Agent | Iterable[Agent]):
+        """
+        Filter references that agent is either receiver or
+        emitter..
+        """
+        if isinstance(agent, Agent):
+            return self.filter(Q(emitter=agent) | Q(receiver=agent))
+        return self.filter(Q(emitter__in=agent) | Q(receiver__in=agent))
 
     def emitter(self, agent: Agent | Iterable[Agent]) -> ReferenceQuerySet:
         """References for the provided emitter(s)."""
         if isinstance(agent, Agent):
-            return self.filter(Q(origin__receiver=agent) | Q(origin__isnull=True, receiver=agent))
-        return self.filter(Q(origin__receiver__in=agent) | Q(origin__isnull=True, receiver__in=agent))
+            return self.filter(emitter=agent)
+        return self.filter(emitter__in=agent)
 
     def receiver(self, agent: Agent | Iterable[Agent]) -> ReferenceQuerySet:
         """References for the provided receiver(s)."""
@@ -188,30 +198,30 @@ class Reference(CapabilitySet, models.Model, metaclass=ReferenceBase):
     )
     """Source reference in references chain."""
     depth = models.PositiveIntegerField(
-        _("Share Count"), default=0, help_text=_("The amount of time a reference can be re-shared.")
+        _("Share limit"), default=0, help_text=_("The amount of time a reference can be re-shared.")
     )
     """Reference chain's current depth."""
-    receiver = models.ForeignKey(Agent, models.CASCADE, related_name="references")
+    emitter = models.ForeignKey(
+        Agent, models.CASCADE, verbose_name=_("Emitter"), related_name="emit_references", db_index=True
+    )
     """Agent receiving capability."""
-    # target = models.ForeignKey("ConcreteObject", models.CASCADE)
-    # """Reference's target."""
+    receiver = models.ForeignKey(
+        Agent, models.CASCADE, verbose_name=_("Receiver"), related_name="references", db_index=True
+    )
+    """Agent receiving capability."""
     expiration = models.DateTimeField(
         _("Expiration"),
         null=True,
         blank=True,
         help_text=_("Defines an expiration date after which the reference is not longer valid."),
     )
+    """Date of expiration."""
 
     objects = ReferenceQuerySet.as_manager()
 
     class Meta:
         abstract = True
         unique_together = (("origin", "receiver", "target"),)
-
-    @property
-    def emitter(self):
-        """Agent emitting the reference."""
-        return self.origin.receiver if self.origin else self.receiver
 
     @classmethod
     def get_object_class(cls):
@@ -239,7 +249,7 @@ class Reference(CapabilitySet, models.Model, metaclass=ReferenceBase):
         if target.references.exists():
             raise ValueError("A reference already exists for this object.")
 
-        self = cls(receiver=emitter, target=target, **kwargs)
+        self = cls(emitter=emitter, receiver=emitter, target=target, **kwargs)
         self.save()
 
         # clone initial capabilities
@@ -260,9 +270,8 @@ class Reference(CapabilitySet, models.Model, metaclass=ReferenceBase):
         """
         if self.origin:
             # FIXME
-            # if self.origin.receiver != self.emitter:
-            #    raise ValueError("origin's receiver and self's emitter are "
-            #                     "different")
+            if self.origin.receiver != self.emitter:
+                raise ValueError("origin's receiver and self's emitter are different")
             if self.origin.depth >= self.depth:
                 if raises:
                     raise ValueError("origin's depth is higher than self's")
@@ -281,40 +290,45 @@ class Reference(CapabilitySet, models.Model, metaclass=ReferenceBase):
     def derive(
         self,
         receiver: Agent | int,
-        items: CapabilitySet.Caps = None,
+        caps: CapabilitySet.Caps = None,
         raises: bool = False,
         defaults: dict[str, Any] = {},
         **kwargs,
     ) -> Reference:
         """Create a new reference derived from self.
 
-        :param items: select capabilities to be derived.
+        :param caps: select capabilities to be derived.
         :param raises: raises PermissionDenied error instead of silent it.
         :param defaults: Capability instances' initial arguments.
         :param **kwargs: initial arguments of the new set.
         """
         kwargs = self._get_derived_kwargs(receiver, kwargs)
         obj = type(self).objects.create(**kwargs)
-        capabilities = self.derive_caps(items, raises=raises, defaults={**defaults, "reference": obj})
+        capabilities = self.derive_caps(caps, raises=raises, defaults={**defaults, "reference": obj})
         self.Capability.objects.bulk_create(capabilities)
         return obj
 
     async def aderive(
-        self, items: CapabilitySet.Caps = None, raises: bool = False, defaults: dict[str, Any] = {}, **kwargs
+        self, caps: CapabilitySet.Caps = None, raises: bool = False, defaults: dict[str, Any] = {}, **kwargs
     ) -> Reference:
         """Async version of :py:meth:`derive`."""
         kwargs = self._get_derived_kwargs(kwargs)
         obj = await type(self).objects.acreate(**kwargs)
-        capabilities = self.derive_caps(items, raises=raises, defaults={**defaults, "reference": obj})
+        capabilities = self.derive_caps(caps, raises=raises, defaults={**defaults, "reference": obj})
         await self.Capability.objects.abulk_create(capabilities)
         return obj
 
     def _get_derived_kwargs(self, receiver: int | Agent, kwargs):
         """Return initial argument for a derived reference from self."""
         r_key = "receiver_id" if isinstance(receiver, int) else "receiver"
+
+        e_key, emitter = get_lazy_relation(self, "receiver", "emitter")
+
         return {
             **kwargs,
+            "emitter": emitter,
             r_key: receiver,
+            e_key: emitter,
             "depth": self.depth + 1,
             "origin": self,
             "target": self.target,

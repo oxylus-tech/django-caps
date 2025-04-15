@@ -19,8 +19,7 @@ class ObjectCreateView(mixins.ObjectCreateMixin, generic.edit.CreateView):
         # we have to reimplement this method because create_root must
         # be called before returning the success_url.
         self.object = form.save()
-        ref = self.create_reference(self.agent, self.object)
-        setattr(self.object, "reference", ref)
+        self.create_reference(self.agent, self.object)
         return HttpResponseRedirect(self.get_success_url())
 
 
