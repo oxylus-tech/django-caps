@@ -11,6 +11,11 @@ caps.views.api
 
 .. automodule:: caps.views.api
 
+caps.views.common
+-----------------
+
+.. automodule:: caps.views.common
+
 caps.views.mixins
 -----------------
 

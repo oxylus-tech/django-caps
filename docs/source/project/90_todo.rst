@@ -23,8 +23,6 @@ TODO
         - urls for the object
         - urls for the object's reference
     - get_reference_urls: provide urls for Reference class
-    - get_urls:
-        - detect existence of templates
 
 - serializers:
 

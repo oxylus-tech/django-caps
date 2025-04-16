@@ -8,6 +8,6 @@ class DjangoModelPermissions(permissions.DjangoModelPermissions):
     """Subclass DRF DjangoModelPermissions in order to add "view" permission on GET request."""
 
     perms_map = {
-        **permissions.DjangoModelPermissions,
+        **permissions.DjangoModelPermissions.perms_map,
         "GET": ["%(app_label)s.view_%(model_name)s"],
     }

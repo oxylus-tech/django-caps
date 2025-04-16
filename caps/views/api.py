@@ -4,9 +4,9 @@ from rest_framework import generics, status, viewsets, mixins as mx
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from .. import models, serializers
+from .. import models, serializers, permissions
 from ..models.capability import CanMany
-from . import mixins, permissions
+from . import mixins
 
 
 __all__ = (
@@ -23,6 +23,7 @@ __all__ = (
 
 class ObjectCreateAPIMixin(mixins.ObjectCreateMixin):
     def perform_create(self, serializer):
+        """Ensure a root reference is created when the Object is saved."""
         super().perform_create(serializer)
         self.create_reference(self.agent, serializer.instance)
 
@@ -75,8 +76,9 @@ class AgentViewSet(viewsets.ModelViewSet):
     """Viewset provides API for :py:class:`~caps.models.agent.Agent`."""
 
     model = models.Agent
-    queryset = models.Agent.all()
+    queryset = models.Agent.objects.all()
     permissions = [permissions.DjangoModelPermissions]
+    filterset_fields = ("group", "user", "user__group")
 
 
 class ReferenceViewSet(mx.RetrieveModelMixin, mx.DestroyModelMixin, mx.ListModelMixin, viewsets.GenericViewSet):
@@ -87,10 +89,14 @@ class ReferenceViewSet(mx.RetrieveModelMixin, mx.DestroyModelMixin, mx.ListModel
 
         - Reference can't be created
         - Reference can't be updated
-        - Reference can only be derived, list, retrieve, and destroyed.
+        - Reference can only be derived, listed, retrieved, and destroyed.
 
     Note: no model nor queryset is provided by default, as Reference is an abstract class and is dependent of the concrete Object sub-model.
     """
+
+    lookup_field = "uuid"
+    lookup_url_kwargs = "uuid"
+    filterset_fields = ("receiver__uuid", "emitter__uuid", "origin__uuid", "target__uuid")
 
     derive_serializer_class = serializers.DeriveSerializer
     """ This specifies serializer class used for the :py:meth:`derive` action. """
