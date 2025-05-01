@@ -51,3 +51,7 @@ class ReferenceListView(mixins.ReferenceMixin, generic.ListView):
 
 class ReferenceDeleteView(mixins.ReferenceMixin, generic.DeleteView):
     pass
+
+
+class ReferenceDeriveView:
+    pass

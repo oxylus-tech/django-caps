@@ -68,7 +68,7 @@ TEMPLATES = [
 
 
 # ASGI_APPLICATION = "ox.asgi.application"
-WSGI_APPLICATION = "ox.wsgi.application"
+WSGI_APPLICATION = "instance.wsgi.application"
 
 
 # Database

@@ -101,7 +101,7 @@ class CapabilitySet:
             capability = by_perm.get(perm_id)
             try:
                 if capability is None:
-                    raise PermissionDenied("")
+                    raise PermissionDenied("Capability does not exist for this reference.")
 
                 # we always use Capability.derive in order to ensure custom
                 # implementations.

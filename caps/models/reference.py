@@ -324,6 +324,12 @@ class Reference(CapabilitySet, models.Model, metaclass=ReferenceBase):
 
         e_key, emitter = get_lazy_relation(self, "receiver", "emitter")
 
+        if self.expiration:
+            if expiration := kwargs.get("expiration"):
+                kwargs["expiration"] = min(expiration, self.expiration)
+            else:
+                kwargs["expiration"] = self.expiration
+
         return {
             **kwargs,
             "emitter": emitter,

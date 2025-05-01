@@ -62,6 +62,13 @@ It is assumed that once a Reference is created it can not be updated (nor its ca
 If a user wants to update a Reference (eg. add more capabilities), he should instead create a new reference and eventually delete the older one. We ensure that all derived references will be destroyed at the same time of a parent (by cascading).
 
 
+Expiration
+..........
+
+An expiration datetime can be provided for a Reference. This allows to share an object for a limited time to someone else. Once the date is expired, the receiver can no longer access it.
+
+Note: all derivated Reference from one with an expiration will expire at this moment max.
+
 
 Capability
 ----------

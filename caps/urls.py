@@ -89,6 +89,6 @@ def get_reference_paths(
 def _get_paths(model: type, basename: str, infos: list[tuple[str, type, str]], kwargs: dict[str, Any] | None = None):
     kwargs = kwargs or {}
     return [
-        path(url, view.as_view(**{"name": f"{basename}-{kind}", "model": model, **kwargs.get(kind, {})}))
+        path(url, view.as_view(**{"model": model, **kwargs.get(kind, {})}), name=f"{basename}-{kind}")
         for kind, view, url in infos
     ]

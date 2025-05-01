@@ -18,13 +18,13 @@ class AgentAdmin(admin.ModelAdmin):
 class BaseReferenceAdmin(admin.ModelAdmin):
     list_display = ("uuid", "target", "origin", "emitter", "receiver", "expiration", "depth")
     list_filter = ("depth",)
-    fields = ("uuid", "origin", "depth", "emitter", "receiver", "expiration")
+    fields = ("uuid", "target", "origin", "depth", "emitter", "receiver", "expiration")
 
 
 class CapabilityAdmin(admin.ModelAdmin):
-    list_display = ("target", "permission", "max_derive")
-    list_filter = ("target", EmptyFieldListFilter)
-    fields = ("target", "permission", "max_derive")
+    list_display = ("reference", "permission", "max_derive")
+    list_filter = (("reference", EmptyFieldListFilter),)
+    fields = ("reference", "permission", "max_derive")
 
 
 class BaseCapabilityInline(admin.TabularInline):
@@ -49,8 +49,8 @@ def register_object(obj_class: type[models.Object], admin_class: type[admin.Mode
         model = obj_class.Capability
 
     class ReferenceAdmin(BaseReferenceAdmin):
-        inline = [CapabilityInline]
+        inlines = [CapabilityInline]
 
-    admin.register(obj_class, admin_class)
-    admin.register(obj_class.Capability, CapabilityAdmin)
-    admin.register(obj_class.Reference, ReferenceAdmin)
+    admin.site.register(obj_class, admin_class)
+    admin.site.register(obj_class.Capability, CapabilityAdmin)
+    admin.site.register(obj_class.Reference, ReferenceAdmin)

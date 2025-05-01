@@ -4,6 +4,7 @@ TODO
 - models:
 
     - CapabilitySet -> derive_caps arg to ease api usage
+    x Reference -> expiration date on derived References.
 
 - migrations/signal:
 
@@ -13,24 +14,9 @@ TODO
 
 - views:
 
-    - views for: Agent (list, detail -> Permission required), Reference (list, detail, delete)
+    x views for: Agent (list, detail -> Permission required), Reference (list, detail, delete)
     - Reference: derive
-    - viewsets for: Reference, Capability
+    x viewsets for: Reference, Capability
 
-- urls:
-
-    - get_object_urls:
-        - urls for the object
-        - urls for the object's reference
-    - get_reference_urls: provide urls for Reference class
-
-- serializers:
-
-    - simple serializers
-
-- filtersets:
-
-    - for: Reference, Capability, Agent, Object
-
-- forms
-- admin
+- CRON:
+    - clear expired references

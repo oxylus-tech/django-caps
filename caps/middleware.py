@@ -46,12 +46,12 @@ class AgentMiddleware:
                 return agent
 
         if request.user.is_anonymous:
-            return next(agents, None)
+            return next(iter(agents), None)
 
         # agents are sorted such as default are first:
         # predicates order ensure that we return first on is_default
         # then only if is user
-        it = (r for r in agents if agent.is_default or agent.user_id == request.user.id)
+        it = (r for r in agents if r.is_default or r.user_id == request.user.id)
         if agent := next(it, None):
             return agent
 

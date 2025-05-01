@@ -94,6 +94,21 @@ You can have custom views as:
         # do something here...
 
 
+Provided views
+..............
+
+Although we provide basic views for django-caps' models, we don't provide template, and it will be up to you to write them according Django practices.
+
+We have views for the following models:
+
+- :py:class:`~caps.models.agent.Agent`: :py:class:`~caps.views.common.AgentListView`, :py:class:`~caps.views.common.AgentDetailView`, :py:class:`~caps.views.common.AgentCreateView`, :py:class:`~caps.views.common.AgentUpdateView`, :py:class:`~caps.views.common.AgentDeleteView`; -
+- :py:class:`~caps.models.object.Object`: :py:class:`~caps.views.generics.ObjectListView`, :py:class:`~caps.views.generics.ObjectDetailView`, :py:class:`~caps.views.generics.ObjectCreateView`, :py:class:`~caps.views.generics.ObjectUpdateView`, :py:class:`~caps.views.generics.ObjectDeleteView`;
+
+- :py:class:`~caps.models.reference.Reference`: :py:class:`~caps.views.common.ReferenceListView`, :py:class:`~caps.views.common.ReferenceDetailView`, :py:class:`~caps.views.common.ReferenceDeleteView`;
+
+  We don't provide create and update views for reference, as they should only be created when the object is created and by derivation (not provided yet). A Reference should not be updated.
+
+
 API
 ...
 
@@ -132,6 +147,24 @@ Serializers:
         class Meta:
             model = models.Post
             fields = ObjectSerializer.fields + ('title', 'content', 'created_at')
+
+You'll have to manually add routes and urls for this part:
+
+.. code-block:: python
+
+    from django.urls import path
+    from rest_framework.routers import SimpleRouter
+
+    from . import viewsets
+
+    router = SimpleRouter()
+    router.register('post', viewsets.PostViewSet)
+    router.register('post-reference', viewsets.PostReferenceViewSet)
+
+    urlpatterns = [
+        # ...
+        path('api', include(router.urls)
+    ]
 
 
 Some example usage

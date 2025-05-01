@@ -201,6 +201,8 @@ class Capability(models.Model):
     class Meta:
         abstract = True
         unique_together = (("reference", "permission_id"),)
+        verbose_name = _("Capability")
+        verbose_name_plural = _("Capabilities")
 
     @classmethod
     def get_reference_class(cls):
