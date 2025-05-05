@@ -4,6 +4,7 @@ import uuid
 from collections.abc import Iterable
 from typing import Any
 
+from django.core.exceptions import PermissionDenied
 from django.db import models
 from django.db.models import Q
 from django.urls import reverse
@@ -13,7 +14,7 @@ from django.utils.translation import gettext_lazy as _
 from caps.utils import get_lazy_relation
 from .agent import Agent
 from .capability import Capability, CapabilityQuerySet, CanMany
-from .capability_set import CapabilitySet
+from .capability_set import CapabilitySet, Caps
 from .nested import NestedModelBase
 
 __all__ = (
@@ -57,7 +58,7 @@ class ReferenceQuerySet(models.QuerySet):
         """Return available references based on expiration and eventual user."""
         if agent is not None:
             self = self.agent(agent)
-        return self.filter(Q(expiration__isnull=True) | Q(expiration__lt=tz.now()))
+        return self.filter(Q(expiration__isnull=True) | Q(expiration__gt=tz.now()))
 
     def agent(self, agent: Agent | Iterable[Agent]):
         """
@@ -223,6 +224,11 @@ class Reference(CapabilitySet, models.Model, metaclass=ReferenceBase):
         abstract = True
         unique_together = (("origin", "receiver", "target"),)
 
+    @property
+    def is_expired(self):
+        """Return True if Reference is expired."""
+        return self.expiration is not None and self.expiration <= tz.now()
+
     @classmethod
     def get_object_class(cls):
         """Return related Object class."""
@@ -290,7 +296,7 @@ class Reference(CapabilitySet, models.Model, metaclass=ReferenceBase):
     def derive(
         self,
         receiver: Agent | int,
-        caps: CapabilitySet.Caps = None,
+        caps: Caps = None,
         raises: bool = False,
         defaults: dict[str, Any] = {},
         **kwargs,
@@ -309,7 +315,7 @@ class Reference(CapabilitySet, models.Model, metaclass=ReferenceBase):
         return obj
 
     async def aderive(
-        self, caps: CapabilitySet.Caps = None, raises: bool = False, defaults: dict[str, Any] = {}, **kwargs
+        self, caps: Caps = None, raises: bool = False, defaults: dict[str, Any] = {}, **kwargs
     ) -> Reference:
         """Async version of :py:meth:`derive`."""
         kwargs = self._get_derived_kwargs(kwargs)
@@ -325,6 +331,9 @@ class Reference(CapabilitySet, models.Model, metaclass=ReferenceBase):
         e_key, emitter = get_lazy_relation(self, "receiver", "emitter")
 
         if self.expiration:
+            if self.is_expired:
+                raise PermissionDenied("Reference is expired.")
+
             if expiration := kwargs.get("expiration"):
                 kwargs["expiration"] = min(expiration, self.expiration)
             else:
@@ -332,7 +341,6 @@ class Reference(CapabilitySet, models.Model, metaclass=ReferenceBase):
 
         return {
             **kwargs,
-            "emitter": emitter,
             r_key: receiver,
             e_key: emitter,
             "depth": self.depth + 1,

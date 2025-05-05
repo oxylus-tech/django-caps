@@ -1,7 +1,10 @@
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError
 
 from . import models
+from .models import Cap
+
 
 __all__ = ("AgentSerializer", "CapabilitySerializer", "ReferenceSerializer", "ObjectSerializer")
 
@@ -34,21 +37,31 @@ class ReferenceSerializer(serializers.Serializer):
     concrete :py:class:`.models.object.Object`.
     """
 
-    origin = serializers.UUIDField(source="origin__uuid")
+    origin = serializers.SerializerMethodField(source="get_origin")
     capabilities = CapabilitySerializer(many=True, read_only=True)
 
     class Meta:
         fields = ["uuid", "origin", "depth", "emitter", "receiver", "expiration"]
         read_only_fields = ["uuid", "depth", "emitter", "receiver", "expiration"]
 
+    def get_origin(self, obj):
+        return obj.origin.uuid
 
-class ObjectSerializer(serializers.Serializer):
+
+class ObjectSerializer(serializers.ModelSerializer):
     """
     Base serializer for Objects. It provides :py:attr:`uuid` field.
     """
 
     reference = ReferenceSerializer(read_only=True)
     """ Reference """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if "pk" in self.fields:
+            del self.fields["pk"]
+        if "id" in self.fields:
+            del self.fields["id"]
 
     class Meta:
         fields = ["reference"]
@@ -65,22 +78,22 @@ class DeriveCapField(serializers.Field):
 
     """
 
-    def to_representation(self, value):
+    def to_representation(self, value: Cap | models.Capability) -> list[int, int | None]:
         if isinstance(value, (tuple, list)):
             return [int(value[0]), int(value[1])]
         elif isinstance(value, models.Capability):
             return [value.permission_id, value.max_derive]
         elif isinstance(value, int):
-            return value
+            return [value, None]
         raise ValueError(f"Invalid value type for Cap: {value}")
 
-    def to_internal_value(self, value):
+    def to_internal_value(self, value: Cap) -> list[int, int | None]:
         if isinstance(value, (tuple, list)):
             if len(value) != 2:
                 raise ValidationError("Incorrect length for list or tuple (must be 2: permission id, max derive)")
-            return [int(value[0]), int(value[1])]
+            return [int(value[0]), int(value[1]) if value is not None else None]
         try:
-            return int(value)
+            return [int(value), None]
         except ValueError:
             raise ValidationError("Provided value must be convertible to an integer")
 
@@ -95,4 +108,7 @@ class DeriveSerializer(serializers.Serializer):
     caps = serializers.ListField(child=DeriveCapField())
 
     def validate_receiver(self, value):
-        return models.Agent.objects.get(uuid=value)
+        try:
+            return models.Agent.objects.get(uuid=value)
+        except ObjectDoesNotExist:
+            raise ValidationError("Invalid receiver.")

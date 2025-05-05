@@ -6,7 +6,7 @@ from caps.models import nested
 from caps.models.capability_set import CapabilitySet
 
 
-class ParentBase(nested.NestedBase):
+class ParentBase(nested.NestedModelBase):
     nested_name = "Caps"
     nested_class = CapabilitySet
 
@@ -15,7 +15,7 @@ class ParentBase(nested.NestedBase):
         return super(ParentBase, cls).create_nested_class(new_class, name, {**attrs, "from_create_nested_class": 234})
 
 
-class InvalidBase(nested.NestedBase):
+class InvalidBase(nested.NestedModelBase):
     pass
 
 

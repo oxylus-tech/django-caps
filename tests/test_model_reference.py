@@ -1,5 +1,8 @@
 import copy
+from datetime import timedelta
 
+from django.core.exceptions import PermissionDenied
+from django.utils import timezone as tz
 import pytest
 
 from .app.models import Reference
@@ -8,8 +11,17 @@ from .conftest import assertCountEqual
 
 @pytest.mark.django_db(transaction=True)
 class TestReferenceQuerySet:
-    def test_available(self):
-        raise NotImplementedError("")
+    def test_available_expiration_isnull(self, ref, user_agent, refs_3):
+        assertCountEqual(Reference.objects.available(user_agent), [ref, refs_3[0]])
+
+    def test_available_not_expired(self, ref, user_agent):
+        ref.expiration = tz.now() + timedelta(hours=1)
+        assert list(Reference.objects.available(user_agent)) == [ref]
+
+    def test_available_expired(self, ref, user_agent):
+        ref.expiration = tz.now() - timedelta(hours=1)
+        ref.save(update_fields=["expiration"])
+        assert not Reference.objects.available(user_agent).exists()
 
     def test_emitter(self, agents):
         for agent in agents:
@@ -40,7 +52,7 @@ class TestReferenceQuerySet:
         for agent in agents:
             items = {ref.uuid for ref in refs if ref.receiver == agent}
             query = Reference.objects.refs(agent, items).values_list("uuid", flat=True)
-            assertCountEqual(items, list(query), "agent: " + str(agent.ref))
+            assertCountEqual(items, list(query), "agent: " + str(agent.uuid))
 
     def test_refs_wrong_agent(self, agents, refs):
         for agent in agents:
@@ -135,11 +147,22 @@ class TestReference:
     def test__get_derived_kwargs(self, ref, group_agent):
         assert ref._get_derived_kwargs(group_agent, {"a": 123}) == {
             "a": 123,
+            "emitter_id": ref.emitter_id,
             "receiver": group_agent,
             "depth": ref.depth + 1,
             "origin": ref,
             "target": ref.target,
         }
+
+    def test__get_derived_kwargs_expired_raise_permission_denied(self, ref, group_agent):
+        ref.expiration = tz.now() - timedelta(hours=1)
+        with pytest.raises(PermissionDenied):
+            ref._get_derived_kwargs(group_agent, {})
+
+    def test__get_derived_kwargs_expiration_fixed(self, ref, group_agent):
+        ref.expiration = tz.now() + timedelta(hours=1)
+        kw = ref._get_derived_kwargs(group_agent, {"expiration": tz.now() + timedelta(hours=3)})
+        assert kw["expiration"] == ref.expiration
 
     def test_get_absolute_url(self, ref):
         assert ref.get_absolute_url()

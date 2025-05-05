@@ -1,5 +1,6 @@
 import pytest
 from django.core.exceptions import ValidationError
+from django.contrib.auth.models import AnonymousUser
 
 from caps.models import Agent
 
@@ -10,8 +11,9 @@ __all__ = ("TestAgentQuerySet", "TestAgent")
 # - test anonymous users on QuerySet
 @pytest.mark.django_db(transaction=True)
 class TestAgentQuerySet:
-    def test_user_anonymous(self):
-        pass
+    def test_user_anonymous(self, anon_agent, user_agent):
+        agents = Agent.objects.user(AnonymousUser())
+        assert list(agents) == [anon_agent]
 
     def test_user_strict(self, user, user_agents):
         query = Agent.objects.user(user, strict=True)

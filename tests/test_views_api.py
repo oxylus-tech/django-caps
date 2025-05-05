@@ -1,12 +1,14 @@
 import pytest
 
+from rest_framework import status
+
 from caps.views import api
 from .app.models import Reference
 from .conftest import req_factory, init_request
 from .test_views_mixins import BaseMixin
 
 
-class ObjectViewSetMixin(api.ObjectViewSetMixin, BaseMixin):
+class ObjectViewSetMixin(api.ObjectViewSet, BaseMixin):
     reference_class = Reference
 
 
@@ -21,8 +23,14 @@ def viewset_mixin(req):
     return ObjectViewSetMixin(request=req)
 
 
+@pytest.fixture
+def ref_viewset(req):
+    req.query_params = req.GET
+    return api.ReferenceViewSet(request=req, model=Reference, queryset=Reference.objects.all(), action="list")
+
+
 @pytest.mark.django_db(transaction=True)
-class TestObjectViewSetMixin:
+class TestObjectViewSet:
     def test_get_can_all_q(self, viewset_mixin):
         viewset_mixin.action = "list"
         assert viewset_mixin.get_can_all_q() == viewset_mixin._get_can_all_q(Reference, api.ObjectListAPIView.can)
@@ -30,3 +38,33 @@ class TestObjectViewSetMixin:
     def test_get_can_all_q_without_can_for_action(self, viewset_mixin):
         viewset_mixin.action = "publish"
         assert viewset_mixin.get_can_all_q() == []
+
+
+class TestReferenceViewSet:
+    def test_get_queryset(self, ref_viewset, user_agents, refs_3, refs_2):
+        ref_viewset.action = "list"
+        query = ref_viewset.get_queryset()
+
+        assert all(q.emitter in user_agents or q.receiver in user_agents for q in query)
+        assert any(q.emitter in user_agents for q in query)
+        assert any(q.receiver in user_agents for q in query)
+
+    def test_get_queryset_for_derive(self, ref_viewset, user_agents, refs_3, refs_2):
+        ref_viewset.action = "derive"
+        query = ref_viewset.get_queryset()
+        assert all(q.emitter in user_agents for q in query)
+
+    def test_derive(self, ref_viewset, user_agent, group_agent, ref):
+        ref_viewset.kwargs = {"uuid": ref.uuid}
+        ref_viewset.request.data = {
+            "receiver": group_agent.uuid,
+            "caps": [c.permission_id for c in ref.capabilities.all()],
+        }
+        resp = ref_viewset.derive(ref_viewset.request)
+        assert resp.data["origin"] == ref.uuid
+
+    def test_derive_invalid(self, ref_viewset, ref, group_agent):
+        ref_viewset.kwargs = {"uuid": ref.uuid}
+        ref_viewset.request.data = {"receiver": group_agent.uuid, "caps": "list"}
+        resp = ref_viewset.derive(ref_viewset.request)
+        assert resp.status_code == status.HTTP_400_BAD_REQUEST

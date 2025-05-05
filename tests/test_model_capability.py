@@ -9,6 +9,16 @@ from tests.app.models import Capability, Reference, ConcreteObject
 
 @pytest.mark.django_db(transaction=True)
 class TestCapabilityQuerySet:
+    def test_can_with_one_permission(self, caps_3, permissions):
+        caps = list(Capability.objects.can(permissions[0]))
+        assert caps == [caps_3[0]]
+
+    def test_can_with_many_permissions(self, permissions, caps_3):
+        caps = Capability.objects.can(permissions[0:1])
+        assertCountEqual(caps, caps_3[0:1])
+
+    # TODO: can_q, can_all_q
+
     def test_can_one_lookup_with_permission(self, permissions):
         perm = permissions[0]
         assert Capability.objects.can_one_lookup(perm) == {"permission__id": perm.id}
@@ -50,21 +60,11 @@ class TestCapabilityQuerySet:
         with pytest.raises(ValueError):
             Capability.objects.can_one_lookup(("test", "invalid"))
 
-    def test_can_with_one_permission(self, caps_3, permissions):
-        caps = list(Capability.objects.can(permissions[0]))
-        assert caps == [caps_3[0]]
-
-    def test_can_with_many_permissions(self, permissions, caps_3):
-        caps = Capability.objects.can(permissions[0:1])
-        assertCountEqual(caps, caps_3[0:1])
-
-    # TODO: can_q, can_all_q
-
     def test_initials(self, caps_3, user_agents):
         cap, *caps = caps_3
 
         obj = ConcreteObject.objects.create(name="test")
-        cap.reference = Reference.objects.create(target=obj, receiver=user_agents[0])
+        cap.reference = Reference.objects.create(target=obj, receiver=user_agents[0], emitter=user_agents[0])
         cap.save()
 
         query = Capability.objects.initials()
@@ -89,6 +89,11 @@ class TestCapability:
         child = parent.derive()
         assert parent.permission == child.permission
         assert parent.max_derive - 1 == child.max_derive
+
+    def test_derive_wrong_reference_target(self, perm, refs_3):
+        parent = Capability(reference=refs_3[0], permission=perm, max_derive=1)
+        with pytest.raises(ValueError):
+            parent.derive(reference=refs_3[1])
 
     def test_derive_fail(self, perm):
         parent = Capability(permission=perm, max_derive=0)
@@ -121,3 +126,5 @@ class TestCapability:
         parent = Capability(permission=perm, max_derive=4)
         child = parent.derive().derive().derive()
         assert parent.is_derived(child)
+
+    # TODO: __eq__, __contains__

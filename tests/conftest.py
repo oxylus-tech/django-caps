@@ -49,8 +49,13 @@ def user(db, user_group):
 
 
 @pytest.fixture
+def anon_agent(db, user):
+    return Agent.objects.create()
+
+
+@pytest.fixture
 def user_agent(db, user):
-    return Agent.objects.create(user=user)
+    return Agent.objects.create(user=user, is_default=True)
 
 
 @pytest.fixture

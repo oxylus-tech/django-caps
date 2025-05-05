@@ -14,5 +14,7 @@ def create_view(user_agent, user_agents):
 
 @pytest.mark.django_db(transaction=True)
 class TestObjectCreateView:
-    def test_form_valid(self, create_view):
-        pass
+    pass
+    # TODO
+    # def test_form_valid(self, create_view):
+    #    pass

@@ -96,7 +96,11 @@ class ReferenceViewSet(mx.RetrieveModelMixin, mx.DestroyModelMixin, mx.ListModel
 
     lookup_field = "uuid"
     lookup_url_kwargs = "uuid"
-    filterset_fields = ("receiver__uuid", "emitter__uuid", "origin__uuid", "target__uuid")
+    filterset_fields = (
+        "receiver__uuid",
+        "emitter__uuid",
+        "origin__uuid",
+    )
 
     derive_serializer_class = serializers.DeriveSerializer
     """ This specifies serializer class used for the :py:meth:`derive` action. """
@@ -128,4 +132,4 @@ class ReferenceViewSet(mx.RetrieveModelMixin, mx.DestroyModelMixin, mx.ListModel
             return Response(derive_ser.errors, status=status.HTTP_400_BAD_REQUEST)
 
         derived = ref.derive(derive_ser.validated_data["receiver"], derive_ser.validated_data["caps"])
-        return Response(self.get_serializer_class(derived).data)
+        return Response(self.get_serializer_class()(derived).data)

@@ -8,7 +8,16 @@ from django.utils.translation import gettext as __
 
 from .capability import Capability
 
-__all__ = ("CapabilitySet",)
+__all__ = ("CapabilitySet", "Cap", "Caps")
+
+
+Cap = int | tuple[int, int | None] | list[int, int | None]
+"""
+Capability information, as tuple of ``(permission_id, max_derive)`` or single permission
+id (then ``max_derive is None``).
+"""
+Caps = Iterable[Cap]
+""" Many capability information. """
 
 
 class CapabilitySet:
@@ -20,13 +29,6 @@ class CapabilitySet:
 
     Capability: type[Capability] | Permission
     """Capability class to use. It must be set in order to use CapabilitySet. """
-    Cap: int | tuple[int, int]
-    """
-    Capability information, as tuple of ``(permission_id, max_derive)`` or single permission
-    id (then ``max_derive is None``).
-    """
-    Caps: Iterable[CapabilitySet.Cap]
-    """ Many capability information. """
     capabilities: Iterable[Capability] = None
     """ Capabilities contained in the CapabilitySet. """
 
@@ -53,7 +55,7 @@ class CapabilitySet:
                 return False
         return True
 
-    def create_capability(self, cap: CapabilitySet.Cap, **kwargs) -> CapabilitySet.Capability:
+    def create_capability(self, cap: Cap, **kwargs) -> CapabilitySet.Capability:
         """Create a single (unsaved) capability.
 
         :param cap: capability information
@@ -63,7 +65,7 @@ class CapabilitySet:
         perm_id, kwargs = self.get_capability_kwargs(cap, {**kwargs, "reference": self})
         return self.Capability(permission_id=perm_id, **kwargs)
 
-    def create_capabilities(self, caps: CapabilitySet.Caps, **kwargs) -> list[CapabilitySet.Capability]:
+    def create_capabilities(self, caps: Caps, **kwargs) -> list[CapabilitySet.Capability]:
         """Create multiple capabilities based on descriptors.
 
         :param caps: capabilities' informations
@@ -73,7 +75,7 @@ class CapabilitySet:
         return [self.create_capability(cap, **kwargs) for cap in caps]
 
     def derive_caps(
-        self, caps: CapabilitySet.Caps | None = None, raises: bool = False, defaults: dict[str, Any] = {}
+        self, caps: Caps | None = None, raises: bool = False, defaults: dict[str, Any] = {}
     ) -> list[Capability]:
         """Derive capabilities from this set.
 
@@ -116,7 +118,7 @@ class CapabilitySet:
             )
         return derived
 
-    def get_capability_kwargs(self, cap: CapabilitySet.Cap, defaults: dict[str, Any]) -> tuple[int, dict[str, Any]]:
+    def get_capability_kwargs(self, cap: Cap, defaults: dict[str, Any]) -> tuple[int, dict[str, Any]]:
         """
         From provided ``cap`` description, return a tuple with permission id and :py:meth:`Capability.derive` arguments.
 
@@ -126,7 +128,7 @@ class CapabilitySet:
         :param cap: the capability descriptor;
         :param **kwargs: extra arguments to pass down to the method;
         """
-        if isinstance(cap, tuple):
+        if isinstance(cap, (tuple, list)):
             perm_id, max_derive = cap
         elif isinstance(cap, int):
             perm_id, max_derive = cap, None

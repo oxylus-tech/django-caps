@@ -266,4 +266,8 @@ class Capability(models.Model):
             return False
         if self.pk and other.pk:
             return self.pk == other.pk
-        return self.permission_id == other.permission_id and self.max_derive == other.max_derive
+        return (
+            self.permission_id == other.permission_id
+            and self.max_derive == other.max_derive
+            and (not self.reference or self.reference.target == other.reference.target)
+        )
