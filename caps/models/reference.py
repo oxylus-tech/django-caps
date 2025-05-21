@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import uuid
 from collections.abc import Iterable
-from typing import Any
+from functools import cached_property
 
+from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.db import models
 from django.db.models import Q
@@ -13,38 +14,13 @@ from django.utils.translation import gettext_lazy as _
 
 from caps.utils import get_lazy_relation
 from .agent import Agent
-from .capability import Capability, CapabilityQuerySet, CanMany
-from .capability_set import CapabilitySet, Caps
-from .nested import NestedModelBase
+from .capability import Capability
+from .capability_set import CapabilitySet
 
 __all__ = (
     "ReferenceQuerySet",
     "Reference",
 )
-
-
-class ReferenceBase(NestedModelBase):
-    nested_class = Capability
-
-    @classmethod
-    def create_nested_class(cls, new_class, name, attrs={}):
-        """Provide `reference` ForeignKey on nested Capability model."""
-        return super(ReferenceBase, cls).create_nested_class(
-            new_class,
-            name,
-            {
-                "reference": models.ForeignKey(
-                    new_class,
-                    models.CASCADE,
-                    null=True,
-                    blank=True,
-                    db_index=True,
-                    related_name="capabilities",
-                    verbose_name=_("Reference"),
-                ),
-                **attrs,
-            },
-        )
 
 
 class ReferenceQuerySet(models.QuerySet):
@@ -107,35 +83,6 @@ class ReferenceQuerySet(models.QuerySet):
             self = self.receiver(receiver)
         return self.filter(uuid__in=uuids)
 
-    def can(self, permissions: CanMany) -> ReferenceQuerySet:
-        """Filter references with the provided permission(s).
-
-        This call :py:meth:`.capability.CapabilityQuerySet.can`, using the same parameters. Providing
-        multiple values will make an OR conditional.
-
-        If you want to filter based on AND please use :py:meth:`can_all`.
-
-        :param permissions: permissions to look for
-        """
-        query = self.model.Capability.objects.can(permissions)
-        return self.filter(capabilities__in=query).distinct()
-
-    def can_all(self, permissions: CanMany) -> ReferenceQuerySet:
-        """
-        Filter references with all the provided permissions.
-
-        :param permissions: permissions to look for, same argument type as :py:meth:`.capability.CapabilityQuerySet.can`.
-        """
-        for q in self.can_all_q(permissions):
-            self = self.filter(q)
-        return self
-
-    def can_all_q(self, permissions: CanMany | None) -> list[Q]:
-        """Return Q lookup for all permissions."""
-        return CapabilityQuerySet.can_all_q(
-            permissions, "capabilities__permission__", model=self.model.get_object_class()
-        )
-
     def bulk_create(self, objs, *a, **kw):
         """Check that objects are valid when saving models in bulk."""
         for obj in objs:
@@ -145,7 +92,7 @@ class ReferenceQuerySet(models.QuerySet):
     # TODO: bulk_update -> is_valid()
 
 
-class Reference(CapabilitySet, models.Model, metaclass=ReferenceBase):
+class Reference(CapabilitySet, models.Model):
     """Reference are the entry point to access an :py:class:`Object`.
 
     Reference provides a set of capabilities for specific receiver.
@@ -162,29 +109,13 @@ class Reference(CapabilitySet, models.Model, metaclass=ReferenceBase):
 
     This class enforce fields validation at `save()` and `bulk_create()`.
 
-    Concrete Reference and Capability
-    ---------------------------------
+    Concrete Reference
+    ------------------
 
     This model is implemented as an abstract in order to have a reference
-    specific to each model (see :py:class:`Object` abstract model).
-
-    The related :py:class:`Capability` subclass is created at the same
-    time as the concrete implementing reference model. The same mechanism
-    also applies on :py:class:`Object` for Reference, as they both use
-    base metaclass :py:class:`NestedBase`. They thus can be customized
-    if required as this example shows:
-
-    .. code-block:: python
-
-        from caps.models import Reference, Capability
-
-        class MyReference(Reference):
-            class Capability(Capability):
-                reference = models.ForeignKey(MyReference, models.CASCADE, null=True, related_name="capabilities")
-                # custom code here...
-
-            target = models.ForeignKey(MyObject, models.CASCADE)
-
+    specific to each model (see :py:class:`Object` abstract model). The
+    actual concrete class is created when :py:class:`Object` is subclassed
+    by a concrete model.
     """
 
     uuid = models.UUIDField(_("Reference"), default=uuid.uuid4, db_index=True)
@@ -217,6 +148,13 @@ class Reference(CapabilitySet, models.Model, metaclass=ReferenceBase):
         help_text=_("Defines an expiration date after which the reference is not longer valid."),
     )
     """Date of expiration."""
+    grants = models.JSONField(_("Granted capabilities"), blank=True)
+    """ Allowed capabilities as DB field.
+
+    This is stored as a dict where keys are permission codename and
+    value `max_derive` argument (or second argument of Capability
+    constructor).
+    """
 
     objects = ReferenceQuerySet.as_manager()
 
@@ -229,13 +167,18 @@ class Reference(CapabilitySet, models.Model, metaclass=ReferenceBase):
         """Return True if Reference is expired."""
         return self.expiration is not None and self.expiration <= tz.now()
 
+    @cached_property
+    def capabilities(self) -> list[Capability]:
+        """Self' capabilities as list of Capability instances."""
+        return [self.capability_class.deserialize(val) for val in self.grants.items()]
+
     @classmethod
     def get_object_class(cls):
         """Return related Object class."""
         return cls.target.field.related_model
 
     @classmethod
-    def create_root(cls, emitter: Agent, target: object, **kwargs) -> Reference:
+    def create_root(cls, emitter: Agent, target: object, template: Reference | None = None, **kwargs) -> Reference:
         """Create and save a new root reference.
 
         There can be only one root reference per object.
@@ -244,6 +187,7 @@ class Reference(CapabilitySet, models.Model, metaclass=ReferenceBase):
 
         :param emitter: the owner of the object, as it is emitter of the root reference.
         :param target: target :py:class:`.object.Object` instance.
+        :param template: use this reference instance as template instead of default one.
         :param **kwargs: Reference's initial arguments.
         :return: the created root reference.
         :yield ValueError: when ``origin`` is provided or a root reference already exists.
@@ -255,17 +199,16 @@ class Reference(CapabilitySet, models.Model, metaclass=ReferenceBase):
         if target.references.exists():
             raise ValueError("A reference already exists for this object.")
 
-        self = cls(emitter=emitter, receiver=emitter, target=target, **kwargs)
-        self.save()
+        kwargs["grants"] = dict(cls.get_object_class().root_reference_grants)
+        return cls.objects.create(emitter=emitter, receiver=emitter, target=target, **kwargs)
 
-        # clone initial capabilities
-        capabilities = list(self.Capability.objects.initials())
-        for cap in capabilities:
-            cap.reference = self
-            cap.pk = None
+    def has_perm(self, user: User, permission: str) -> bool:
+        """Return True if reference grants the provided permission."""
+        return self.receiver.is_agent(user) and permission in self.grants
 
-        self.Capability.objects.bulk_create(capabilities)
-        return self
+    def get_all_permissions(self, user: User) -> bool:
+        """Return allowed permissions for this user."""
+        return self.receiver.is_agent(user) and set(self.grants.keys()) or []
 
     def is_valid(self, raises: bool = False) -> bool:
         """Check Reference values validity, throwing exception on invalid
@@ -290,44 +233,33 @@ class Reference(CapabilitySet, models.Model, metaclass=ReferenceBase):
             return False
         return super().is_derived(other)
 
-    def get_capabilities(self) -> CapabilityQuerySet:
-        return self.capabilities.all()
-
     def derive(
-        self,
-        receiver: Agent | int,
-        caps: Caps = None,
-        raises: bool = False,
-        defaults: dict[str, Any] = {},
-        **kwargs,
+        self, receiver: Agent | int, capabilities: Iterable[Capability] | None = None, raises: bool = False, **kwargs
     ) -> Reference:
         """Create a new reference derived from self.
 
-        :param caps: select capabilities to be derived.
+        :param receiver: the reference's receiver
+        :param capabilities: select capabilities to be derived.
         :param raises: raises PermissionDenied error instead of silent it.
-        :param defaults: Capability instances' initial arguments.
-        :param **kwargs: initial arguments of the new set.
+        :param **kwargs: initial arguments of the Reference.
         """
-        kwargs = self._get_derived_kwargs(receiver, kwargs)
-        obj = type(self).objects.create(**kwargs)
-        capabilities = self.derive_caps(caps, raises=raises, defaults={**defaults, "reference": obj})
-        self.Capability.objects.bulk_create(capabilities)
-        return obj
+        kwargs = self._get_derive_kwargs(receiver, kwargs)
+        capabilities = self.derive_caps(capabilities, raises)
+        kwargs["grants"] = dict(cap.serialize() for cap in capabilities)
+        return type(self).objects.create(**kwargs)
 
     async def aderive(
-        self, caps: Caps = None, raises: bool = False, defaults: dict[str, Any] = {}, **kwargs
+        self, receiver: Agent | int, capabilities: Iterable[Capability] | None = None, raises: bool = False, **kwargs
     ) -> Reference:
         """Async version of :py:meth:`derive`."""
-        kwargs = self._get_derived_kwargs(kwargs)
-        obj = await type(self).objects.acreate(**kwargs)
-        capabilities = self.derive_caps(caps, raises=raises, defaults={**defaults, "reference": obj})
-        await self.Capability.objects.abulk_create(capabilities)
-        return obj
+        kwargs = self._get_derive_kwargs(receiver, kwargs)
+        capabilities = self.derive_caps(capabilities, raises)
+        kwargs["grants"] = dict(cap.serialize() for cap in capabilities)
+        return await type(self).objects.acreate(**kwargs)
 
-    def _get_derived_kwargs(self, receiver: int | Agent, kwargs):
+    def _get_derive_kwargs(self, receiver: int | Agent, kwargs):
         """Return initial argument for a derived reference from self."""
         r_key = "receiver_id" if isinstance(receiver, int) else "receiver"
-
         e_key, emitter = get_lazy_relation(self, "receiver", "emitter")
 
         if self.expiration:

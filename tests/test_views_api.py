@@ -31,13 +31,11 @@ def ref_viewset(req):
 
 @pytest.mark.django_db(transaction=True)
 class TestObjectViewSet:
-    def test_get_can_all_q(self, viewset_mixin):
-        viewset_mixin.action = "list"
-        assert viewset_mixin.get_can_all_q() == viewset_mixin._get_can_all_q(Reference, api.ObjectListAPIView.can)
+    def test_perform_create(self, viewset_mixin):
+        raise NotImplementedError()
 
-    def test_get_can_all_q_without_can_for_action(self, viewset_mixin):
-        viewset_mixin.action = "publish"
-        assert viewset_mixin.get_can_all_q() == []
+    def test_get_reference_queryset_for_detail(self, viewset_mixin):
+        raise NotImplementedError()
 
 
 class TestReferenceViewSet:
@@ -52,13 +50,13 @@ class TestReferenceViewSet:
     def test_get_queryset_for_derive(self, ref_viewset, user_agents, refs_3, refs_2):
         ref_viewset.action = "derive"
         query = ref_viewset.get_queryset()
-        assert all(q.emitter in user_agents for q in query)
+        assert all(q.receiver in user_agents for q in query)
 
     def test_derive(self, ref_viewset, user_agent, group_agent, ref):
         ref_viewset.kwargs = {"uuid": ref.uuid}
         ref_viewset.request.data = {
             "receiver": group_agent.uuid,
-            "caps": [c.permission_id for c in ref.capabilities.all()],
+            "capabilities": [c.serialize() for c in ref.capabilities],
         }
         resp = ref_viewset.derive(ref_viewset.request)
         assert resp.data["origin"] == ref.uuid

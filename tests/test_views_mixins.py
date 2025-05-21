@@ -9,6 +9,8 @@ from .app.models import Reference, ConcreteObject
 
 
 class BaseMixin:
+    object = None
+
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
 
@@ -17,6 +19,9 @@ class BaseMixin:
 
     def get_queryset(self):
         return ConcreteObject.objects.all()
+
+    def get_object(self):
+        return self.object
 
 
 class ObjectMixin(mixins.ObjectMixin, BaseMixin):
@@ -100,32 +105,33 @@ class TestObjectMixin:
 
 
 @pytest.fixture
-def perm_mixin(req):
-    return ObjectPermissionMixin(request=req)
+def perm_mixin(req, object, ref):
+    object.reference = ref
+    return ObjectPermissionMixin(request=req, object=object)
 
 
-@pytest.mark.django_db(transaction=True)
 class TestObjectPermissionMixin:
-    def test_get_can_all_q(self, perm_mixin, perm):
-        perm_mixin.can = perm
-        q = perm_mixin.get_can_all_q()
-        assert q == Reference.objects.can_all_q(perm)
+    def test_get_object(self, perm_mixin):
+        # we just assert that check_object_permissions is called
+        call = []
+        perm_mixin.check_object_permissions = lambda *a: call.append(a)
+        perm_mixin.get_object()
+        assert call
 
-    # FIXME: bug may happen -> q's contenttype target the same class but doesn't have the same id.
-    # def test__get_can_all_q(self):
-    #    q = mixins.ObjectPermissionMixin._get_can_all_q(Reference, "view")
-    #    assert q == Reference.objects.can_all_q("view")
+    def test_check_object_permissions(self, perm_mixin, object, ref):
+        object.reference = ref
+        perm_mixin.check_object_permissions(object)
 
-    def test_get_reference_queryset(self, perm_mixin, req, refs, perm):
-        perm_mixin.can = perm
-        perm_mixin.agents = req.agent
-        query = perm_mixin.get_reference_queryset()
-        assert all(perm.id in r.capabilities.values_list("permission_id", flat=True) for r in query)
+    def test_check_object_permissions_raises_permission_denied(self, perm_mixin, object, ref, user_2):
+        object.reference = ref
+        perm_mixin.request.user = user_2
+        with pytest.raises(Http404):
+            perm_mixin.check_object_permissions(object)
 
-    def test_get_reference_queryset_with_orphan(self, perm_mixin, req, refs, orphan_perm):
-        perm_mixin.can = orphan_perm
-        perm_mixin.agents = req.agent
-        assert not perm_mixin.get_reference_queryset()
+    def test_get_permissions(self, perm_mixin):
+        perms = perm_mixin.get_permissions()
+        assert len(perms) == 1
+        assert isinstance(perms[0], perm_mixin.permissions[0])
 
 
 @pytest.fixture
@@ -133,12 +139,10 @@ def single_mixin(req, ref, perm):
     return SingleObjectMixin(can=perm, kwargs={"uuid": ref.uuid}, request=req, agents=ref.receiver)
 
 
-@pytest.mark.django_db(transaction=True)
 class TestSingleObjectMixin:
     def test_get_reference_queryset(self, single_mixin, refs, ref):
         query = single_mixin.get_reference_queryset()
-        assert query.count() == 1
-        assert query.first() == ref
+        assert (query.count(), query.first()) == (1, ref)
 
     def test_get_object(self, single_mixin, refs, ref):
         assert single_mixin.get_object() == ref.target

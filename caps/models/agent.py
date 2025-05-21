@@ -77,6 +77,17 @@ class Agent(models.Model):
         """Return True when Agent targets anonymous users."""
         return not self.user and not self.group
 
+    def is_agent(self, user: User):
+        """Return True if user can act as this agent.
+
+        This methods also check based on user's group and anonymity.
+        """
+        if user.is_anonymous:
+            return self.is_anonymous
+        return self.user_id == user.pk or any(
+            gid == self.group_id for gid in user.groups.all().values_list("pk", flat=True)
+        )
+
     def clean(self):
         if self.user and self.group:
             raise ValidationError(_("Agent targets either a user or a group"))

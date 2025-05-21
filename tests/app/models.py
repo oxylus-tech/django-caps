@@ -2,7 +2,7 @@ from django.db import models
 
 from caps.models import Object
 
-__all__ = ("ConcreteObject", "Reference", "Capability")
+__all__ = ("ConcreteObject", "Reference")
 
 
 class ConcreteObject(Object):
@@ -10,11 +10,15 @@ class ConcreteObject(Object):
 
     detail_url_name = "concrete-detail"
 
+    root_reference_grants = {
+        "caps_test.view_concreteobject": 4,
+        "caps_test.change_concreteobject": 2,
+    }
+
     name = models.CharField(max_length=16)
 
 
 Reference = ConcreteObject.Reference
-Capability = ConcreteObject.Capability
 
 
 # class AbstractObject(Object):

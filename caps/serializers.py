@@ -3,10 +3,10 @@ from rest_framework import serializers
 from rest_framework.serializers import ValidationError
 
 from . import models
-from .models import Cap
+from .models.capability import RawCapability
 
 
-__all__ = ("AgentSerializer", "CapabilitySerializer", "ReferenceSerializer", "ObjectSerializer")
+__all__ = ("AgentSerializer", "ReferenceSerializer", "ObjectSerializer", "CapabilityField", "DeriveSerializer")
 
 
 class AgentSerializer(serializers.ModelSerializer):
@@ -15,18 +15,6 @@ class AgentSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Agent
         fields = ["user_id", "group_id"]
-
-
-class CapabilitySerializer(serializers.Serializer):
-    """
-    Serializer for :py:class:`caps.models.capability.Capability`.
-
-    Implemented as simple Serializer, since the corresponding models are generated based on
-    concrete :py:class:`.models.object.Object`.
-    """
-
-    class Meta:
-        fields = ["permission_id", "reference_id", "max_derive"]
 
 
 class ReferenceSerializer(serializers.Serializer):
@@ -38,11 +26,10 @@ class ReferenceSerializer(serializers.Serializer):
     """
 
     origin = serializers.SerializerMethodField(source="get_origin")
-    capabilities = CapabilitySerializer(many=True, read_only=True)
 
     class Meta:
         fields = ["uuid", "origin", "depth", "emitter", "receiver", "expiration"]
-        read_only_fields = ["uuid", "depth", "emitter", "receiver", "expiration"]
+        read_only_fields = "__all__"
 
     def get_origin(self, obj):
         return obj.origin.uuid
@@ -67,7 +54,7 @@ class ObjectSerializer(serializers.ModelSerializer):
         fields = ["reference"]
 
 
-class DeriveCapField(serializers.Field):
+class CapabilityField(serializers.Field):
     """Serialize/Deserialize a :py:type:`~caps.models.capability_set.Cap`, used to derive a reference.
 
     Allowed values are:
@@ -78,24 +65,16 @@ class DeriveCapField(serializers.Field):
 
     """
 
-    def to_representation(self, value: Cap | models.Capability) -> list[int, int | None]:
-        if isinstance(value, (tuple, list)):
-            return [int(value[0]), int(value[1])]
-        elif isinstance(value, models.Capability):
-            return [value.permission_id, value.max_derive]
-        elif isinstance(value, int):
-            return [value, None]
-        raise ValueError(f"Invalid value type for Cap: {value}")
+    capability_class = models.Capability
 
-    def to_internal_value(self, value: Cap) -> list[int, int | None]:
-        if isinstance(value, (tuple, list)):
-            if len(value) != 2:
-                raise ValidationError("Incorrect length for list or tuple (must be 2: permission id, max derive)")
-            return [int(value[0]), int(value[1]) if value is not None else None]
+    def to_representation(self, value: models.Capability) -> tuple[str, int]:
+        return value.serialize()
+
+    def to_internal_value(self, value: RawCapability) -> list[int, int | None]:
         try:
-            return [int(value), None]
-        except ValueError:
-            raise ValidationError("Provided value must be convertible to an integer")
+            return self.capability_class.deserialize(value)
+        except ValueError as err:
+            raise ValidationError(str(err))
 
 
 class DeriveSerializer(serializers.Serializer):
@@ -105,7 +84,7 @@ class DeriveSerializer(serializers.Serializer):
     """
 
     receiver = serializers.UUIDField()
-    caps = serializers.ListField(child=DeriveCapField())
+    capabilities = serializers.ListField(child=CapabilityField())
 
     def validate_receiver(self, value):
         try:

@@ -1,75 +1,40 @@
-from django.db.models import Q
-
-from rest_framework import generics, status, viewsets, mixins as mx
+from rest_framework import status, viewsets, mixins as mx
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from .. import models, serializers, permissions
-from ..models.capability import CanMany
 from . import mixins
 
 
 __all__ = (
-    "ObjectListAPIView",
-    "ObjectRetrieveAPIView",
-    "ObjectCreateAPIView",
-    "ObjectUpdateAPIView",
-    "ObjectDestroyAPIView",
     "ObjectViewSet",
     "AgentViewSet",
     "ReferenceViewSet",
 )
 
 
-class ObjectCreateAPIMixin(mixins.ObjectCreateMixin):
+class ObjectViewSet(mixins.ObjectCreateMixin, viewsets.ModelViewSet):
+    """
+    This is the base mixin handling permissions check for django-caps.
+    """
+
+    permissions = [permissions.ObjectPermissions]
+    lookup_field = "reference__uuid"
+    lookup_url_kwarg = "uuid"
+
     def perform_create(self, serializer):
         """Ensure a root reference is created when the Object is saved."""
         super().perform_create(serializer)
         self.create_reference(self.agent, serializer.instance)
 
-
-class ObjectListAPIView(mixins.ObjectListMixin, generics.ListAPIView):
-    pass
-
-
-class ObjectRetrieveAPIView(mixins.ObjectDetailMixin, generics.RetrieveAPIView):
-    pass
-
-
-class ObjectCreateAPIView(ObjectCreateAPIMixin, generics.CreateAPIView):
-    pass
-
-
-class ObjectUpdateAPIView(mixins.ObjectUpdateMixin, generics.UpdateAPIView):
-    pass
-
-
-class ObjectDestroyAPIView(mixins.ObjectDeleteMixin, generics.DestroyAPIView):
-    pass
-
-
-class ObjectViewSet(ObjectCreateAPIMixin, mixins.SingleObjectMixin, viewsets.ModelViewSet):
-    """
-    This is the base mixin handling permission check for django-caps.
-
-    It provides mapping between actions and specific permissions.
-
-    """
-
-    can: dict[str, CanMany] = {
-        "list": ObjectListAPIView.can,
-        "retrieve": ObjectRetrieveAPIView.can,
-        "create": ObjectCreateAPIView.can,
-        "update": ObjectUpdateAPIView.can,
-        "destroy": ObjectDestroyAPIView.can,
-    }
-    """ Map of ViewSet actions to references' ones. """
-
-    def get_can_all_q(self) -> list[Q]:
-        """Return Q object for filtering reference on :py:attr:`can` attribute and current request action."""
-        cls = self.get_reference_class()
-        can = self.can and self.can.get(self.action)
-        return self._get_can_all_q(cls, can) if can else []
+    def get_reference_queryset(self):
+        # here is a little similar to SingleObjectMixin but
+        # we have to do it only when action is detail
+        query = super().get_reference_queryset()
+        if self.detail:
+            uuid = self.kwargs[self.lookup_url_kwarg]
+            query = query.filter(uuid=uuid)
+        return query
 
 
 class AgentViewSet(viewsets.ModelViewSet):
@@ -107,9 +72,9 @@ class ReferenceViewSet(mx.RetrieveModelMixin, mx.DestroyModelMixin, mx.ListModel
     serializer_class = serializers.ReferenceSerializer
 
     def get_queryset(self):
-        query = super().get_queryset().prefetch_related("capabilities")
+        query = super().get_queryset()
         if self.action == "derive":
-            return query.emitter(self.request.agents)
+            return query.receiver(self.request.agents)
         return query.agent(self.request.agents)
 
     @action(detail=True, methods=["post"])
@@ -122,14 +87,14 @@ class ReferenceViewSet(mx.RetrieveModelMixin, mx.DestroyModelMixin, mx.ListModel
         .. code-block:: yaml
 
             receiver: "agent-uuid"
-            caps:
-                - [12, 1]
-                - 1
+            capabilities:
+                - ["myapp.view_myobject", 1]
+                - ["myapp.change_myobject", 0]
         """
         ref = self.get_object()
         derive_ser = self.derive_serializer_class(data=request.data)
         if not derive_ser.is_valid():
             return Response(derive_ser.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        derived = ref.derive(derive_ser.validated_data["receiver"], derive_ser.validated_data["caps"])
+        derived = ref.derive(derive_ser.validated_data["receiver"], derive_ser.validated_data["capabilities"])
         return Response(self.get_serializer_class()(derived).data)

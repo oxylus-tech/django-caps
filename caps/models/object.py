@@ -2,7 +2,8 @@ from __future__ import annotations
 
 
 from django.db import models
-from django.db.models import OuterRef, Prefetch, Subquery
+from django.db.models import Q, OuterRef, Prefetch, Subquery
+from django.contrib.auth.models import Permission
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
@@ -19,11 +20,6 @@ class ObjectBase(NestedModelBase):
     """
 
     nested_class = Reference
-
-    def __new__(mcls, name, bases, attrs):
-        cls = super(ObjectBase, mcls).__new__(mcls, name, bases, attrs)
-        setattr(cls, "Capability", cls.Reference.Capability)
-        return cls
 
     @classmethod
     def create_nested_class(cls, new_class, name, attrs={}):
@@ -92,7 +88,24 @@ class Object(models.Model, metaclass=ObjectBase):
         - :py:class:`Capability` concrete model accessible from the :py:class:`Object` concrete subclass;
     """
 
+    root_reference_grants = {}
+    """
+    This class attribute provide the default value for grant object.
+    It should follows the structure of :py:attr:`~.reference.Reference.grants` field, such as:
+
+    .. code-block:: python
+
+        root_reference_grants = {
+            "auth.view_user": 1,
+            "app.change_mymodel": 2
+        }
+
+    """
+
     objects = ObjectQuerySet.as_manager()
+
+    detail_url_name = None
+    """ Provide url name used for get_absolute_url. """
 
     class Meta:
         abstract = True
@@ -104,8 +117,25 @@ class Object(models.Model, metaclass=ObjectBase):
         ref_set = getattr(self, "agent_reference_set", None)
         return ref_set and ref_set[0] or None
 
-    detail_url_name = None
-    """ Provide url name used for get_absolute_url. """
+    @classmethod
+    def check_root_reference_grants(cls):
+        """
+        Lookup for declared permissions of :py:attr:`root_reference_grants`, raising ValueError if
+        there are declared permissions not present in database.
+        """
+        keys = set()
+        q = Q()
+        for key in cls.root_reference_grants.keys():
+            app_label, codename = key.split(".", 1)
+            q |= Q(content_type__app_label=app_label, codename=codename)
+            keys.add((app_label, codename))
+
+        perms = set(Permission.objects.filter(q).values_list("content_type__app_label", "codename"))
+
+        if delta := (keys - perms):
+            raise ValueError(
+                f"`{cls.__name__}.root_reference_grants` has permissions not present in the database: {', '.join(delta)}"
+            )
 
     def get_absolute_url(self) -> str:
         """

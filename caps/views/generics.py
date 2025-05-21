@@ -6,11 +6,11 @@ from . import mixins
 __all__ = ("ObjectListView", "ObjectDetailView", "ObjectCreateView", "ObjectUpdateView", "ObjectDeleteView")
 
 
-class ObjectListView(mixins.ObjectListMixin, generic.ListView):
+class ObjectListView(mixins.ObjectMixin, generic.ListView):
     pass
 
 
-class ObjectDetailView(mixins.ObjectDetailMixin, generic.DetailView):
+class ObjectDetailView(mixins.ObjectPermissionMixin, generic.DetailView):
     pass
 
 
@@ -23,9 +23,9 @@ class ObjectCreateView(mixins.ObjectCreateMixin, generic.edit.CreateView):
         return HttpResponseRedirect(self.get_success_url())
 
 
-class ObjectUpdateView(mixins.ObjectUpdateMixin, generic.edit.UpdateView):
+class ObjectUpdateView(mixins.ObjectPermissionMixin, generic.edit.UpdateView):
     pass
 
 
-class ObjectDeleteView(mixins.ObjectDeleteMixin, generic.edit.DeleteView):
+class ObjectDeleteView(mixins.ObjectPermissionMixin, generic.edit.DeleteView):
     pass

@@ -5,7 +5,7 @@ from django.core.exceptions import PermissionDenied
 from django.utils import timezone as tz
 import pytest
 
-from .app.models import Reference
+from .app.models import Reference, ConcreteObject
 from .conftest import assertCountEqual
 
 
@@ -59,26 +59,6 @@ class TestReferenceQuerySet:
             query = Reference.objects.refs(agent, set(ref.uuid for ref in refs if ref.receiver != agent))
             assert not query.exists(), "agent: " + str(agent.ref)
 
-    def test_can(self, user_agent, ref, refs, orphan_cap, caps_3):
-        orphan_cap.reference = ref
-        orphan_cap.save(update_fields=["reference"])
-        query = Reference.objects.can(orphan_cap.permission)
-        assert list(query) == [ref]
-
-    def test_can_with_many(self, user_agent, ref, refs_3, orphan_cap, caps_3):
-        orphan_cap.reference = ref
-        orphan_cap.save(update_fields=["reference"])
-        query = Reference.objects.can([orphan_cap.permission] + [c.permission for c in caps_3])
-        assertCountEqual(query, [ref] + refs_3)
-
-    def test_can_all(self, user_agent, ref, refs, orphan_cap, caps_3):
-        orphan_cap.reference = ref
-        orphan_cap.save(update_fields=["reference"])
-        query = Reference.objects.can_all([orphan_cap.permission, caps_3[0].permission])
-        assert list(query) == [ref]
-
-    # TODO: can_all_q, bulk_create
-
 
 @pytest.mark.django_db(transaction=True)
 class TestReference:
@@ -86,10 +66,7 @@ class TestReference:
         ref = Reference.create_root(user_agent, object)
         assert ref.receiver == ref.emitter == user_agent
         assert ref.origin is None
-        assertCountEqual(
-            ref.capabilities.all().values("permission_id", "max_derive"),
-            [{"permission_id": c.permission_id, "max_derive": c.max_derive} for c in caps_3],
-        )
+        assert ref.grants == ConcreteObject.root_reference_grants
 
     def test_create_root_raise_with_origin(self, user_agent, object, refs):
         with pytest.raises(ValueError):
@@ -98,6 +75,28 @@ class TestReference:
     def test_create_root_raise_with_reference_already_present(self, user_agent, object, ref):
         with pytest.raises(ValueError):
             Reference.create_root(user_agent, object)
+
+    def test_has_perm(self, ref, user, caps_3):
+        for cap in caps_3:
+            assert ref.has_perm(user, cap.permission)
+
+    def test_has_perm_group_agent(self, ref, user, caps_3):
+        for cap in caps_3:
+            assert ref.has_perm(user, cap.permission)
+
+    def test_has_perm_wrong_perm(self, ref, user, orphan_perm):
+        assert not ref.has_perm(user, orphan_perm)
+
+    def test_has_perm_wrong_user(self, ref, user_2, caps_3, orphan_perm):
+        for cap in caps_3:
+            assert not ref.has_perm(user_2, cap.permission)
+        assert not ref.has_perm(user_2, orphan_perm)
+
+    def test_get_all_permissions(self, ref, user):
+        assert ref.get_all_permissions(user) == set(ref.grants.keys())
+
+    def test_get_all_permissions_wrong_user(self, ref, user_2):
+        assert not ref.get_all_permissions(user_2)
 
     def test_is_valid(self, refs):
         assert refs[2].is_valid()
@@ -139,13 +138,10 @@ class TestReference:
         assert obj.depth == ref.depth + 1
         assert obj.receiver == group_agent
         assert obj.emitter == ref.receiver
-        assertCountEqual(
-            obj.capabilities.all().values_list("permission_id", flat=True),
-            ref.capabilities.all().values_list("permission_id", flat=True),
-        )
+        assert obj.grants.keys() == ref.grants.keys()
 
-    def test__get_derived_kwargs(self, ref, group_agent):
-        assert ref._get_derived_kwargs(group_agent, {"a": 123}) == {
+    def test__get_derive_kwargs(self, ref, group_agent):
+        assert ref._get_derive_kwargs(group_agent, {"a": 123}) == {
             "a": 123,
             "emitter_id": ref.emitter_id,
             "receiver": group_agent,
@@ -154,14 +150,14 @@ class TestReference:
             "target": ref.target,
         }
 
-    def test__get_derived_kwargs_expired_raise_permission_denied(self, ref, group_agent):
+    def test__get_derive_kwargs_expired_raise_permission_denied(self, ref, group_agent):
         ref.expiration = tz.now() - timedelta(hours=1)
         with pytest.raises(PermissionDenied):
-            ref._get_derived_kwargs(group_agent, {})
+            ref._get_derive_kwargs(group_agent, {})
 
-    def test__get_derived_kwargs_expiration_fixed(self, ref, group_agent):
+    def test__get_derive_kwargs_expiration_fixed(self, ref, group_agent):
         ref.expiration = tz.now() + timedelta(hours=1)
-        kw = ref._get_derived_kwargs(group_agent, {"expiration": tz.now() + timedelta(hours=3)})
+        kw = ref._get_derive_kwargs(group_agent, {"expiration": tz.now() + timedelta(hours=3)})
         assert kw["expiration"] == ref.expiration
 
     def test_get_absolute_url(self, ref):

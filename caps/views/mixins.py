@@ -1,23 +1,18 @@
 import inspect
-from functools import cache
 
-from django.db.models import Q
+from django.core.exceptions import PermissionDenied
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import get_object_or_404
 
+from .. import permissions
 from ..models import Agent, Object, Reference
-from ..models.capability import CanMany
 
 
 __all__ = (
     "ObjectMixin",
     "ObjectPermissionMixin",
     "SingleObjectMixin",
-    "ObjectListMixin",
-    "ObjectDetailMixin",
     "ObjectCreateMixin",
-    "ObjectUpdateMixin",
-    "ObjectDeleteMixin",
     "ByUUIDMixin",
     "AgentMixin",
     "ReferenceMixin",
@@ -60,7 +55,7 @@ class ObjectMixin:
 
     def get_reference_queryset(self):
         """Return reference queryset used to select objects."""
-        return self.get_reference_class().objects.available(self.agents)
+        return self.get_reference_class().objects.available(self.agents).select_related("receiver")
 
     def get_reference_class(self):
         """Return reference class used to create reference for object."""
@@ -85,44 +80,29 @@ class ObjectMixin:
         return super().dispatch(request, *args, **kwargs)
 
 
+# This class code is mostly taken from Django Rest Framework's permissions.DjangoModelPermissions
+# Its code falls under the same license.
 class ObjectPermissionMixin(ObjectMixin):
     """
-    Mixin providing access filtering based on reference and user's permission, using :py:attr:`can` attribute.
+    This mixin checks for object permission when ``get_object()`` is called. It raises a
+    ``PermissionDenied`` or ``Http404`` if user does not have access to the object.
     """
 
-    can: CanMany
-    """ Capability permission(s) required to display the view.
+    permissions = [permissions.ObjectPermissions]
 
-    A string with Permission codename. ContentType will be matched \
-    against current Capability's target :py:class:`.object.Object`.
-    """
+    def get_object(self):
+        obj = super().get_object()
+        self.check_object_permissions(obj)
+        return obj
 
-    @staticmethod
-    @cache
-    def _get_can_all_q(reference_class, can: CanMany | None = None) -> list[Q]:
-        """Retun Q objects for filtering reference based on provided ``can``
-        attribute.
+    def check_object_permissions(self, obj):
+        if perms := self.get_permissions():
+            allowed = any(p.has_object_permission(self.request, self, obj) for p in perms)
+            if not allowed:
+                raise PermissionDenied(f"Permission not allowed for {self.request.method} on this object.")
 
-        This method uses :py:func:`functools.cache` in order to optimize
-        queryset building. This assumes that :py:attr:`can` will not change
-        accross different view instances.
-        """
-        return reference_class.objects.can_all_q(can)
-
-    def get_can_all_q(self) -> list[Q]:
-        """Retun Q objects for filtering reference based on :py:attr:`can` attribute."""
-        cls = self.get_reference_class()
-        return self._get_can_all_q(cls, self.can)
-
-    def get_reference_queryset(self):
-        """Return queryset for references."""
-        query = super().get_reference_queryset()
-
-        if self.can:
-            all_q = self.get_can_all_q()
-            for q in all_q:
-                query = query.filter(q)
-        return query
+    def get_permissions(self):
+        return [p() for p in self.permissions]
 
 
 class SingleObjectMixin(ObjectPermissionMixin):
@@ -131,27 +111,20 @@ class SingleObjectMixin(ObjectPermissionMixin):
     Note: user's reference is fetched from `get_reference_queryset`, not `get_queryset`.
     """
 
-    lookup_url_kwargs = "uuid"
+    lookup_url_kwarg = "uuid"
     """ URL's kwargs argument used to retrieve reference uuid. """
 
     def get_reference_queryset(self):
-        uuid = self.kwargs[self.lookup_url_kwargs]
+        # we ensure selected object will be assigned to the right reference.
+        uuid = self.kwargs[self.lookup_url_kwarg]
         return super().get_reference_queryset().filter(uuid=uuid)
 
     def get_object(self):
-        query = self.get_queryset()
-        return get_object_or_404(query)
+        uuid = self.kwargs[self.lookup_url_kwarg]
+        return get_object_or_404(self.get_queryset(), references__uuid=uuid)
 
 
-class ObjectListMixin(ObjectPermissionMixin):
-    can = "view"
-
-
-class ObjectDetailMixin(SingleObjectMixin):
-    can = "view"
-
-
-class ObjectCreateMixin(ObjectPermissionMixin):
+class ObjectCreateMixin(ObjectMixin):
     can = "add"
 
     def create_reference(self, emitter: Agent, target: Object):
@@ -162,23 +135,15 @@ class ObjectCreateMixin(ObjectPermissionMixin):
         return ref
 
 
-class ObjectUpdateMixin(SingleObjectMixin):
-    can = "change"
-
-
-class ObjectDeleteMixin(SingleObjectMixin):
-    can = "delete"
-
-
 # ---- Other mixins
 class ByUUIDMixin:
     """Fetch a model by UUID."""
 
-    lookup_url_kwargs = "uuid"
+    lookup_url_kwarg = "uuid"
     """ URL's kwargs argument used to retrieve reference uuid. """
 
     def get_object(self):
-        return get_object_or_404(self.get_queryset(), uuid=self.kwargs[self.lookup_url_kwargs])
+        return get_object_or_404(self.get_queryset(), uuid=self.kwargs[self.lookup_url_kwarg])
 
 
 class AgentMixin(ByUUIDMixin, PermissionRequiredMixin):
