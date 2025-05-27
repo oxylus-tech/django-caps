@@ -25,14 +25,26 @@ class ReferenceSerializer(serializers.Serializer):
     concrete :py:class:`.models.object.Object`.
     """
 
-    origin = serializers.SerializerMethodField(source="get_origin")
+    uuid = serializers.CharField()
+    depth = serializers.IntegerField()
+    emitter = serializers.SerializerMethodField()
+    receiver = serializers.SerializerMethodField()
+    origin = serializers.SerializerMethodField()
+    expiration = serializers.DateTimeField()
+    grants = serializers.JSONField()
 
     class Meta:
-        fields = ["uuid", "origin", "depth", "emitter", "receiver", "expiration"]
+        fields = ["uuid", "origin", "depth", "emitter", "receiver", "expiration", "grants"]
         read_only_fields = "__all__"
 
+    def get_emitter(self, obj):
+        return obj.emitter and str(obj.emitter.uuid) or None
+
+    def get_receiver(self, obj):
+        return obj.receiver and str(obj.receiver.uuid) or None
+
     def get_origin(self, obj):
-        return obj.origin.uuid
+        return obj.origin and str(obj.origin.uuid) or None
 
 
 class ObjectSerializer(serializers.ModelSerializer):
@@ -40,6 +52,8 @@ class ObjectSerializer(serializers.ModelSerializer):
     Base serializer for Objects. It provides :py:attr:`uuid` field.
     """
 
+    uuid = serializers.CharField(source="reference__uuid", read_only=True)
+    """ Reference UUID """
     reference = ReferenceSerializer(read_only=True)
     """ Reference """
 
@@ -52,9 +66,10 @@ class ObjectSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = ["reference"]
+        read_only_fields = ["reference", "uuid"]
 
 
-class CapabilityField(serializers.Field):
+class CapabilityField(serializers.JSONField):
     """Serialize/Deserialize a :py:type:`~caps.models.capability_set.Cap`, used to derive a reference.
 
     Allowed values are:
@@ -72,6 +87,9 @@ class CapabilityField(serializers.Field):
 
     def to_internal_value(self, value: RawCapability) -> list[int, int | None]:
         try:
+            if isinstance(value, str):
+                value = value.split(",")
+                value = [value[0].strip(), value[1] and int(value[1]) or 0]
             return self.capability_class.deserialize(value)
         except ValueError as err:
             raise ValidationError(str(err))

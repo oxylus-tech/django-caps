@@ -235,7 +235,7 @@ class Reference(CapabilitySet, models.Model):
 
     def derive(
         self, receiver: Agent | int, capabilities: Iterable[Capability] | None = None, raises: bool = False, **kwargs
-    ) -> Reference:
+    ) -> Reference | None:
         """Create a new reference derived from self.
 
         :param receiver: the reference's receiver
@@ -245,6 +245,8 @@ class Reference(CapabilitySet, models.Model):
         """
         kwargs = self._get_derive_kwargs(receiver, kwargs)
         capabilities = self.derive_caps(capabilities, raises)
+        if not capabilities:
+            raise PermissionDenied("Can not derive this reference")
         kwargs["grants"] = dict(cap.serialize() for cap in capabilities)
         return type(self).objects.create(**kwargs)
 

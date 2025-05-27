@@ -1,6 +1,7 @@
 import pytest
 import unittest
 
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import Group, User, Permission
 from django.test import RequestFactory
 
@@ -50,8 +51,24 @@ def user(db, user_group):
 
 
 @pytest.fixture
+def user_perms(user):
+    ct = ContentType.objects.get_for_model(ConcreteObject)
+    perms = Permission.objects.filter(content_type=ct)
+    user.user_permissions.set(perms)
+    return perms
+
+
+@pytest.fixture
 def user_2(db):
     return User.objects.create_user(username="test_2", password="none-2")
+
+
+@pytest.fixture
+def user_2_perms(user_2):
+    ct = ContentType.objects.get_for_model(ConcreteObject)
+    perms = Permission.objects.filter(content_type=ct, codename__contains="view")
+    user_2.user_permissions.set(perms)
+    return perms
 
 
 @pytest.fixture

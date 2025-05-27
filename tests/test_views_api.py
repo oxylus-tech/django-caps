@@ -3,13 +3,15 @@ import pytest
 from rest_framework import status
 
 from caps.views import api
-from .app.models import Reference
+from .app.models import Reference, ConcreteObject
+from .app.serializers import ConcreteObjectSerializer
 from .conftest import req_factory, init_request
 from .test_views_mixins import BaseMixin
 
 
 class ObjectViewSetMixin(api.ObjectViewSet, BaseMixin):
-    reference_class = Reference
+    queryset = ConcreteObject.objects.all()
+    serializer_class = ConcreteObjectSerializer
 
 
 @pytest.fixture
@@ -19,8 +21,8 @@ def req(user_agent, user_agents):
 
 
 @pytest.fixture
-def viewset_mixin(req):
-    return ObjectViewSetMixin(request=req)
+def viewset_mixin(req, user_agent):
+    return ObjectViewSetMixin(request=req, agent=user_agent)
 
 
 @pytest.fixture
@@ -31,11 +33,19 @@ def ref_viewset(req):
 
 @pytest.mark.django_db(transaction=True)
 class TestObjectViewSet:
-    def test_perform_create(self, viewset_mixin):
-        raise NotImplementedError()
+    def test_perform_create(self, viewset_mixin, req, user_agent):
+        ser = ConcreteObjectSerializer(data={"name": "Name"}, context={"request": req})
+        ser.is_valid()
+        viewset_mixin.perform_create(ser)
 
-    def test_get_reference_queryset_for_detail(self, viewset_mixin):
-        raise NotImplementedError()
+        assert isinstance(ser.instance.reference, Reference)
+        assert ser.instance.reference.receiver == user_agent
+
+    def test_get_reference_queryset_for_detail(self, viewset_mixin, ref):
+        viewset_mixin.detail = True
+        viewset_mixin.kwargs = {"uuid": ref.uuid}
+        query = viewset_mixin.get_reference_queryset()
+        assert list(query) == [ref]
 
 
 class TestReferenceViewSet:

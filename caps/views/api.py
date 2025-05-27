@@ -18,14 +18,19 @@ class ObjectViewSet(mixins.ObjectCreateMixin, viewsets.ModelViewSet):
     This is the base mixin handling permissions check for django-caps.
     """
 
-    permissions = [permissions.ObjectPermissions]
-    lookup_field = "reference__uuid"
+    permission_classes = [permissions.ObjectPermissions]
+    lookup_field = "references__uuid"
     lookup_url_kwarg = "uuid"
 
     def perform_create(self, serializer):
         """Ensure a root reference is created when the Object is saved."""
         super().perform_create(serializer)
         self.create_reference(self.agent, serializer.instance)
+
+    def get_reference_class(self):
+        if not self.reference_class:
+            return self.queryset.model.Reference
+        return super().get_reference_class()
 
     def get_reference_queryset(self):
         # here is a little similar to SingleObjectMixin but
@@ -78,7 +83,7 @@ class ReferenceViewSet(mx.RetrieveModelMixin, mx.DestroyModelMixin, mx.ListModel
         return query.agent(self.request.agents)
 
     @action(detail=True, methods=["post"])
-    def derive(self, request, pk=None):
+    def derive(self, request, uuid=None):
         """Derive reference from current one.
 
         Example of request's POST data in YAML (see :py:meth:`~caps.models.reference.Reference.derive`,
