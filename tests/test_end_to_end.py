@@ -52,7 +52,6 @@ def test_api_create_reference(client, client_2, user_2):
     )
 
     # Ensure access
-    print(resp.data)
     uuid = resp.data["uuid"]
     resp = client_2.get(reverse("concreteobject-detail", args=[uuid]))
     assert resp.status_code == 200

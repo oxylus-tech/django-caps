@@ -32,7 +32,6 @@ classifiers = [
 python = "^3.13"
 Django = "^5"
 djangorestframework = "^3"
-django-filter = "^25.1"
 
 
 [tool.poetry.group.dev.dependencies]
