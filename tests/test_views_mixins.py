@@ -36,10 +36,6 @@ class SingleObjectMixin(mixins.SingleObjectMixin, BaseMixin):
     reference_class = Reference
 
 
-class ObjectCreateMixin(mixins.ObjectCreateMixin, BaseMixin):
-    reference_class = Reference
-
-
 @pytest.fixture
 def req(user_agent, user_agents):
     req = req_factory.get("/test")
@@ -61,30 +57,9 @@ class TestObjectMixin:
         object_mixin.all_agents = True
         assert object_mixin.get_agents() == user_agents
 
-    def test_get_reference_queryset(self, object_mixin, user_agent, refs):
-        object_mixin.agents = user_agent
-        query = object_mixin.get_reference_queryset()
-        assert all(r.receiver == user_agent or r.emitter == user_agent for r in query)
+    def test_get_queryset(self, object_mixin, user_agent, refs):
+        raise NotImplementedError()
 
-    def test_get_reference_class_using_class_attribute(self, object_mixin):
-        object_mixin.reference_class = Reference
-        assert object_mixin.get_reference_class() is Reference
-
-    def test_get_reference_class_using_model_attribute(self, object_mixin):
-        object_mixin.model = ConcreteObject
-        assert object_mixin.get_reference_class() is Reference
-
-    def test_get_reference_class_raise_missing_attribute(self, object_mixin):
-        with pytest.raises(ValueError, match="There is no Reference class"):
-            object_mixin.reference_class = None
-            object_mixin.get_reference_class()
-
-    def test_get_reference_class_raise_is_not_a_reference_subclass(self, object_mixin):
-        object_mixin.reference_class = mixins.ObjectMixin
-        with pytest.raises(ValueError, match="is not a Reference subclass"):
-            object_mixin.get_reference_class()
-
-    # def test_get_queryset(self, object_mixin, user_agent, refs):
     #    object_mixin.agents = user_agent
     #    query = object_mixin.get_queryset()
     #    assert all(o.reference.agent == user_agent for o in query)
@@ -119,11 +94,14 @@ class TestObjectPermissionMixin:
         assert call
 
     def test_check_object_permissions(self, perm_mixin, object, ref):
-        object.reference = ref
+        perm_mixin.check_object_permissions(object)
+
+    def test_check_object_permissions_from_ref(self, perm_mixin, object, ref, user_2):
+        perm_mixin.request.user = user_2
         perm_mixin.check_object_permissions(object)
 
     def test_check_object_permissions_raises_permission_denied(self, perm_mixin, object, ref, user_2):
-        object.reference = ref
+        object.reference = None
         perm_mixin.request.user = user_2
         with pytest.raises(Http404):
             perm_mixin.check_object_permissions(object)
@@ -136,14 +114,10 @@ class TestObjectPermissionMixin:
 
 @pytest.fixture
 def single_mixin(req, ref, perm):
-    return SingleObjectMixin(can=perm, kwargs={"uuid": ref.uuid}, request=req, agents=ref.receiver)
+    return SingleObjectMixin(can=perm, kwargs={"uuid": ref.target.uuid}, request=req, agents=ref.receiver)
 
 
 class TestSingleObjectMixin:
-    def test_get_reference_queryset(self, single_mixin, refs, ref):
-        query = single_mixin.get_reference_queryset()
-        assert (query.count(), query.first()) == (1, ref)
-
     def test_get_object(self, single_mixin, refs, ref):
         assert single_mixin.get_object() == ref.target
 
@@ -151,16 +125,3 @@ class TestSingleObjectMixin:
         single_mixin.kwargs["uuid"] = uuid4()
         with pytest.raises(Http404):
             single_mixin.get_object()
-
-
-@pytest.fixture
-def create_mixin(req, perm):
-    return ObjectCreateMixin(can=perm, request=req)
-
-
-@pytest.mark.django_db(transaction=True)
-class TestObjectCreateMixin:
-    def test_create_reference(self, create_mixin, user_agent, object, caps_3):
-        ref = create_mixin.create_reference(user_agent, object)
-        assert object.reference is ref
-        assert (ref.target, ref.emitter) == (object, user_agent)

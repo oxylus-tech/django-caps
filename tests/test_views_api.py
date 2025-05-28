@@ -38,14 +38,13 @@ class TestObjectViewSet:
         ser.is_valid()
         viewset_mixin.perform_create(ser)
 
-        assert isinstance(ser.instance.reference, Reference)
-        assert ser.instance.reference.receiver == user_agent
+        assert ser.instance.owner == user_agent
 
-    def test_get_reference_queryset_for_detail(self, viewset_mixin, ref):
-        viewset_mixin.detail = True
-        viewset_mixin.kwargs = {"uuid": ref.uuid}
-        query = viewset_mixin.get_reference_queryset()
-        assert list(query) == [ref]
+    def test_get_queryset(self):
+        raise NotImplementedError()
+
+    def test_share(self):
+        raise NotImplementedError()
 
 
 class TestReferenceViewSet:
@@ -57,22 +56,22 @@ class TestReferenceViewSet:
         assert any(q.emitter in user_agents for q in query)
         assert any(q.receiver in user_agents for q in query)
 
-    def test_get_queryset_for_derive(self, ref_viewset, user_agents, refs_3, refs_2):
-        ref_viewset.action = "derive"
+    def test_get_queryset_for_share(self, ref_viewset, user_agents, refs_3, refs_2):
+        ref_viewset.action = "share"
         query = ref_viewset.get_queryset()
         assert all(q.receiver in user_agents for q in query)
 
-    def test_derive(self, ref_viewset, user_agent, group_agent, ref):
+    def test_share(self, ref_viewset, user_agent, group_agent, ref):
         ref_viewset.kwargs = {"uuid": ref.uuid}
         ref_viewset.request.data = {
             "receiver": group_agent.uuid,
-            "capabilities": [c.serialize() for c in ref.capabilities],
+            "grants": ref.grants,
         }
-        resp = ref_viewset.derive(ref_viewset.request)
-        assert resp.data["origin"] == ref.uuid
+        resp = ref_viewset.share(ref_viewset.request)
+        assert resp.data["origin"] == str(ref.uuid)
 
-    def test_derive_invalid(self, ref_viewset, ref, group_agent):
+    def test_share_invalid(self, ref_viewset, ref, group_agent):
         ref_viewset.kwargs = {"uuid": ref.uuid}
-        ref_viewset.request.data = {"receiver": group_agent.uuid, "caps": "list"}
-        resp = ref_viewset.derive(ref_viewset.request)
+        ref_viewset.request.data = {"receiver": group_agent.uuid, "grants": "list"}
+        resp = ref_viewset.share(ref_viewset.request)
         assert resp.status_code == status.HTTP_400_BAD_REQUEST

@@ -13,16 +13,11 @@ class PermissionsBackend(BaseBackend):
     """
 
     def has_perm(self, user, perm, obj=None) -> bool:
-        if isinstance(obj, models.Object):
-            obj = getattr(obj, "reference", None)
-
-        if isinstance(obj, models.Reference):
+        if isinstance(obj, (models.Object, models.Reference)):
             return obj.has_perm(user, perm)
         return False
 
-    def get_all_permissions(self, user, obj=None):
-        if isinstance(obj, models.Object):
-            obj = getattr(obj, "reference", None)
-        if isinstance(obj, models.Reference):
+    def get_all_permissions(self, user, obj=None) -> set[str]:
+        if isinstance(obj, (models.Object, models.Reference)):
             return obj.get_all_permissions(user)
         return set()

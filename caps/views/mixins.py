@@ -1,18 +1,15 @@
-import inspect
-
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import get_object_or_404
 
 from .. import permissions
-from ..models import Agent, Object, Reference
+from ..models import Agent
 
 
 __all__ = (
     "ObjectMixin",
     "ObjectPermissionMixin",
     "SingleObjectMixin",
-    "ObjectCreateMixin",
     "ByUUIDMixin",
     "AgentMixin",
     "ReferenceMixin",
@@ -53,26 +50,9 @@ class ObjectMixin:
         """Return value to use for :py:attr:`agents`."""
         return self.request.agents if self.all_agents else self.request.agent
 
-    def get_reference_queryset(self):
-        """Return reference queryset used to select objects."""
-        return self.get_reference_class().objects.available(self.agents).select_related("receiver")
-
-    def get_reference_class(self):
-        """Return reference class used to create reference for object."""
-        ref_class = self.reference_class
-        if not ref_class:
-            try:
-                ref_class = getattr(self.model, "Reference")
-            except AttributeError:
-                raise ValueError("There is no Reference class provided for this model nor this view.")
-        if not inspect.isclass(ref_class) or not issubclass(ref_class, Reference):
-            raise ValueError(f"{ref_class} is not a Reference subclass.")
-        return ref_class
-
     def get_queryset(self):
         """Get Object queryset based get_reference_queryset."""
-        refs = self.get_reference_queryset()
-        return super().get_queryset().refs(refs)
+        return super().get_queryset().available(self.request.agents)
 
     def dispatch(self, request, *args, **kwargs):
         self.agents = self.get_agents()
@@ -114,25 +94,9 @@ class SingleObjectMixin(ObjectPermissionMixin):
     lookup_url_kwarg = "uuid"
     """ URL's kwargs argument used to retrieve reference uuid. """
 
-    def get_reference_queryset(self):
-        # we ensure selected object will be assigned to the right reference.
-        uuid = self.kwargs[self.lookup_url_kwarg]
-        return super().get_reference_queryset().filter(uuid=uuid)
-
     def get_object(self):
         uuid = self.kwargs[self.lookup_url_kwarg]
-        return get_object_or_404(self.get_queryset(), references__uuid=uuid)
-
-
-class ObjectCreateMixin(ObjectMixin):
-    can = "add"
-
-    def create_reference(self, emitter: Agent, target: Object):
-        """Create root reference for the provided object."""
-        cls = self.get_reference_class()
-        ref = cls.create_root(emitter, target)
-        setattr(target, "reference", ref)
-        return ref
+        return get_object_or_404(self.get_queryset(), uuid=uuid)
 
 
 # ---- Other mixins
@@ -154,6 +118,7 @@ class ReferenceMixin(ByUUIDMixin):
     """Mixin used by Reference views and viewsets."""
 
     def get_queryset(self):
-        # a user can view/delete only mixin for which he is
+        # FIXME: owner shall be able to remove any reference
+        # a user can view/delete only reference for which he is
         # either receiver or emitter.
         return super().get_queryset().agent(self.request.agents)

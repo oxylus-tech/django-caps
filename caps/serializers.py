@@ -3,10 +3,9 @@ from rest_framework import serializers
 from rest_framework.serializers import ValidationError
 
 from . import models
-from .models.capability import RawCapability
 
 
-__all__ = ("AgentSerializer", "ReferenceSerializer", "ObjectSerializer", "CapabilityField", "DeriveSerializer")
+__all__ = ("AgentSerializer", "ReferenceSerializer", "ObjectSerializer", "ShareSerializer")
 
 
 class AgentSerializer(serializers.ModelSerializer):
@@ -26,7 +25,6 @@ class ReferenceSerializer(serializers.Serializer):
     """
 
     uuid = serializers.CharField()
-    depth = serializers.IntegerField()
     emitter = serializers.SerializerMethodField()
     receiver = serializers.SerializerMethodField()
     origin = serializers.SerializerMethodField()
@@ -34,8 +32,8 @@ class ReferenceSerializer(serializers.Serializer):
     grants = serializers.JSONField()
 
     class Meta:
-        fields = ["uuid", "origin", "depth", "emitter", "receiver", "expiration", "grants"]
-        read_only_fields = "__all__"
+        fields = ["uuid", "origin", "emitter", "receiver", "expiration", "grants"]
+        read_only_fields = fields
 
     def get_emitter(self, obj):
         return obj.emitter and str(obj.emitter.uuid) or None
@@ -52,8 +50,7 @@ class ObjectSerializer(serializers.ModelSerializer):
     Base serializer for Objects. It provides :py:attr:`uuid` field.
     """
 
-    uuid = serializers.CharField(source="reference__uuid", read_only=True)
-    """ Reference UUID """
+    owner = serializers.UUIDField(source="owner__uuid", read_only=True)
     reference = ReferenceSerializer(read_only=True)
     """ Reference """
 
@@ -64,45 +61,26 @@ class ObjectSerializer(serializers.ModelSerializer):
         if "id" in self.fields:
             del self.fields["id"]
 
+    def validate(self, data):
+        v_data = super().validate(data)
+        if request := self.context.get("request"):
+            v_data["owner"] = request.agent
+        return v_data
+
     class Meta:
         fields = ["reference"]
-        read_only_fields = ["reference", "uuid"]
+        read_only_fields = ["reference", "uuid", "owner"]
 
 
-class CapabilityField(serializers.JSONField):
-    """Serialize/Deserialize a :py:type:`~caps.models.capability_set.Cap`, used to derive a reference.
-
-    Allowed values are:
-
-        - a tuple of ``(permission_id, max_derive|None)``
-        - an integer value for ``permission_id``
-        - (serializing) a Capability
-
-    """
-
-    capability_class = models.Capability
-
-    def to_representation(self, value: models.Capability) -> tuple[str, int]:
-        return value.serialize()
-
-    def to_internal_value(self, value: RawCapability) -> list[int, int | None]:
-        try:
-            if isinstance(value, str):
-                value = value.split(",")
-                value = [value[0].strip(), value[1] and int(value[1]) or 0]
-            return self.capability_class.deserialize(value)
-        except ValueError as err:
-            raise ValidationError(str(err))
-
-
-class DeriveSerializer(serializers.Serializer):
+class ShareSerializer(serializers.Serializer):
     """
     This serializer is used to deserialize requests to
     derive a Reference (:py:meth:`~caps.views.api.ReferenceViewSet.derive`).
     """
 
     receiver = serializers.UUIDField()
-    capabilities = serializers.ListField(child=CapabilityField())
+    expiration = serializers.DateTimeField(required=False)
+    grants = serializers.DictField(child=serializers.IntegerField())
 
     def validate_receiver(self, value):
         try:

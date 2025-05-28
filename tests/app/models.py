@@ -10,7 +10,7 @@ class ConcreteObject(Object):
 
     detail_url_name = "concrete-detail"
 
-    root_reference_grants = {
+    root_grants = {
         "caps_test.view_concreteobject": 4,
         "caps_test.change_concreteobject": 2,
     }

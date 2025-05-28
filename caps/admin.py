@@ -15,9 +15,8 @@ class AgentAdmin(admin.ModelAdmin):
 
 
 class ReferenceAdmin(admin.ModelAdmin):
-    list_display = ("uuid", "target", "origin", "emitter", "receiver", "expiration", "depth")
-    list_filter = ("depth",)
-    fields = ("uuid", "target", "origin", "depth", "emitter", "receiver", "expiration", "grants")
+    list_display = ("uuid", "target", "origin", "emitter", "receiver", "expiration")
+    fields = ("uuid", "target", "origin", "emitter", "receiver", "expiration", "grants")
 
 
 def register_object(obj_class: type[models.Object], admin_class: type[admin.ModelAdmin]):

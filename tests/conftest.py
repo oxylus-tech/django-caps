@@ -5,8 +5,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import Group, User, Permission
 from django.test import RequestFactory
 
-from caps.models import Agent, Capability, CapabilitySet
-from .app.models import ConcreteObject, Reference
+from caps.models import Agent
+from .app.models import ConcreteObject
 
 
 __all__ = ("assertCountEqual",)
@@ -59,8 +59,10 @@ def user_perms(user):
 
 
 @pytest.fixture
-def user_2(db):
-    return User.objects.create_user(username="test_2", password="none-2")
+def user_2(db, user_group):
+    user = User.objects.create_user(username="test_2", password="none-2")
+    user.groups.add(user_group)
+    return user
 
 
 @pytest.fixture
@@ -82,6 +84,11 @@ def user_agent(db, user):
 
 
 @pytest.fixture
+def user_2_agent(db, user_2):
+    return Agent.objects.create(user=user_2, is_default=True)
+
+
+@pytest.fixture
 def group_agent(db, user_group):
     return Agent.objects.create(group=user_group)
 
@@ -92,15 +99,24 @@ def user_agents(db, user_agent, group_agent):
 
 
 @pytest.fixture
-def agents(db, user_agents, group):
-    return user_agents + [Agent.objects.create(group=group)]
+def user_2_agents(db, user_2_agent, group_agent):
+    return [user_2_agent, group_agent]
+
+
+@pytest.fixture
+def agents(db, user_2_agents, group):
+    return user_2_agents + [Agent.objects.create(group=group)]
 
 
 # -- Capabilities
 @pytest.fixture
 def permissions(db):
     perms = Permission.objects.all().values_list("content_type__app_label", "codename")[0:3]
-    return [".".join(p) for p in perms]
+    perms = [".".join(p) for p in perms]
+
+    if perms[0] not in ConcreteObject.root_grants:
+        ConcreteObject.root_grants.update({p: 2 for p in perms})
+    return perms
 
 
 @pytest.fixture
@@ -113,69 +129,40 @@ def orphan_perm():
     return Permission.objects.all().last().codename
 
 
-@pytest.fixture
-def orphan_cap(orphan_perm):
-    return Capability(permission=orphan_perm, max_derive=1)
-
-
-@pytest.fixture
-def caps_3(permissions):
-    caps = [Capability(permission=perm, max_derive=2) for i, perm in enumerate(permissions)]
-    ConcreteObject.root_reference_grants = {
-        **dict(c.serialize() for c in caps),
-        "caps_test.view_concreteobject": 1,
-    }
-    return caps
-
-
-@pytest.fixture
-def caps_2(caps_3):
-    return [c.derive() for c in caps_3]
-
-
-@pytest.fixture
-def caps_set_3(caps_3):
-    obj = CapabilitySet()
-    obj.capabilities = caps_3
-    return obj
-
-
-@pytest.fixture
-def caps_set_2(caps_2):
-    obj = CapabilitySet()
-    obj.capabilities = caps_2
-    return obj
-
-
 # -- Objects
 @pytest.fixture
-def object(db):
-    return ConcreteObject.objects.create(name="test-object")
+def object(user_agent, db):
+    return ConcreteObject.objects.create(name="test-object", owner=user_agent)
 
 
 @pytest.fixture
-def objects(db):
-    objects = [ConcreteObject(name=f"object-{i}") for i in range(0, 3)]
+def objects(user_agent, db):
+    objects = [ConcreteObject(name=f"object-{i}", owner=user_agent) for i in range(0, 3)]
     ConcreteObject.objects.bulk_create(objects)
     return objects
 
 
 @pytest.fixture
-def ref(user_agent, object, caps_3):
+def user_2_object(user_2_agent, db):
+    return ConcreteObject.objects.create(name="user-2-object", owner=user_2_agent)
+
+
+@pytest.fixture
+def ref(user_2_agent, object):
     # FIXME: set object.reference to ref
-    return Reference.create_root(user_agent, object)
+    return object.share(user_2_agent)
 
 
 @pytest.fixture
-def group_ref(group_agent, object, caps_3):
-    return Reference.create_root(group_agent, object)
+def group_ref(group_agent, object):
+    return object.share(group_agent, object)
 
 
 @pytest.fixture
-def refs_3(agents, objects, caps_3):
+def refs_3(agents, objects):
     # caps_3: all action, derive 3
     # We enforce the values
-    return [Reference.create_root(agents[i], objects[i]) for i in range(0, len(agents))]
+    return [object.share(agent) for object, agent in zip(objects, agents)]
 
 
 @pytest.fixture
@@ -185,11 +172,11 @@ def ref_3(refs_3):
 
 # FIXME
 @pytest.fixture
-def refs_2(refs_3, agents, caps_2):
+def refs_2(refs_3, agents):
     return [
-        refs_3[0].derive(agents[1], caps_2),
-        refs_3[1].derive(agents[2], caps_2),
-        refs_3[2].derive(agents[0], caps_2),
+        refs_3[0].share(agents[1]),
+        refs_3[1].share(agents[2]),
+        refs_3[2].share(agents[0]),
     ]
 
 

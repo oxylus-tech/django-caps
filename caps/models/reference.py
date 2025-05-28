@@ -2,20 +2,16 @@ from __future__ import annotations
 
 import uuid
 from collections.abc import Iterable
-from functools import cached_property
 
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.db import models
 from django.db.models import Q
-from django.urls import reverse
 from django.utils import timezone as tz
 from django.utils.translation import gettext_lazy as _
 
 from caps.utils import get_lazy_relation
 from .agent import Agent
-from .capability import Capability
-from .capability_set import CapabilitySet
 
 __all__ = (
     "ReferenceQuerySet",
@@ -36,7 +32,15 @@ class ReferenceQuerySet(models.QuerySet):
             self = self.agent(agent)
         return self.filter(Q(expiration__isnull=True) | Q(expiration__gt=tz.now()))
 
-    def agent(self, agent: Agent | Iterable[Agent]):
+    def expired(self, exclude: bool = False) -> ReferenceQuerySet:
+        """Filter by expiration.
+
+        :param exclude: if True, exclude instead of filter.
+        """
+        q = {"expiration__isnull": False, "expiration__lt": tz.now()}
+        return self.exclude(**q) if exclude else self.filter(**q)
+
+    def agent(self, agent: Agent | Iterable[Agent]) -> ReferenceQuerySet:
         """
         Filter references that agent is either receiver or
         emitter..
@@ -92,7 +96,7 @@ class ReferenceQuerySet(models.QuerySet):
     # TODO: bulk_update -> is_valid()
 
 
-class Reference(CapabilitySet, models.Model):
+class Reference(models.Model):
     """Reference are the entry point to access an :py:class:`Object`.
 
     Reference provides a set of capabilities for specific receiver.
@@ -118,8 +122,8 @@ class Reference(CapabilitySet, models.Model):
     by a concrete model.
     """
 
-    uuid = models.UUIDField(_("Reference"), default=uuid.uuid4, db_index=True)
-    """Public reference used in API and with the external world."""
+    uuid = models.UUIDField(_("UUID"), default=uuid.uuid4, db_index=True)
+    """Public reference id used in API."""
     origin = models.ForeignKey(
         "self",
         models.CASCADE,
@@ -129,10 +133,6 @@ class Reference(CapabilitySet, models.Model):
         verbose_name=_("Source Reference"),
     )
     """Source reference in references chain."""
-    depth = models.PositiveIntegerField(
-        _("Share limit"), default=0, help_text=_("The amount of time a reference can be re-shared.")
-    )
-    """Reference chain's current depth."""
     emitter = models.ForeignKey(
         Agent, models.CASCADE, verbose_name=_("Emitter"), related_name="emit_references", db_index=True
     )
@@ -149,11 +149,9 @@ class Reference(CapabilitySet, models.Model):
     )
     """Date of expiration."""
     grants = models.JSONField(_("Granted capabilities"), blank=True)
-    """ Allowed capabilities as DB field.
+    """ Allowed permissions as a dict of ``{"permission": allowed_reshare}`.
 
-    This is stored as a dict where keys are permission codename and
-    value `max_derive` argument (or second argument of Capability
-    constructor).
+    The integer value of ``allowed_reshare`` determines the amount of reshare can be done.
     """
 
     objects = ReferenceQuerySet.as_manager()
@@ -167,48 +165,18 @@ class Reference(CapabilitySet, models.Model):
         """Return True if Reference is expired."""
         return self.expiration is not None and self.expiration <= tz.now()
 
-    @cached_property
-    def capabilities(self) -> list[Capability]:
-        """Self' capabilities as list of Capability instances."""
-        return [self.capability_class.deserialize(val) for val in self.grants.items()]
-
     @classmethod
     def get_object_class(cls):
         """Return related Object class."""
         return cls.target.field.related_model
 
-    @classmethod
-    def create_root(cls, emitter: Agent, target: object, template: Reference | None = None, **kwargs) -> Reference:
-        """Create and save a new root reference.
-
-        There can be only one root reference per object.
-
-        New capabilities will be created by cloning default ones (which are those without an assigned reference).
-
-        :param emitter: the owner of the object, as it is emitter of the root reference.
-        :param target: target :py:class:`.object.Object` instance.
-        :param template: use this reference instance as template instead of default one.
-        :param **kwargs: Reference's initial arguments.
-        :return: the created root reference.
-        :yield ValueError: when ``origin`` is provided or a root reference already exists.
-        """
-        if "origin" in kwargs:
-            raise ValueError(
-                'attribute "origin" can not be passed as an argument to ' "`create()`: you should use derive instead"
-            )
-        if target.references.exists():
-            raise ValueError("A reference already exists for this object.")
-
-        kwargs["grants"] = dict(cls.get_object_class().root_reference_grants)
-        return cls.objects.create(emitter=emitter, receiver=emitter, target=target, **kwargs)
-
     def has_perm(self, user: User, permission: str) -> bool:
         """Return True if reference grants the provided permission."""
         return self.receiver.is_agent(user) and permission in self.grants
 
-    def get_all_permissions(self, user: User) -> bool:
+    def get_all_permissions(self, user: User) -> set[str]:
         """Return allowed permissions for this user."""
-        return self.receiver.is_agent(user) and set(self.grants.keys()) or []
+        return self.receiver.is_agent(user) and set(self.grants.keys()) or set()
 
     def is_valid(self, raises: bool = False) -> bool:
         """Check Reference values validity, throwing exception on invalid
@@ -218,50 +186,44 @@ class Reference(CapabilitySet, models.Model):
         :yield ValueError: when reference is invaldi
         """
         if self.origin:
-            # FIXME
             if self.origin.receiver != self.emitter:
                 raise ValueError("origin's receiver and self's emitter are different")
-            if self.origin.depth >= self.depth:
-                if raises:
-                    raise ValueError("origin's depth is higher than self's")
-                else:
-                    return False
         return True
 
-    def is_derived(self, other: Reference) -> bool:
-        if other.depth <= self.depth or self.target != other.target:
-            return False
-        return super().is_derived(other)
+    def share(self, receiver: Agent, grants: dict[str, int] | None = None, **kwargs):
+        """Create a new saved reference shared from self.
 
-    def derive(
-        self, receiver: Agent | int, capabilities: Iterable[Capability] | None = None, raises: bool = False, **kwargs
-    ) -> Reference | None:
-        """Create a new reference derived from self.
-
-        :param receiver: the reference's receiver
-        :param capabilities: select capabilities to be derived.
-        :param raises: raises PermissionDenied error instead of silent it.
-        :param **kwargs: initial arguments of the Reference.
+        See :py:meth:`get_shared` for arguments.
         """
-        kwargs = self._get_derive_kwargs(receiver, kwargs)
-        capabilities = self.derive_caps(capabilities, raises)
-        if not capabilities:
-            raise PermissionDenied("Can not derive this reference")
-        kwargs["grants"] = dict(cap.serialize() for cap in capabilities)
-        return type(self).objects.create(**kwargs)
+        obj = self.get_shared(receiver, grants, **kwargs)
+        obj.save()
+        return obj
 
-    async def aderive(
-        self, receiver: Agent | int, capabilities: Iterable[Capability] | None = None, raises: bool = False, **kwargs
-    ) -> Reference:
-        """Async version of :py:meth:`derive`."""
-        kwargs = self._get_derive_kwargs(receiver, kwargs)
-        capabilities = self.derive_caps(capabilities, raises)
-        kwargs["grants"] = dict(cap.serialize() for cap in capabilities)
-        return await type(self).objects.acreate(**kwargs)
+    async def ashare(self, receiver: Agent, grants: dict[str, int] | None = None, **kwargs):
+        """Create a new saved reference shared from self (async).
 
-    def _get_derive_kwargs(self, receiver: int | Agent, kwargs):
+        See :py:meth:`get_shared` for arguments.
+        """
+        obj = self.get_shared(receiver, grants, **kwargs)
+        await obj.asave()
+        return obj
+
+    def get_shared(self, receiver: Agent, grants: dict[str, int] | None = None, **kwargs):
+        """Return new reference shared from self. The object is not saved.
+
+        :param receiver: the receiver
+        :param grants: optional granted permissions
+        :param **kwargs: extra initial arguments
+        :yield PermissionDenied: when reference expired or no grant is shareable.
+        """
+        grants = self.get_shared_grants(grants)
+        if not grants:
+            raise PermissionDenied("Share not allowed.")
+        kwargs = self.get_shared_kwargs(receiver, kwargs)
+        return type(self)(grants=grants, **kwargs)
+
+    def get_shared_kwargs(self, receiver: Agent, kwargs):
         """Return initial argument for a derived reference from self."""
-        r_key = "receiver_id" if isinstance(receiver, int) else "receiver"
         e_key, emitter = get_lazy_relation(self, "receiver", "emitter")
 
         if self.expiration:
@@ -275,23 +237,22 @@ class Reference(CapabilitySet, models.Model):
 
         return {
             **kwargs,
-            r_key: receiver,
+            "receiver": receiver,
             e_key: emitter,
-            "depth": self.depth + 1,
             "origin": self,
             "target": self.target,
         }
 
-    def get_absolute_url(self) -> str:
-        """
-        Return url to the related object.
+    def get_shared_grants(self, grants: dict[str, int] | None = None, **kwargs) -> dict[str, int]:
+        """Return :py:attr:`grants` for shared reference."""
+        if grants:
+            return {
+                key: min(value - 1, grants[key]) for key, value in self.grants.items() if key in grants and value > 0
+            }
+        return {key: value - 1 for key, value in self.grants.items() if value > 0}
 
-        :yield ValueError: when related object class has no `detail_url_name` provided.
-        """
-        url_name = self.target.detail_url_name
-        if not url_name:
-            raise ValueError("Missing attribute `detail_url_name` on target object.")
-        return reverse(url_name, kwargs={"uuid": self.uuid})
+    def get_absolute_url(self):
+        return self.target.get_absolute_url()
 
     def save(self, *a, **kw):
         self.is_valid(raises=True)

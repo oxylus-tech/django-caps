@@ -13,33 +13,44 @@ __all__ = (
 )
 
 
-class ObjectViewSet(mixins.ObjectCreateMixin, viewsets.ModelViewSet):
+class ObjectViewSet(mixins.ObjectMixin, viewsets.ModelViewSet):
     """
     This is the base mixin handling permissions check for django-caps.
     """
 
+    share_serializer_class = serializers.ShareSerializer
+    """ This specifies serializer class used for the :py:meth:`share` action. """
+
     permission_classes = [permissions.ObjectPermissions]
-    lookup_field = "references__uuid"
+    lookup_field = "uuid"
     lookup_url_kwarg = "uuid"
 
-    def perform_create(self, serializer):
-        """Ensure a root reference is created when the Object is saved."""
-        super().perform_create(serializer)
-        self.create_reference(self.agent, serializer.instance)
+    def get_queryset(self):
+        if self.action == "share":
+            return super().get_queryset().filter(owner__in=self.request.agents)
+        return super().get_queryset()
 
-    def get_reference_class(self):
-        if not self.reference_class:
-            return self.queryset.model.Reference
-        return super().get_reference_class()
+    @action(detail=True, methods=["post"])
+    def share(self, request, uuid=None):
+        """Share object.
 
-    def get_reference_queryset(self):
-        # here is a little similar to SingleObjectMixin but
-        # we have to do it only when action is detail
-        query = super().get_reference_queryset()
-        if self.detail:
-            uuid = self.kwargs[self.lookup_url_kwarg]
-            query = query.filter(uuid=uuid)
-        return query
+        Example of request's POST data in YAML (see :py:meth:`~caps.models.reference.Reference.share` and :py:class:`~caps.serializers.ShareSerializer`):
+
+        .. code-block:: yaml
+
+            receiver: "agent-uuid"
+            expiration: null
+            grants:
+                myapp.view_myobject: 1
+                myapp.change_myobject: 0
+
+        """
+        obj = self.get_object()
+        ser = self.share_serializer_class(data=request.data)
+        if not ser.is_valid():
+            return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
+        obj.reference = obj.share(ser.validated_data["receiver"], ser.validated_data["grants"])
+        return Response(self.get_serializer_class()(obj).data)
 
 
 class AgentViewSet(viewsets.ModelViewSet):
@@ -59,7 +70,7 @@ class ReferenceViewSet(mx.RetrieveModelMixin, mx.DestroyModelMixin, mx.ListModel
 
         - Reference can't be created
         - Reference can't be updated
-        - Reference can only be derived, listed, retrieved, and destroyed.
+        - Reference can only be shared, listed, retrieved, and destroyed.
 
     Note: no model nor queryset is provided by default, as Reference is an abstract class and is dependent of the concrete Object sub-model.
     """
@@ -70,36 +81,25 @@ class ReferenceViewSet(mx.RetrieveModelMixin, mx.DestroyModelMixin, mx.ListModel
         "receiver__uuid",
         "emitter__uuid",
         "origin__uuid",
+        "target__uuid",
     )
 
-    derive_serializer_class = serializers.DeriveSerializer
-    """ This specifies serializer class used for the :py:meth:`derive` action. """
+    share_serializer_class = serializers.ShareSerializer
+    """ This specifies serializer class used for the :py:meth:`share` action. """
     serializer_class = serializers.ReferenceSerializer
 
     def get_queryset(self):
         query = super().get_queryset()
-        if self.action == "derive":
+        if self.action == "share":
             return query.receiver(self.request.agents)
         return query.agent(self.request.agents)
 
     @action(detail=True, methods=["post"])
-    def derive(self, request, uuid=None):
-        """Derive reference from current one.
-
-        Example of request's POST data in YAML (see :py:meth:`~caps.models.reference.Reference.derive`,
-        :py:type:`~caps.models.capability_set.CapabilitySet.Cap`, and :py:class:`~caps.serializers.DeriveSerializer`):
-
-        .. code-block:: yaml
-
-            receiver: "agent-uuid"
-            capabilities:
-                - ["myapp.view_myobject", 1]
-                - ["myapp.change_myobject", 0]
-        """
+    def share(self, request, uuid=None):
+        """Share object reference to someone. See :py:meth:`ObjectViewSet.share` for more info."""
         ref = self.get_object()
-        derive_ser = self.derive_serializer_class(data=request.data)
-        if not derive_ser.is_valid():
-            return Response(derive_ser.errors, status=status.HTTP_400_BAD_REQUEST)
-
-        derived = ref.derive(derive_ser.validated_data["receiver"], derive_ser.validated_data["capabilities"])
-        return Response(self.get_serializer_class()(derived).data)
+        ser = self.share_serializer_class(data=request.data)
+        if not ser.is_valid():
+            return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
+        shared = ref.share(ser.validated_data["receiver"], ser.validated_data["grants"])
+        return Response(self.get_serializer_class()(shared).data)
