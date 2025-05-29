@@ -1,5 +1,5 @@
 from .agent import Agent, AgentQuerySet
-from .object import Object, ObjectQuerySet
+from .object import Object, ObjectQuerySet, ObjectBase
 from .access import Access, AccessQuerySet
 
 __all__ = (
@@ -7,6 +7,7 @@ __all__ = (
     "AgentQuerySet",
     "Object",
     "ObjectQuerySet",
+    "ObjectBase",
     "Access",
     "AccessQuerySet",
 )
