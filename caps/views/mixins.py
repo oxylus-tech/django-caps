@@ -1,9 +1,10 @@
+from django.db.models import Q
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import get_object_or_404
 
 from .. import permissions
-from ..models import Agent
+from ..models import Agent, AccessQuerySet
 
 
 __all__ = (
@@ -12,7 +13,7 @@ __all__ = (
     "SingleObjectMixin",
     "ByUUIDMixin",
     "AgentMixin",
-    "ReferenceMixin",
+    "AccessMixin",
 )
 
 
@@ -23,13 +24,13 @@ class ObjectMixin:
     It provides:
 
         - assign self's :py:attr:`agent` and :py:attr:`agents`
-        - queryset to available :py:class:`~caps.models.reference.Reference`.
+        - queryset to available :py:class:`~caps.models.access.Access`.
 
     """
 
     all_agents: bool = False
     """
-    When this parameter is ``True``, it filter object's reference using
+    When this parameter is ``True``, it filter object's access using
     all user's assigned agents instead of only the current one. See :py:attr:`agents` for more information.
     """
 
@@ -37,22 +38,37 @@ class ObjectMixin:
     """ Current request's agent. """
     agents: Agent | list[Agent] | None = None
     """
-    Receiver(s) used to fetch reference. It is different from :py:attr:`agent` as the latest is used to create references.
+    Receiver(s) used to fetch access. It is different from :py:attr:`agent` as the latest is used to create accesses.
 
     This value is set in :py:meth:`dispatch` using :py:meth:`get_agents`. It will be either all request's user's
     agents (if :py:attr:`all_agents`) or only the active one.
     """
 
-    reference_class = None
-    """ Reference class (defaults to model's Reference). """
+    access_class = None
+    """ Access class (defaults to model's Access). """
 
     def get_agents(self) -> Agent | list[Agent]:
         """Return value to use for :py:attr:`agents`."""
         return self.request.agents if self.all_agents else self.request.agent
 
+    def get_access_queryset(self) -> AccessQuerySet | None:
+        """Return queryset for accesses."""
+        query = None
+        if model := getattr(self, "model", None):
+            query = model.Access.objects.all()
+        else:
+            query = getattr(self, "queryset", None)
+            if query is not None:
+                query = query.model.Access.objects.all()
+
+        if query is not None:
+            return query.select_related("receiver")
+        return None
+
     def get_queryset(self):
-        """Get Object queryset based get_reference_queryset."""
-        return super().get_queryset().available(self.request.agents)
+        """Get Object queryset based get_access_queryset."""
+        accesses = self.get_access_queryset()
+        return super().get_queryset().available(self.request.agents, accesses)
 
     def dispatch(self, request, *args, **kwargs):
         self.agents = self.get_agents()
@@ -75,9 +91,9 @@ class ObjectPermissionMixin(ObjectMixin):
         self.check_object_permissions(obj)
         return obj
 
-    def check_object_permissions(self, obj):
+    def check_object_permissions(self, request, obj):
         if perms := self.get_permissions():
-            allowed = any(p.has_object_permission(self.request, self, obj) for p in perms)
+            allowed = any(p.has_object_permission(request, self, obj) for p in perms)
             if not allowed:
                 raise PermissionDenied(f"Permission not allowed for {self.request.method} on this object.")
 
@@ -85,18 +101,34 @@ class ObjectPermissionMixin(ObjectMixin):
         return [p() for p in self.permissions]
 
 
-class SingleObjectMixin(ObjectPermissionMixin):
+class SingleObjectMixin(ObjectMixin):
     """Detail mixin used to retrieve Object detail.
 
-    Note: user's reference is fetched from `get_reference_queryset`, not `get_queryset`.
+    It requires subclass to have  a ``check_object_permissions`` method (
+    eg by a child of :py:class:`ObjectPermissionMixin` or DRF APIView).
     """
 
     lookup_url_kwarg = "uuid"
-    """ URL's kwargs argument used to retrieve reference uuid. """
+    """ URL's kwargs argument used to retrieve access uuid. """
+
+    def get_access_queryset(self):
+        """When ``uuid`` GET argument is provided, filter accesses on it."""
+        query = super().get_access_queryset()
+        if query is not None:
+            if uuid := self.kwargs.get(self.lookup_url_kwarg):
+                return query.filter(uuid=uuid)
+        return query
 
     def get_object(self):
         uuid = self.kwargs[self.lookup_url_kwarg]
-        return get_object_or_404(self.get_queryset(), uuid=uuid)
+
+        q = Q(uuid=uuid, owner__in=self.request.agents)
+        if accesses := self.get_access_queryset():
+            q |= Q(accesses__in=accesses)
+
+        obj = get_object_or_404(self.get_queryset(), q)
+        self.check_object_permissions(self.request, obj)
+        return obj
 
 
 # ---- Other mixins
@@ -104,7 +136,7 @@ class ByUUIDMixin:
     """Fetch a model by UUID."""
 
     lookup_url_kwarg = "uuid"
-    """ URL's kwargs argument used to retrieve reference uuid. """
+    """ URL's kwargs argument used to retrieve access uuid. """
 
     def get_object(self):
         return get_object_or_404(self.get_queryset(), uuid=self.kwargs[self.lookup_url_kwarg])
@@ -114,11 +146,11 @@ class AgentMixin(ByUUIDMixin, PermissionRequiredMixin):
     model = Agent
 
 
-class ReferenceMixin(ByUUIDMixin):
-    """Mixin used by Reference views and viewsets."""
+class AccessMixin(ByUUIDMixin):
+    """Mixin used by Access views and viewsets."""
 
     def get_queryset(self):
-        # FIXME: owner shall be able to remove any reference
-        # a user can view/delete only reference for which he is
+        # FIXME: owner shall be able to remove any access
+        # a user can view/delete only access for which he is
         # either receiver or emitter.
         return super().get_queryset().agent(self.request.agents)

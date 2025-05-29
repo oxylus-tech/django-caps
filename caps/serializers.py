@@ -5,7 +5,7 @@ from rest_framework.serializers import ValidationError
 from . import models
 
 
-__all__ = ("AgentSerializer", "ReferenceSerializer", "ObjectSerializer", "ShareSerializer")
+__all__ = ("AgentSerializer", "AccessSerializer", "ObjectSerializer", "ShareSerializer")
 
 
 class AgentSerializer(serializers.ModelSerializer):
@@ -16,15 +16,15 @@ class AgentSerializer(serializers.ModelSerializer):
         fields = ["user_id", "group_id"]
 
 
-class ReferenceSerializer(serializers.Serializer):
+class AccessSerializer(serializers.Serializer):
     """
-    Serializer for :py:class:`caps.models.capability.Reference`.
+    Serializer for :py:class:`caps.models.capability.Access`.
 
     Implemented as simple Serializer, since the corresponding models are generated based on
     concrete :py:class:`.models.object.Object`.
     """
 
-    uuid = serializers.CharField()
+    uuid = serializers.CharField(read_only=True)
     emitter = serializers.SerializerMethodField()
     receiver = serializers.SerializerMethodField()
     origin = serializers.SerializerMethodField()
@@ -50,9 +50,10 @@ class ObjectSerializer(serializers.ModelSerializer):
     Base serializer for Objects. It provides :py:attr:`uuid` field.
     """
 
+    uuid = serializers.SerializerMethodField()
     owner = serializers.UUIDField(source="owner__uuid", read_only=True)
-    reference = ReferenceSerializer(read_only=True)
-    """ Reference """
+    access = AccessSerializer(read_only=True)
+    """ Access """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -61,6 +62,11 @@ class ObjectSerializer(serializers.ModelSerializer):
         if "id" in self.fields:
             del self.fields["id"]
 
+    def get_uuid(self, obj):
+        if obj.access:
+            return str(obj.access.uuid)
+        return str(obj.uuid)
+
     def validate(self, data):
         v_data = super().validate(data)
         if request := self.context.get("request"):
@@ -68,14 +74,14 @@ class ObjectSerializer(serializers.ModelSerializer):
         return v_data
 
     class Meta:
-        fields = ["reference"]
-        read_only_fields = ["reference", "uuid", "owner"]
+        fields = ["access"]
+        read_only_fields = ["access", "uuid", "owner"]
 
 
 class ShareSerializer(serializers.Serializer):
     """
     This serializer is used to deserialize requests to
-    derive a Reference (:py:meth:`~caps.views.api.ReferenceViewSet.derive`).
+    derive a Access (:py:meth:`~caps.views.api.AccessViewSet.share`).
     """
 
     receiver = serializers.UUIDField()

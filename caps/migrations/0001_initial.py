@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
             name="Agent",
             fields=[
                 ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
-                ("uuid", models.UUIDField(default=uuid.uuid4, verbose_name="Reference")),
+                ("uuid", models.UUIDField(default=uuid.uuid4, verbose_name="Access")),
                 ("is_default", models.BooleanField(blank=True, default=False, verbose_name="Default User Agent")),
                 (
                     "group",

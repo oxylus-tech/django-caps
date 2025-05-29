@@ -37,8 +37,8 @@ Create an object to be accessed:
     __all__ = ("Post",)
 
 
-    # Create our example model. A Reference and Capability model will be
-    # generated and accessible from Post (Post.Reference, Post.Capability)
+    # Create our example model. A Access and Capability model will be
+    # generated and accessible from Post (Post.Access, Post.Capability)
     class Post(Object):
         title = models.CharField(_("Title"), max_length=64)
         content = models.TextField(_("Content"))
@@ -68,15 +68,15 @@ Using views provided by caps, example of ``urls.py`` file:
         ),
     ]
 
-Even a shorter version, providing views for object references too:
+Even a shorter version, providing views for object accesses too:
 
 .. code-block:: python
 
     from caps import urls
     from . import models
 
-    # By settings `references=True` you also add default views for references assuming related templates exists (such as `myapp/postreference_detail.html`).
-    urlpatterns = urls.get_object_paths(models.Post, 'post', references=True)
+    # By settings `accesses=True` you also add default views for accesses assuming related templates exists (such as `myapp/postaccess_detail.html`).
+    urlpatterns = urls.get_object_paths(models.Post, 'post', accesses=True)
 
 You can have custom views as:
 
@@ -104,9 +104,9 @@ We have views for the following models:
 - :py:class:`~caps.models.agent.Agent`: :py:class:`~caps.views.common.AgentListView`, :py:class:`~caps.views.common.AgentDetailView`, :py:class:`~caps.views.common.AgentCreateView`, :py:class:`~caps.views.common.AgentUpdateView`, :py:class:`~caps.views.common.AgentDeleteView`; -
 - :py:class:`~caps.models.object.Object`: :py:class:`~caps.views.generics.ObjectListView`, :py:class:`~caps.views.generics.ObjectDetailView`, :py:class:`~caps.views.generics.ObjectCreateView`, :py:class:`~caps.views.generics.ObjectUpdateView`, :py:class:`~caps.views.generics.ObjectDeleteView`;
 
-- :py:class:`~caps.models.reference.Reference`: :py:class:`~caps.views.common.ReferenceListView`, :py:class:`~caps.views.common.ReferenceDetailView`, :py:class:`~caps.views.common.ReferenceDeleteView`;
+- :py:class:`~caps.models.access.Access`: :py:class:`~caps.views.common.AccessListView`, :py:class:`~caps.views.common.AccessDetailView`, :py:class:`~caps.views.common.AccessDeleteView`;
 
-  We don't provide create and update views for reference, as they should only be created when the object is created and by derivation (not provided yet). A Reference should not be updated.
+  We don't provide create and update views for access, as they should only be created when the object is created and by derivation (not provided yet). A Access should not be updated.
 
 
 API
@@ -119,7 +119,7 @@ This is simple too, in ``viewsets.py``:
     from caps import views
     from . import models, serializers
 
-    __all__ = ('PostViewSet', 'PostReferenceViewSet')
+    __all__ = ('PostViewSet', 'PostAccessViewSet')
 
     # Example of viewset using DRF.
     # assuming you have implemented serializer for Post
@@ -128,9 +128,9 @@ This is simple too, in ``viewsets.py``:
         queryset = models.Post.objects.all()
         serializer_class = serializers.PostSerializer
 
-    class PostReferenceViewSet(viewsets.ReferenceViewSet):
-        model = models.Post.Reference
-        queryset = models.Post.Reference.objects.all()
+    class PostAccessViewSet(viewsets.AccessViewSet):
+        model = models.Post.Access
+        queryset = models.Post.Access.objects.all()
 
 Serializers:
 
@@ -159,7 +159,7 @@ You'll have to manually add routes and urls for this part:
 
     router = SimpleRouter()
     router.register('post', viewsets.PostViewSet)
-    router.register('post-reference', viewsets.PostReferenceViewSet)
+    router.register('post-access', viewsets.PostAccessViewSet)
 
     urlpatterns = [
         # ...
@@ -188,20 +188,20 @@ Example of Django-Caps' API usage:
     agent_1 = Agent.objects.create(user=user_1)
 
     # Create allowed capabilities for Post
-    # Theses will be used as default ones for Post's root Reference
+    # Theses will be used as default ones for Post's root Access
     permissions = Permission.objects.all()[:3]
     capabilities = [Post.Capability(permission=perm, max_derive=2) for perm in Permission]
 
     Post.Capability.objects.bulk_create(capabilities)
 
-    # Create the post and the root reference
-    # Root reference: the original reference from which all other references
+    # Create the post and the root access
+    # Root access: the original access from which all other accesses
     # are derived (created/shared).
     post = Post.objects.create(title="Some title", content="Some content")
-    ref = Post.Reference.create_root(agent, object)
+    access = Post.Access.create_root(agent, object)
 
     # Get the object
-    the_post = Post.objects.refs(ref).first()
+    the_post = Post.objects.accesses(access).first()
 
-    # This create a new reference with only shareable capabilities (max_derive>0)
-    ref_1 = ref.derive(agent_1, capabilities)
+    # This create a new access with only shareable capabilities (max_derive>0)
+    access_1 = access.derive(agent_1, capabilities)

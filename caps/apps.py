@@ -15,13 +15,13 @@ class CapsConfig(AppConfig):
 #     def ready(self):
 #         """ Enforce permissions validation at boot-up. """
 #         from .models import Object
-#         self.check_root_reference_grants(Object)
+#         self.check_root_access_grants(Object)
 #
-#     def check_root_reference_grants(self, model):
+#     def check_root_access_grants(self, model):
 #         try:
-#             model.check_root_reference_grants()
+#             model.check_root_access_grants()
 #         except ValueError as err:
 #             logger.warn(err)
 #
 #         for sub in model.__subclasses__():
-#             self.check_root_reference_grants(sub)
+#             self.check_root_access_grants(sub)

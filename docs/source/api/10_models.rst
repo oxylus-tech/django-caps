@@ -20,10 +20,10 @@ caps.models.capability_set
 
 .. automodule:: caps.models.capability_set
 
-caps.models.reference
+caps.models.access
 ---------------------
 
-.. automodule:: caps.models.reference
+.. automodule:: caps.models.access
 
 caps.models.object
 ------------------

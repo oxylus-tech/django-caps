@@ -18,7 +18,7 @@ class TestObjectSerializer:
         ser = ConcreteObjectSerializer(object)
         assert "pk" not in ser.data
         assert "id" not in ser.data
-        assert "reference" in ser.data
+        assert "access" in ser.data
 
 
 @pytest.fixture

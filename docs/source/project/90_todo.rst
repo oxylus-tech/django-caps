@@ -4,7 +4,7 @@ TODO
 - models:
 
     - CapabilitySet -> derive_caps arg to ease api usage
-    x Reference -> expiration date on derived References.
+    x Access -> expiration date on derived Accesss.
 
 - migrations/signal:
 
@@ -14,9 +14,9 @@ TODO
 
 - views:
 
-    x views for: Agent (list, detail -> Permission required), Reference (list, detail, delete)
-    - Reference: derive
-    x viewsets for: Reference, Capability
+    x views for: Agent (list, detail -> Permission required), Access (list, detail, delete)
+    - Access: derive
+    x viewsets for: Access, Capability
 
 - CRON:
-    - clear expired references
+    - clear expired accesses

@@ -1,7 +1,7 @@
 from .generics import ObjectListView, ObjectDetailView, ObjectCreateView, ObjectUpdateView, ObjectDeleteView
 from .api import (
     ObjectViewSet,
-    ReferenceViewSet,
+    AccessViewSet,
     AgentViewSet,
 )
 from .common import (
@@ -10,9 +10,9 @@ from .common import (
     AgentCreateView,
     AgentUpdateView,
     AgentDeleteView,
-    ReferenceDetailView,
-    ReferenceListView,
-    ReferenceDeleteView,
+    AccessDetailView,
+    AccessListView,
+    AccessDeleteView,
 )
 
 
@@ -23,14 +23,14 @@ __all__ = (
     "ObjectUpdateView",
     "ObjectDeleteView",
     "ObjectViewSet",
-    "ReferenceViewSet",
+    "AccessViewSet",
     "AgentViewSet",
     "AgentDetailView",
     "AgentListView",
     "AgentCreateView",
     "AgentUpdateView",
     "AgentDeleteView",
-    "ReferenceDetailView",
-    "ReferenceListView",
-    "ReferenceDeleteView",
+    "AccessDetailView",
+    "AccessListView",
+    "AccessDeleteView",
 )

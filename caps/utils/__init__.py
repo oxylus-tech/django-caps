@@ -9,20 +9,20 @@ def get_lazy_relation(obj, field, out_field: str | None = None) -> tuple[str, An
 
     .. code-block:: python
 
-        ref = Reference.objects.all().first()
+        access = Access.objects.all().first()
 
         # relation has not been fetched
-        k, v = get_lazy_relation(ref, 'origin')
+        k, v = get_lazy_relation(access, 'origin')
         assert k == 'origin_id' and isinstance(v, int)
 
         # fetch from db:
-        ref.origin
-        k, v = get_lazy_relation(ref, 'origin')
-        assert k == 'origin' and isinstance(v, Reference)
+        access.origin
+        k, v = get_lazy_relation(access, 'origin')
+        assert k == 'origin' and isinstance(v, Access)
 
         # map a name:
-        k, v = get_lazy_relation(ref, 'origin', 'dest')
-        assert k == 'dest' and isinstance(v, Reference)
+        k, v = get_lazy_relation(access, 'origin', 'dest')
+        assert k == 'dest' and isinstance(v, Access)
 
     :param obj: object to get value on
     :param field: object's field to lookup

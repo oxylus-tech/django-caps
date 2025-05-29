@@ -9,11 +9,11 @@ from . import mixins
 __all__ = (
     "ObjectViewSet",
     "AgentViewSet",
-    "ReferenceViewSet",
+    "AccessViewSet",
 )
 
 
-class ObjectViewSet(mixins.ObjectMixin, viewsets.ModelViewSet):
+class ObjectViewSet(mixins.SingleObjectMixin, viewsets.ModelViewSet):
     """
     This is the base mixin handling permissions check for django-caps.
     """
@@ -25,6 +25,12 @@ class ObjectViewSet(mixins.ObjectMixin, viewsets.ModelViewSet):
     lookup_field = "uuid"
     lookup_url_kwarg = "uuid"
 
+    def get_access_queryset(self):
+        # disable access fetch
+        if self.action == "share":
+            return None
+        return super().get_access_queryset()
+
     def get_queryset(self):
         if self.action == "share":
             return super().get_queryset().filter(owner__in=self.request.agents)
@@ -32,9 +38,9 @@ class ObjectViewSet(mixins.ObjectMixin, viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def share(self, request, uuid=None):
-        """Share object.
+        """Share object, returning the newly created Access.
 
-        Example of request's POST data in YAML (see :py:meth:`~caps.models.reference.Reference.share` and :py:class:`~caps.serializers.ShareSerializer`):
+        Example of request's POST data in YAML (see :py:meth:`~caps.models.access.Access.share` and :py:class:`~caps.serializers.ShareSerializer`):
 
         .. code-block:: yaml
 
@@ -49,8 +55,10 @@ class ObjectViewSet(mixins.ObjectMixin, viewsets.ModelViewSet):
         ser = self.share_serializer_class(data=request.data)
         if not ser.is_valid():
             return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
-        obj.reference = obj.share(ser.validated_data["receiver"], ser.validated_data["grants"])
-        return Response(self.get_serializer_class()(obj).data)
+
+        access = obj.share(ser.validated_data["receiver"], ser.validated_data["grants"])
+        ser_cls = type(self.get_serializer_class()._declared_fields["access"])
+        return Response(ser_cls(access).data)
 
 
 class AgentViewSet(viewsets.ModelViewSet):
@@ -62,21 +70,21 @@ class AgentViewSet(viewsets.ModelViewSet):
     filterset_fields = ("group", "user", "user__group")
 
 
-class ReferenceViewSet(mx.RetrieveModelMixin, mx.DestroyModelMixin, mx.ListModelMixin, viewsets.GenericViewSet):
+class AccessViewSet(mx.RetrieveModelMixin, mx.DestroyModelMixin, mx.ListModelMixin, viewsets.GenericViewSet):
     """
-    This viewset provides API to :py:class:`~caps.models.reference.Reference`.
+    This viewset provides API to :py:class:`~caps.models.access.Access`.
 
     It ensures that:
 
-        - Reference can't be created
-        - Reference can't be updated
-        - Reference can only be shared, listed, retrieved, and destroyed.
+        - Access can't be created
+        - Access can't be updated
+        - Access can only be shared, listed, retrieved, and destroyed.
 
-    Note: no model nor queryset is provided by default, as Reference is an abstract class and is dependent of the concrete Object sub-model.
+    Note: no model nor queryset is provided by default, as Access is an abstract class and is dependent of the concrete Object sub-model.
     """
 
     lookup_field = "uuid"
-    lookup_url_kwargs = "uuid"
+    lookup_url_kwarg = "uuid"
     filterset_fields = (
         "receiver__uuid",
         "emitter__uuid",
@@ -86,7 +94,7 @@ class ReferenceViewSet(mx.RetrieveModelMixin, mx.DestroyModelMixin, mx.ListModel
 
     share_serializer_class = serializers.ShareSerializer
     """ This specifies serializer class used for the :py:meth:`share` action. """
-    serializer_class = serializers.ReferenceSerializer
+    serializer_class = serializers.AccessSerializer
 
     def get_queryset(self):
         query = super().get_queryset()
@@ -96,10 +104,10 @@ class ReferenceViewSet(mx.RetrieveModelMixin, mx.DestroyModelMixin, mx.ListModel
 
     @action(detail=True, methods=["post"])
     def share(self, request, uuid=None):
-        """Share object reference to someone. See :py:meth:`ObjectViewSet.share` for more info."""
-        ref = self.get_object()
+        """Share object access to someone. See :py:meth:`ObjectViewSet.share` for more info."""
+        access = self.get_object()
         ser = self.share_serializer_class(data=request.data)
         if not ser.is_valid():
             return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
-        shared = ref.share(ser.validated_data["receiver"], ser.validated_data["grants"])
+        shared = access.share(ser.validated_data["receiver"], ser.validated_data["grants"])
         return Response(self.get_serializer_class()(shared).data)

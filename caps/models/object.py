@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
 
 from .agent import Agent
-from .reference import Reference, ReferenceQuerySet
+from .access import Access, AccessQuerySet
 from .nested import NestedModelBase
 
 __all__ = ("ObjectBase", "ObjectQuerySet", "Object")
@@ -19,14 +19,14 @@ __all__ = ("ObjectBase", "ObjectQuerySet", "Object")
 class ObjectBase(NestedModelBase):
     """Metaclass for Object model classes.
 
-    It subclass Reference if no `Reference` member is provided.
+    It subclass Access if no `Access` member is provided.
     """
 
-    nested_class = Reference
+    nested_class = Access
 
     @classmethod
     def create_nested_class(cls, new_class, name, attrs={}):
-        """Provide `target` ForeignKey on nested Reference model."""
+        """Provide `target` ForeignKey on nested Access model."""
         return super(ObjectBase, cls).create_nested_class(
             new_class,
             name,
@@ -35,7 +35,7 @@ class ObjectBase(NestedModelBase):
                     new_class,
                     models.CASCADE,
                     db_index=True,
-                    related_name="references",
+                    related_name="accesses",
                     verbose_name=_("Target"),
                 ),
                 **attrs,
@@ -46,62 +46,69 @@ class ObjectBase(NestedModelBase):
 class ObjectQuerySet(models.QuerySet):
     """QuerySet for Objects."""
 
-    def available(self, agents: Agent | Iterable[Agent]):
+    def available(self, agents: Agent | Iterable[Agent], accesses: AccessQuerySet | None = None):
         """
-        Return object available to provided agents (as owner or receiver).
+        Return object available to provided agents as owner or receiver (when ``accesses`` is provided).
+
+        It prefetch/annotates the resulting items using :py:meth:`access`, if accesses is provided.
+
         :param agents: for the provided agent
-        :param uuid: if provided filter for this uuid
+        :param accesses: use this queryset for accesses
         """
-        refs = self.model.Reference.objects.receiver(agents).expired(exclude=True).select_related("receiver")
+        if accesses is None or accesses.query.is_empty():
+            if isinstance(agents, Agent):
+                return self.filter(owner=agents)
+            return self.filter(owner__in=agents)
+
+        accesses = accesses.receiver(agents).expired(exclude=True)
         if isinstance(agents, Agent):
-            q = Q(owner=agents) | Q(references__in=refs)
+            q = Q(owner=agents) | Q(accesses__in=accesses)
         else:
-            q = Q(owner__in=agents) | Q(references__in=refs)
-        return self.refs(refs).filter(q)
+            q = Q(owner__in=agents) | Q(accesses__in=accesses)
+        return self.access(accesses).filter(q)
 
-    def refs(self, refs: ReferenceQuerySet | Reference, strict: bool = False) -> ObjectQuerySet:
-        """Return Objects for the provided references.
+    def access(self, access: AccessQuerySet | Access, strict: bool = False) -> ObjectQuerySet:
+        """Prefetch object with accesses from the provided queryset (as ``agent_accesses``).
 
-        This method annotates the Object with ``agent_reference_set`` whose value
-        is set to relevant reference(s). This allows to use :py:attr:`reference` property.
+        The items are annotated with ``access_uuid`` corresponding to the access.
 
-        :param refs: use this Reference QuerySet or instance
-        :param strict: if True, filter only items with references
-        :return: the annotated queryset.
+        :param access: use this Access QuerySet or instance
+        :param strict: if True, filter only items with prefetched access
+        :return: the annotated and prefetched queryset.
         """
-        if isinstance(refs, self.model.Reference):
-            refs = self.model.Reference.objects.filter(pk=refs.pk)
+        if isinstance(access, self.model.Access):
+            access = self.model.Access.objects.filter(pk=access.pk)
 
-        fk_field = self.model.Reference._meta.get_field("target")
+        fk_field = self.model.Access._meta.get_field("target")
         lookup = fk_field.remote_field.get_accessor_name()
-        prefetch = Prefetch(lookup, refs, "agent_reference_set")
-        refs = refs.filter(target=OuterRef("pk"))
+        prefetch = Prefetch(lookup, access, "agent_accesses")
+        access = access.filter(target=OuterRef("pk"))
 
-        self = self.annotate(reference_id=Subquery(refs.values("id")[:1])).prefetch_related(prefetch)
-        return self.filter(reference_id__isnull=False) if strict else self
+        self = self.annotate(access_uuid=Subquery(access.values("uuid")[:1])).prefetch_related(prefetch)
+        return self.filter(access_uuid__isnull=False) if strict else self
 
 
 class Object(models.Model, metaclass=ObjectBase):
-    """An object accessible through References.
+    """An object accessible through Accesss.
 
-    It can have a member `Reference` (subclass of
-    `caps.models.Reference`) that is used as object's specific
-    reference. If none is provided, a it will be generated automatically
+    It can have a member `Access` (subclass of
+    `caps.models.Access`) that is used as object's specific
+    access. If none is provided, a it will be generated automatically
     for concrete classes.
 
     The ``Capability`` concrete model class will be set at creation, when
-    the related :py:class:`Reference` is created.
+    the related :py:class:`Access` is created.
 
     This provides:
 
-        - :py:class:`Reference` concrete model accessible from the :py:class:`Object` concrete subclass;
+        - :py:class:`Access` concrete model accessible from the :py:class:`Object` concrete subclass;
         - :py:class:`Capability` concrete model accessible from the :py:class:`Object` concrete subclass;
     """
 
     root_grants = {}
     """
     This class attribute provide the default value for grant object.
-    It should follows the structure of :py:attr:`~.reference.Reference.grants` field, such as:
+    It should follows the structure of :py:attr:`~.access.Access.grants` field, such as:
 
     .. code-block:: python
 
@@ -124,11 +131,11 @@ class Object(models.Model, metaclass=ObjectBase):
         abstract = True
 
     @cached_property
-    def reference(self) -> Reference:
-        """Return Reference to this object for receiver provided to
-        ObjectQuerySet's `ref()` or `refs()`."""
-        ref_set = getattr(self, "agent_reference_set", None)
-        return ref_set and ref_set[0] or None
+    def access(self) -> Access:
+        """Return Access to this object for receiver provided to
+        ObjectQuerySet's `access()` or `accesses()`."""
+        access_set = getattr(self, "agent_accesses", None)
+        return access_set and access_set[0] or None
 
     @classmethod
     def check_root_grants(cls):
@@ -154,16 +161,16 @@ class Object(models.Model, metaclass=ObjectBase):
         """Return True if user has provided permission for object."""
         if self.owner.is_agent(user):
             return True
-        return self.reference and self.reference.has_perm(user, perm) or False
+        return self.access and self.access.has_perm(user, perm) or False
 
     def get_all_permissions(self, user) -> set[str]:
         """Return allowed permissions for this user."""
         if self.owner.is_agent(user):
             return self.root_grants
-        return self.reference and self.reference.get_all_permissions(user) or set()
+        return self.access and self.access.get_all_permissions(user) or set()
 
-    def share(self, receiver: Agent, grants: dict[str, int] | None = None, **kwargs) -> Reference:
-        """Share and save reference to this object.
+    def share(self, receiver: Agent, grants: dict[str, int] | None = None, **kwargs) -> Access:
+        """Share and save access to this object.
 
         See :py:meth:`get_shared` for parameters.
         """
@@ -171,13 +178,13 @@ class Object(models.Model, metaclass=ObjectBase):
         obj.save()
         return obj
 
-    async def ashare(self, receiver: Agent, grants: dict[str, int] | None = None, **kwargs) -> Reference:
-        """Share and save reference to this object (async)."""
+    async def ashare(self, receiver: Agent, grants: dict[str, int] | None = None, **kwargs) -> Access:
+        """Share and save access to this object (async)."""
         obj = self.get_shared(receiver, grants, **kwargs)
         await obj.asave()
         return obj
 
-    def get_shared(self, receiver: Agent, grants: dict[str, int] | None = None, **kwargs) -> Reference:
+    def get_shared(self, receiver: Agent, grants: dict[str, int] | None = None, **kwargs) -> Access:
         """Share this object to this receiver.
 
         :param receiver: share's receiver
@@ -188,9 +195,11 @@ class Object(models.Model, metaclass=ObjectBase):
             grants = {key: min(value, grants[key]) for key, value in self.root_grants.items() if key in grants}
         else:
             grants = dict(self.root_grants.items())
-        return self.Reference(target=self, emitter=self.owner, receiver=receiver, grants=grants, **kwargs)
+        return self.Access(target=self, emitter=self.owner, receiver=receiver, grants=grants, **kwargs)
 
     def get_absolute_url(self) -> str:
         if not self.detail_url_name:
             raise ValueError("Missing attribute `detail_url_name`.")
+        if self.access:
+            return self.access.get_absolute_url()
         return reverse(self.detail_url_name, kwargs={"uuid": self.uuid})

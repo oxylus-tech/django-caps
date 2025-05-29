@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.db import models
 from django.db.models import Q
+from django.urls import reverse
 from django.utils import timezone as tz
 from django.utils.translation import gettext_lazy as _
 
@@ -14,25 +15,25 @@ from caps.utils import get_lazy_relation
 from .agent import Agent
 
 __all__ = (
-    "ReferenceQuerySet",
-    "Reference",
+    "AccessQuerySet",
+    "Access",
 )
 
 
-class ReferenceQuerySet(models.QuerySet):
-    """QuerySet for Reference classes."""
+class AccessQuerySet(models.QuerySet):
+    """QuerySet for Access classes."""
 
     class Meta:
         abstract = True
         unique_together = (("receiver", "target", "emitter"),)
 
-    def available(self, agent: Agent | Iterable[Agent] | None = None) -> ReferenceQuerySet:
-        """Return available references based on expiration and eventual user."""
+    def available(self, agent: Agent | Iterable[Agent] | None = None) -> AccessQuerySet:
+        """Return available accesses based on expiration and eventual user."""
         if agent is not None:
             self = self.agent(agent)
         return self.filter(Q(expiration__isnull=True) | Q(expiration__gt=tz.now()))
 
-    def expired(self, exclude: bool = False) -> ReferenceQuerySet:
+    def expired(self, exclude: bool = False) -> AccessQuerySet:
         """Filter by expiration.
 
         :param exclude: if True, exclude instead of filter.
@@ -40,47 +41,47 @@ class ReferenceQuerySet(models.QuerySet):
         q = {"expiration__isnull": False, "expiration__lt": tz.now()}
         return self.exclude(**q) if exclude else self.filter(**q)
 
-    def agent(self, agent: Agent | Iterable[Agent]) -> ReferenceQuerySet:
+    def agent(self, agent: Agent | Iterable[Agent]) -> AccessQuerySet:
         """
-        Filter references that agent is either receiver or
+        Filter accesses that agent is either receiver or
         emitter..
         """
         if isinstance(agent, Agent):
             return self.filter(Q(emitter=agent) | Q(receiver=agent))
         return self.filter(Q(emitter__in=agent) | Q(receiver__in=agent))
 
-    def emitter(self, agent: Agent | Iterable[Agent]) -> ReferenceQuerySet:
-        """References for the provided emitter(s)."""
+    def emitter(self, agent: Agent | Iterable[Agent]) -> AccessQuerySet:
+        """Accesss for the provided emitter(s)."""
         if isinstance(agent, Agent):
             return self.filter(emitter=agent)
         return self.filter(emitter__in=agent)
 
-    def receiver(self, agent: Agent | Iterable[Agent]) -> ReferenceQuerySet:
-        """References for the provided receiver(s)."""
+    def receiver(self, agent: Agent | Iterable[Agent]) -> AccessQuerySet:
+        """Accesss for the provided receiver(s)."""
         if isinstance(agent, Agent):
             return self.filter(receiver=agent)
         return self.filter(receiver__in=agent)
 
-    def ref(self, receiver: Agent | Iterable[Agent] | None, uuid: uuid.UUID) -> ReferenceQuerySet:
-        """Reference by uuid and receiver(s).
+    def access(self, receiver: Agent | Iterable[Agent] | None, uuid: uuid.UUID) -> AccessQuerySet:
+        """Access by uuid and receiver(s).
 
         Note that ``receiver`` is provided as first parameter in order to enforce its usage. It however can be ``None``: this only
         should be used when queryset has already been filtered by receiver.
 
-        :param receiver: the agent that retrieving the reference.
-        :param uuid: the reference uuid to fetch.
-        :yield DoesNotExist: when the reference is not found.
+        :param receiver: the agent that retrieving the access.
+        :param uuid: the access uuid to fetch.
+        :yield DoesNotExist: when the access is not found.
         """
         if receiver:
             self = self.receiver(receiver)
         return self.get(uuid=uuid)
 
-    def refs(self, receiver: Agent | Iterable[Agent] | None, uuids: Iterable[uuid.UUID]) -> ReferenceQuerySet:
-        """References by many uuid and receiver(s).
+    def accesses(self, receiver: Agent | Iterable[Agent] | None, uuids: Iterable[uuid.UUID]) -> AccessQuerySet:
+        """Accesss by many uuid and receiver(s).
 
-        Please refer to :py:meth:`ReferenceQuerySet.ref` for more information.
+        Please accesser to :py:meth:`AccessQuerySet.access` for more information.
 
-        :param receiver: the agent that retrieving the reference.
+        :param receiver: the agent that retrieving the access.
         :param uuids: an iterable of uuids to fetch
         """
         if receiver:
@@ -96,56 +97,56 @@ class ReferenceQuerySet(models.QuerySet):
     # TODO: bulk_update -> is_valid()
 
 
-class Reference(models.Model):
-    """Reference are the entry point to access an :py:class:`Object`.
+class Access(models.Model):
+    """Access are the entry point to access an :py:class:`Object`.
 
-    Reference provides a set of capabilities for specific receiver.
+    Access provides a set of capabilities for specific receiver.
     The concrete sub-model MUST provide the ``target`` foreign key to an
     Object.
 
-    There are two kind of reference:
+    There are two kind of access:
 
-    - root: the root reference from which all other references to object
+    - root: the root access from which all other accesses to object
       are derived. Created from the :py:meth:`create` class method. It has no :py:attr:`origin`
-      and **there can be only one root reference per :py:class:`Object` instance.
-    - derived: reference derived from root or another derived. Created
+      and **there can be only one root access per :py:class:`Object` instance.
+    - derived: access derived from root or another derived. Created
       from the :py:meth:`derive` method.
 
     This class enforce fields validation at `save()` and `bulk_create()`.
 
-    Concrete Reference
+    Concrete Access
     ------------------
 
-    This model is implemented as an abstract in order to have a reference
+    This model is implemented as an abstract in order to have a access
     specific to each model (see :py:class:`Object` abstract model). The
     actual concrete class is created when :py:class:`Object` is subclassed
     by a concrete model.
     """
 
     uuid = models.UUIDField(_("UUID"), default=uuid.uuid4, db_index=True)
-    """Public reference id used in API."""
+    """Public access id used in API."""
     origin = models.ForeignKey(
         "self",
         models.CASCADE,
         blank=True,
         null=True,
         related_name="derived",
-        verbose_name=_("Source Reference"),
+        verbose_name=_("Source Access"),
     )
-    """Source reference in references chain."""
+    """Source access in accesses chain."""
     emitter = models.ForeignKey(
-        Agent, models.CASCADE, verbose_name=_("Emitter"), related_name="emit_references", db_index=True
+        Agent, models.CASCADE, verbose_name=_("Emitter"), related_name="emit_accesses", db_index=True
     )
     """Agent receiving capability."""
     receiver = models.ForeignKey(
-        Agent, models.CASCADE, verbose_name=_("Receiver"), related_name="references", db_index=True
+        Agent, models.CASCADE, verbose_name=_("Receiver"), related_name="accesses", db_index=True
     )
     """Agent receiving capability."""
     expiration = models.DateTimeField(
         _("Expiration"),
         null=True,
         blank=True,
-        help_text=_("Defines an expiration date after which the reference is not longer valid."),
+        help_text=_("Defines an expiration date after which the access is not longer valid."),
     )
     """Date of expiration."""
     grants = models.JSONField(_("Granted capabilities"), blank=True)
@@ -154,7 +155,7 @@ class Reference(models.Model):
     The integer value of ``allowed_reshare`` determines the amount of reshare can be done.
     """
 
-    objects = ReferenceQuerySet.as_manager()
+    objects = AccessQuerySet.as_manager()
 
     class Meta:
         abstract = True
@@ -162,7 +163,7 @@ class Reference(models.Model):
 
     @property
     def is_expired(self):
-        """Return True if Reference is expired."""
+        """Return True if Access is expired."""
         return self.expiration is not None and self.expiration <= tz.now()
 
     @classmethod
@@ -171,7 +172,7 @@ class Reference(models.Model):
         return cls.target.field.related_model
 
     def has_perm(self, user: User, permission: str) -> bool:
-        """Return True if reference grants the provided permission."""
+        """Return True if access grants the provided permission."""
         return self.receiver.is_agent(user) and permission in self.grants
 
     def get_all_permissions(self, user: User) -> set[str]:
@@ -179,11 +180,11 @@ class Reference(models.Model):
         return self.receiver.is_agent(user) and set(self.grants.keys()) or set()
 
     def is_valid(self, raises: bool = False) -> bool:
-        """Check Reference values validity, throwing exception on invalid
+        """Check Access values validity, throwing exception on invalid
         values.
 
         :returns True if valid, otherwise raise ValueError
-        :yield ValueError: when reference is invaldi
+        :yield ValueError: when access is invaldi
         """
         if self.origin:
             if self.origin.receiver != self.emitter:
@@ -191,7 +192,7 @@ class Reference(models.Model):
         return True
 
     def share(self, receiver: Agent, grants: dict[str, int] | None = None, **kwargs):
-        """Create a new saved reference shared from self.
+        """Create a new saved access shared from self.
 
         See :py:meth:`get_shared` for arguments.
         """
@@ -200,7 +201,7 @@ class Reference(models.Model):
         return obj
 
     async def ashare(self, receiver: Agent, grants: dict[str, int] | None = None, **kwargs):
-        """Create a new saved reference shared from self (async).
+        """Create a new saved access shared from self (async).
 
         See :py:meth:`get_shared` for arguments.
         """
@@ -209,12 +210,12 @@ class Reference(models.Model):
         return obj
 
     def get_shared(self, receiver: Agent, grants: dict[str, int] | None = None, **kwargs):
-        """Return new reference shared from self. The object is not saved.
+        """Return new access shared from self. The object is not saved.
 
         :param receiver: the receiver
         :param grants: optional granted permissions
         :param **kwargs: extra initial arguments
-        :yield PermissionDenied: when reference expired or no grant is shareable.
+        :yield PermissionDenied: when access expired or no grant is shareable.
         """
         grants = self.get_shared_grants(grants)
         if not grants:
@@ -223,12 +224,12 @@ class Reference(models.Model):
         return type(self)(grants=grants, **kwargs)
 
     def get_shared_kwargs(self, receiver: Agent, kwargs):
-        """Return initial argument for a derived reference from self."""
+        """Return initial argument for a derived access from self."""
         e_key, emitter = get_lazy_relation(self, "receiver", "emitter")
 
         if self.expiration:
             if self.is_expired:
-                raise PermissionDenied("Reference is expired.")
+                raise PermissionDenied("Access is expired.")
 
             if expiration := kwargs.get("expiration"):
                 kwargs["expiration"] = min(expiration, self.expiration)
@@ -244,7 +245,7 @@ class Reference(models.Model):
         }
 
     def get_shared_grants(self, grants: dict[str, int] | None = None, **kwargs) -> dict[str, int]:
-        """Return :py:attr:`grants` for shared reference."""
+        """Return :py:attr:`grants` for shared access."""
         if grants:
             return {
                 key: min(value - 1, grants[key]) for key, value in self.grants.items() if key in grants and value > 0
@@ -252,7 +253,10 @@ class Reference(models.Model):
         return {key: value - 1 for key, value in self.grants.items() if value > 0}
 
     def get_absolute_url(self):
-        return self.target.get_absolute_url()
+        if not self.target.detail_url_name:
+            raise ValueError("Missing attribute `detail_url_name`.")
+
+        return reverse(self.target.detail_url_name, kwargs={"uuid": self.uuid})
 
     def save(self, *a, **kw):
         self.is_valid(raises=True)

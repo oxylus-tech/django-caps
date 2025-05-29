@@ -5,7 +5,7 @@ from django.http import Http404
 
 from caps.views import mixins
 from .conftest import init_request, req_factory
-from .app.models import Reference, ConcreteObject
+from .app.models import ConcreteObject
 
 
 class BaseMixin:
@@ -25,15 +25,15 @@ class BaseMixin:
 
 
 class ObjectMixin(mixins.ObjectMixin, BaseMixin):
-    reference_class = Reference
+    model = ConcreteObject
 
 
 class ObjectPermissionMixin(mixins.ObjectPermissionMixin, BaseMixin):
-    reference_class = Reference
+    model = ConcreteObject
 
 
-class SingleObjectMixin(mixins.SingleObjectMixin, BaseMixin):
-    reference_class = Reference
+class SingleObjectMixin(mixins.SingleObjectMixin, mixins.ObjectPermissionMixin, BaseMixin):
+    model = ConcreteObject
 
 
 @pytest.fixture
@@ -57,12 +57,12 @@ class TestObjectMixin:
         object_mixin.all_agents = True
         assert object_mixin.get_agents() == user_agents
 
-    def test_get_queryset(self, object_mixin, user_agent, refs):
+    def test_get_queryset(self, object_mixin, user_agent, accesses):
         raise NotImplementedError()
 
     #    object_mixin.agents = user_agent
     #    query = object_mixin.get_queryset()
-    #    assert all(o.reference.agent == user_agent for o in query)
+    #    assert all(o.access.agent == user_agent for o in query)
 
     def test_dispatch(self, object_mixin):
         class Base:
@@ -80,8 +80,8 @@ class TestObjectMixin:
 
 
 @pytest.fixture
-def perm_mixin(req, object, ref):
-    object.reference = ref
+def perm_mixin(req, object, access):
+    object.access = access
     return ObjectPermissionMixin(request=req, object=object)
 
 
@@ -93,18 +93,18 @@ class TestObjectPermissionMixin:
         perm_mixin.get_object()
         assert call
 
-    def test_check_object_permissions(self, perm_mixin, object, ref):
-        perm_mixin.check_object_permissions(object)
+    def test_check_object_permissions(self, perm_mixin, req, object, access):
+        perm_mixin.check_object_permissions(req, object)
 
-    def test_check_object_permissions_from_ref(self, perm_mixin, object, ref, user_2):
+    def test_check_object_permissions_from_access(self, perm_mixin, req, object, access, user_2):
         perm_mixin.request.user = user_2
-        perm_mixin.check_object_permissions(object)
+        perm_mixin.check_object_permissions(req, object)
 
-    def test_check_object_permissions_raises_permission_denied(self, perm_mixin, object, ref, user_2):
-        object.reference = None
+    def test_check_object_permissions_raises_permission_denied(self, perm_mixin, req, object, access, user_2):
+        object.access = None
         perm_mixin.request.user = user_2
         with pytest.raises(Http404):
-            perm_mixin.check_object_permissions(object)
+            perm_mixin.check_object_permissions(req, object)
 
     def test_get_permissions(self, perm_mixin):
         perms = perm_mixin.get_permissions()
@@ -113,15 +113,27 @@ class TestObjectPermissionMixin:
 
 
 @pytest.fixture
-def single_mixin(req, ref, perm):
-    return SingleObjectMixin(can=perm, kwargs={"uuid": ref.target.uuid}, request=req, agents=ref.receiver)
+def single_mixin(req, access):
+    return SingleObjectMixin(kwargs={"uuid": access.target.uuid}, request=req, agents=access.receiver)
 
 
 class TestSingleObjectMixin:
-    def test_get_object(self, single_mixin, refs, ref):
-        assert single_mixin.get_object() == ref.target
+    def test_get_object(self, single_mixin, accesses, access):
+        assert single_mixin.get_object() == access.target
 
-    def test_get_object_raises_404(self, single_mixin, refs, user_agent):
+    def test_get_object_raises_404(self, single_mixin, accesses, user_agent):
         single_mixin.kwargs["uuid"] = uuid4()
+        with pytest.raises(Http404):
+            single_mixin.get_object()
+
+    def test_get_object_from_access_uuid(self, single_mixin, access):
+        single_mixin.kwargs["uuid"] = access.uuid
+        single_mixin.request.agents = [access.receiver]
+        obj = single_mixin.get_object()
+        assert (obj, access) == (access.target, access)
+
+    def test_get_object_from_access_uuid_wrong_agent(self, single_mixin, access, group_agent):
+        single_mixin.kwargs["uuid"] = access.uuid
+        single_mixin.request.agents = [group_agent]
         with pytest.raises(Http404):
             single_mixin.get_object()

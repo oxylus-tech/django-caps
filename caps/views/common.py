@@ -9,9 +9,9 @@ __all__ = (
     "AgentCreateView",
     "AgentUpdateView",
     "AgentDeleteView",
-    "ReferenceDetailView",
-    "ReferenceListView",
-    "ReferenceDeleteView",
+    "AccessDetailView",
+    "AccessListView",
+    "AccessDeleteView",
 )
 
 
@@ -39,15 +39,15 @@ class AgentDeleteView(mixins.AgentMixin, generic.edit.DeleteView):
     permission_required = "caps.delete_agent"
 
 
-class ReferenceDetailView(mixins.ReferenceMixin, generic.DetailView):
+class AccessDetailView(mixins.AccessMixin, generic.DetailView):
     def get_queryset(self):
-        """Ensure capabilities are prefetch at the same time than the reference."""
-        return super().get_queryset().prefetch_related("capabilities")
+        """Ensure capabilities are paccessetch at the same time than the access."""
+        return super().get_queryset().paccessetch_related("capabilities")
 
 
-class ReferenceListView(mixins.ReferenceMixin, generic.ListView):
+class AccessListView(mixins.AccessMixin, generic.ListView):
     pass
 
 
-class ReferenceDeleteView(mixins.ReferenceMixin, generic.DeleteView):
+class AccessDeleteView(mixins.AccessMixin, generic.DeleteView):
     pass

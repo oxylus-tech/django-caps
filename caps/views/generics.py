@@ -9,7 +9,7 @@ class ObjectListView(mixins.ObjectMixin, generic.ListView):
     pass
 
 
-class ObjectDetailView(mixins.ObjectPermissionMixin, generic.DetailView):
+class ObjectDetailView(mixins.SingleObjectMixin, mixins.ObjectPermissionMixin, generic.DetailView):
     pass
 
 
@@ -17,9 +17,9 @@ class ObjectCreateView(generic.edit.CreateView):
     pass
 
 
-class ObjectUpdateView(mixins.ObjectPermissionMixin, generic.edit.UpdateView):
+class ObjectUpdateView(mixins.SingleObjectMixin, mixins.ObjectPermissionMixin, generic.edit.UpdateView):
     pass
 
 
-class ObjectDeleteView(mixins.ObjectPermissionMixin, generic.edit.DeleteView):
+class ObjectDeleteView(mixins.SingleObjectMixin, mixins.ObjectPermissionMixin, generic.edit.DeleteView):
     pass

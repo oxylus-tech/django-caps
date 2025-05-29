@@ -1,11 +1,11 @@
 from .agent import Agent, AgentQuerySet
 from .object import Object
-from .reference import Reference, ReferenceQuerySet
+from .access import Access, AccessQuerySet
 
 __all__ = (
     "Agent",
     "AgentQuerySet",
     "Object",
-    "Reference",
-    "ReferenceQuerySet",
+    "Access",
+    "AccessQuerySet",
 )

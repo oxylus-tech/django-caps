@@ -6,12 +6,12 @@ Capability vs ACL permission systems
 #. Granular and Delegable Access Control
 
     - In a capability-based system, access rights are directly assigned to objects (capabilities) rather than being centrally managed per resource.
-    - Advantage: Users can delegate access rights without requiring modifications to a central policy (e.g., passing a token or capability reference to another user).
+    - Advantage: Users can delegate access rights without requiring modifications to a central policy (e.g., passing a token or capability access to another user).
     - In contrast: ACLs require explicit permission modifications on the resource, which can be complex and require admin intervention.
 
 #. Reduced Need for a Central Authority
 
-    - Capabilities are typically self-contained (e.g., a token, key, or reference) and grant access upon presentation.
+    - Capabilities are typically self-contained (e.g., a token, key, or access) and grant access upon presentation.
     - Advantage: There is no need for continuous lookups in a central access control database.
     - In contrast: ACL-based systems require checking a central list for each access attempt, which can create performance bottlenecks.
 
@@ -44,4 +44,4 @@ So... When to use what?
     - Capability-based systems are ideal for distributed, decentralized, and microservices-based environments, where flexibility, delegation, and security are key.
     - ACL-based systems are better suited for traditional enterprise IT environments, where strict identity-based access control is needed.
 
-    This however still can be usable for object permissions by providing references for groups instead of users.
+    This however still can be usable for object permissions by providing accesses for groups instead of users.

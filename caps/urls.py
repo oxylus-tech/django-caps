@@ -7,14 +7,14 @@ from . import models, views
 
 def get_object_paths(
     obj_class: type[models.Object],
-    url_prefix: str | None = None,
+    url_paccessix: str | None = None,
     kwargs: dict[str, Any] | None = None,
     basename: str = "",
-    references: bool = False,
-    ref_kwargs: dict[str, Any] | None = None,
+    accesses: bool = False,
+    access_kwargs: dict[str, Any] | None = None,
 ) -> list[path]:
     """
-    Return Django paths for the provided object class, including to edit reference (:py:func:`get_reference_path`).
+    Return Django paths for the provided object class, including to edit access (:py:func:`get_access_path`).
 
     .. code-block:: python
 
@@ -26,61 +26,61 @@ def get_object_paths(
         )
 
     :param obj_class: the object model class;
-    :param url_prefix: url base path (default to model name);
+    :param url_paccessix: url base path (default to model name);
     :param kwargs: ``as_view`` kwargs, by view kind (list, detail, etc.)
     :param basename: use this as url's basename (default to model name)
-    :param references: if True, generate path for Object's Reference using default view (see :py:mod:`caps.views.common`)
-    :param ref_kwargs: ``kwargs`` argument passed down to :py:func:`get_reference_class`.
+    :param accesses: if True, generate path for Object's Access using default view (see :py:mod:`caps.views.common`)
+    :param access_kwargs: ``kwargs`` argument passed down to :py:func:`get_access_class`.
 
     :return: a list of path
     """
     if not basename:
         basename = obj_class._meta.model_name
-    if url_prefix is None:
-        url_prefix = basename
+    if url_paccessix is None:
+        url_paccessix = basename
     kwargs = kwargs or {}
     return _get_paths(
         obj_class,
         basename,
         [
-            ("list", views.ObjectListView, url_prefix),
-            ("detail", views.ObjectDetailView, f"{url_prefix}/<uuid:uuid>"),
-            ("create", views.ObjectCreateView, f"{url_prefix}/create"),
-            ("update", views.ObjectUpdateView, f"{url_prefix}/<uuid:uuid>/update"),
-            ("delete", views.ObjectDeleteView, f"{url_prefix}/<uuid:uuid>/delete"),
+            ("list", views.ObjectListView, url_paccessix),
+            ("detail", views.ObjectDetailView, f"{url_paccessix}/<uuid:uuid>"),
+            ("create", views.ObjectCreateView, f"{url_paccessix}/create"),
+            ("update", views.ObjectUpdateView, f"{url_paccessix}/<uuid:uuid>/update"),
+            ("delete", views.ObjectDeleteView, f"{url_paccessix}/<uuid:uuid>/delete"),
         ],
         kwargs,
-    ) + get_reference_paths(obj_class.Reference, f"{url_prefix}/reference", kwargs=ref_kwargs)
+    ) + get_access_paths(obj_class.Access, f"{url_paccessix}/access", kwargs=access_kwargs)
 
 
-def get_reference_paths(
-    ref_class: type[models.Reference],
-    url_prefix: str = "reference",
+def get_access_paths(
+    access_class: type[models.Access],
+    url_paccessix: str = "access",
     kwargs: dict[str, Any] | None = None,
     basename: str = "",
 ) -> list[path]:
     """
-    Return Django paths for the provided reference class.
+    Return Django paths for the provided access class.
 
     Created path for views: ``list``, ``detail``, ``delete``.
 
-    The path will have names such as (for a model named ``contact``): ``contact-reference-list``.
+    The path will have names such as (for a model named ``contact``): ``contact-access-list``.
 
-    :param ref_class: Reference class
+    :param access_class: Access class
     :param kwargs: ``as_view`` extra arguments by view type
-    :param basename: use this a base name for url, instead of ``{object_model_name}-reference``.
+    :param basename: use this a base name for url, instead of ``{object_model_name}-access``.
     :returns: list of path
     """
     if not basename:
-        obj_class = ref_class.get_object_class()
-        basename = f"{obj_class._meta.model_name}-reference"
+        obj_class = access_class.get_object_class()
+        basename = f"{obj_class._meta.model_name}-access"
     return _get_paths(
-        ref_class,
+        access_class,
         basename,
         [
-            ("list", views.ReferenceListView, url_prefix),
-            ("detail", views.ReferenceDetailView, f"{url_prefix}/<uuid:uuid>"),
-            ("delete", views.ReferenceDeleteView, f"{url_prefix}/<uuid:uuid>/delete"),
+            ("list", views.AccessListView, url_paccessix),
+            ("detail", views.AccessDetailView, f"{url_paccessix}/<uuid:uuid>"),
+            ("delete", views.AccessDeleteView, f"{url_paccessix}/<uuid:uuid>/delete"),
         ],
         kwargs,
     )

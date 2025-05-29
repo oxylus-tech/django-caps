@@ -4,7 +4,7 @@ Django-Caps
 Django-Caps provides capability based object permission system for Django applications.
 This project is inspired by `Capn'Proto documentation <https://capnproto.org>`_ (`interesting paper <http://www.erights.org/elib/capability/ode/ode.pdf>`_).
 
-A capability is a permission provided for a specific object. It can be *derived* (shared) a limited amount of time. Users never directly access the targeted object, but through a *reference* that defines allowed capabilities for it.
+A capability is a permission provided for a specific object. It can be *derived* (shared) a limited amount of time. Users never directly access the targeted object, but through a *access* that defines allowed capabilities for it.
 
 In short, why use capabilities?
 
@@ -15,28 +15,16 @@ In short, why use capabilities?
 More in the guide, :ref:`Capability vs ACL permission systems`.
 
 
-Overview
+Features
 --------
 
-Features
-........
+Here is what we provide:
 
-This package provides:
+- **Capability based object permissions system**: objects can be shared with specific permissions to user/group. The object is then accessed by this shared object rather than directly (except for its owner).
+- **Access sharing**: Objects' accesses can be shared with granular control on permissions.
+- **Integration**: authentication/permission backend is provided both for Django and Django Rest Framework. Views, viewsets and serializers too.
+- **Agents**: users can act under different profiles, as a user or group. The accesses always target other agents.
 
-- Capability based object permission system;
-- Django views and mixins;
-- Django Rest Framework views, viewsets and serializers;
-- A user can act under different profiles (agents);
 
-Models
-......
-
-The current implementation provides the following models:
-
-- ``Capability``: a single access right link to a specific action;
-- ``Reference``: reference to an object, linked to an agent and a set of capabilities;
-- ``Agent``: either an user or a group.
-
-  Note: although capabilities are primarely designed to target only users, reducing ambient privilege (see below), we allow to assign them on groups. This allows to use capability-like system for object permissions on use-case not primarely targetted.
-
-- ``Object``: objects to be accessed through references.
+Among other things:
+- **Database id obfuscation**: object internal id are never exposed to the outside world. Instead uuid are used to reference them in API and urls. This mitigate attacks on predictive id.

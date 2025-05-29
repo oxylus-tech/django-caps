@@ -24,7 +24,7 @@ def client_2(user_2, user_2_perms):
     return client
 
 
-def test_api_create_reference(client, client_2, user_2, group_agent):
+def test_api_create_access(client, client_2, user_2, group_agent):
     resp = client.post(reverse("concreteobject-list"), {"name": "Name"})
     assert resp.data["uuid"]
 
@@ -49,22 +49,30 @@ def test_api_create_reference(client, client_2, user_2, group_agent):
     )
     assert resp.status_code == 200
 
-    # Ensure access
+    access_uuid = resp.data["uuid"]
+
+    # Access by object uuid not allowed for user 2
     resp = client_2.get(reverse("concreteobject-detail", args=[uuid]))
+    assert resp.status_code == 404
+
+    # Only by shared access
+    resp = client_2.get(reverse("concreteobject-detail", args=[access_uuid]))
     assert resp.status_code == 200
-    ref_uuid = resp.data["reference"]["uuid"]
+    assert resp.data["uuid"] == access_uuid
 
     # default ConcreteObject don't grant deletion
-    resp = client_2.delete(reverse("concreteobject-detail", args=[uuid]))
+    resp = client_2.delete(reverse("concreteobject-detail", args=[access_uuid]))
     assert resp.status_code == 403
 
     # Share from object forbidden on user 2
-    resp = client_2.post(reverse("concreteobject-share", args=[uuid]), {"receiver": user_2.agents.all().first().uuid})
+    resp = client_2.post(
+        reverse("concreteobject-share", args=[access_uuid]), {"receiver": user_2.agents.all().first().uuid}
+    )
     assert resp.status_code == 403
 
     # Derive should not happen here
     resp = client_2.post(
-        reverse("concreteobjectreference-share", args=[ref_uuid]),
+        reverse("concreteobjectaccess-share", args=[access_uuid]),
         {"receiver": group_agent.uuid},
     )
     assert resp.status_code == 403

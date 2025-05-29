@@ -9,5 +9,5 @@ class ObjectViewSet(views.ObjectViewSet):
     queryset = models.ConcreteObject.objects.all()
 
 
-class ReferenceViewSet(views.ReferenceViewSet):
-    queryset = models.Reference.objects.all()
+class AccessViewSet(views.AccessViewSet):
+    queryset = models.Access.objects.all()

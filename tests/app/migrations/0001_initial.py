@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name="ConcreteObjectReference",
+            name="ConcreteObjectAccess",
             fields=[
                 ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 ("uuid", models.UUIDField(db_index=True, default=uuid.uuid4, verbose_name="UUID")),
@@ -39,7 +39,7 @@ class Migration(migrations.Migration):
                     "expiration",
                     models.DateTimeField(
                         blank=True,
-                        help_text="Defines an expiration date after which the reference is not longer valid.",
+                        help_text="Defines an expiration date after which the access is not longer valid.",
                         null=True,
                         verbose_name="Expiration",
                     ),
@@ -49,7 +49,7 @@ class Migration(migrations.Migration):
                     "emitter",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        related_name="emit_references",
+                        related_name="emit_accesses",
                         to="caps.agent",
                         verbose_name="Emitter",
                     ),
@@ -61,15 +61,15 @@ class Migration(migrations.Migration):
                         null=True,
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="derived",
-                        to="caps_test.concreteobjectreference",
-                        verbose_name="Source Reference",
+                        to="caps_test.concreteobjectaccess",
+                        verbose_name="Source Access",
                     ),
                 ),
                 (
                     "receiver",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        related_name="references",
+                        related_name="accesses",
                         to="caps.agent",
                         verbose_name="Receiver",
                     ),
@@ -78,7 +78,7 @@ class Migration(migrations.Migration):
                     "target",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        related_name="references",
+                        related_name="accesses",
                         to="caps_test.concreteobject",
                         verbose_name="Target",
                     ),

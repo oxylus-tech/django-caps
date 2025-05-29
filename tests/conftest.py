@@ -148,38 +148,38 @@ def user_2_object(user_2_agent, db):
 
 
 @pytest.fixture
-def ref(user_2_agent, object):
-    # FIXME: set object.reference to ref
+def access(user_2_agent, object):
+    # FIXME: set object.access to access
     return object.share(user_2_agent)
 
 
 @pytest.fixture
-def group_ref(group_agent, object):
+def group_access(group_agent, object):
     return object.share(group_agent, object)
 
 
 @pytest.fixture
-def refs_3(agents, objects):
+def accesses_3(agents, objects):
     # caps_3: all action, derive 3
     # We enforce the values
     return [object.share(agent) for object, agent in zip(objects, agents)]
 
 
 @pytest.fixture
-def ref_3(refs_3):
-    return refs_3[0]
+def access_3(accesses_3):
+    return accesses_3[0]
 
 
 # FIXME
 @pytest.fixture
-def refs_2(refs_3, agents):
+def accesses_2(accesses_3, agents):
     return [
-        refs_3[0].share(agents[1]),
-        refs_3[1].share(agents[2]),
-        refs_3[2].share(agents[0]),
+        accesses_3[0].share(agents[1]),
+        accesses_3[1].share(agents[2]),
+        accesses_3[2].share(agents[0]),
     ]
 
 
 @pytest.fixture
-def refs(refs_3, refs_2):
-    return refs_3 + refs_2
+def accesses(accesses_3, accesses_2):
+    return accesses_3 + accesses_2
