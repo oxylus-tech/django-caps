@@ -104,6 +104,11 @@
     <span class="s2">&quot;caps.middleware.AgentMiddleware&quot;</span><span class="p">,</span>
     <span class="c1"># ...</span>
 <span class="p">]</span>
+
+<span class="n">AUTHENTICATION_BACKENDS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;django.contrib.auth.backends.ModelBackend&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;caps.backends.PermissionsBackend&quot;</span><span class="p">,</span>
+<span class="p">]</span>
 </pre></div>
 </div>
 <p>Create an object to be accessed:</p>

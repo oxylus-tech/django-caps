@@ -28,6 +28,11 @@ In settings, add application and middleware. The middleware is used to assign us
         # ...
     ]
 
+    AUTHENTICATION_BACKENDS = [
+        "django.contrib.auth.backends.ModelBackend",
+        "caps.backends.PermissionsBackend",
+    ]
+
 
 Create an object to be accessed:
 
