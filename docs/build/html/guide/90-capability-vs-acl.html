@@ -1,0 +1,180 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Capability vs ACL permission systems &mdash; Django-Caps 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="API" href="../api.html" />
+    <link rel="prev" title="Overview" href="01-overview.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a href="../index.html" class="icon icon-home">
+            Django-Caps
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../guide.html">Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="00-quickstart.html">Quickstart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="01-overview.html">Overview</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Capability vs ACL permission systems</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project.html">Project</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Django-Caps</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../guide.html">Guide</a></li>
+      <li class="breadcrumb-item active">Capability vs ACL permission systems</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/guide/90-capability-vs-acl.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <section id="capability-vs-acl-permission-systems">
+<span id="id1"></span><h1>Capability vs ACL permission systems<a class="headerlink" href="#capability-vs-acl-permission-systems" title="Link to this heading"></a></h1>
+<ol class="arabic">
+<li><p>Granular and Delegable Access Control</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>In a capability-based system, access rights are directly assigned to objects (capabilities) rather than being centrally managed per resource.</p></li>
+<li><p>Advantage: Users can delegate access rights without requiring modifications to a central policy (e.g., passing a token or capability access to another user).</p></li>
+<li><p>In contrast: ACLs require explicit permission modifications on the resource, which can be complex and require admin intervention.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Reduced Need for a Central Authority</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Capabilities are typically self-contained (e.g., a token, key, or access) and grant access upon presentation.</p></li>
+<li><p>Advantage: There is no need for continuous lookups in a central access control database.</p></li>
+<li><p>In contrast: ACL-based systems require checking a central list for each access attempt, which can create performance bottlenecks.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Better Security Against Privilege Escalation</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Capabilities are unforgeable and granted explicitly to users or processes.</p></li>
+<li><p>Advantage: It prevents confused deputy attacks (where a process inadvertently misuses privileges granted by another entity).</p></li>
+<li><p>In contrast: ACLs check permissions based on identity, which can lead to privilege escalation through indirect means (e.g., exploiting a process with broad access).</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>More Dynamic and Scalable Access Control</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Capability-based models are inherently distributed and flexible.</p></li>
+<li><p>Advantage: New permissions can be granted dynamically without modifying a central ACL.</p></li>
+<li><p>In contrast: ACLs require centralized policy updates and administrative overhead.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Easier Revocation and Least Privilege Enforcement</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Capability-based models can revoke access by simply invalidating or expiring the capability.</p></li>
+<li><p>Advantage: Fine-grained control over individual access rights.</p></li>
+<li><p>In contrast: ACLs may require searching for all instances of a user’s permissions and modifying multiple entries.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Better Fit for Decentralized or Distributed Systems</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Many modern cloud, containerized, and microservices architectures favor capabilities (e.g., bearer tokens, OAuth, API keys).</p></li>
+<li><p>Advantage: Eliminates reliance on a single access control authority, improving resilience.</p></li>
+<li><p>In contrast: ACLs are often tied to a centralized authentication and authorization model.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+<p>So… When to use what?</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Capability-based systems are ideal for distributed, decentralized, and microservices-based environments, where flexibility, delegation, and security are key.</p></li>
+<li><p>ACL-based systems are better suited for traditional enterprise IT environments, where strict identity-based access control is needed.</p></li>
+</ul>
+<p>This however still can be usable for object permissions by providing accesses for groups instead of users.</p>
+</div></blockquote>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="01-overview.html" class="btn btn-neutral float-left" title="Overview" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../api.html" class="btn btn-neutral float-right" title="API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Thomas.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,238 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Overview &mdash; Django-Caps 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Capability vs ACL permission systems" href="90-capability-vs-acl.html" />
+    <link rel="prev" title="Quickstart" href="00-quickstart.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a href="../index.html" class="icon icon-home">
+            Django-Caps
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../guide.html">Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="00-quickstart.html">Quickstart</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Overview</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#core-models">Core Models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#create-and-update-access">Create and update Access</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#access-expiration">Access expiration</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#usage-example">Usage Example</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#granting-access-from-an-object">Granting Access from an Object</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#resharing-an-access">Resharing an Access</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#permission-check">Permission Check</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="90-capability-vs-acl.html">Capability vs ACL permission systems</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project.html">Project</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Django-Caps</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../guide.html">Guide</a></li>
+      <li class="breadcrumb-item active">Overview</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/guide/01-overview.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <section id="overview">
+<h1>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h1>
+<p>The system is designed to support fine-grained, shareable permissions across users, groups, and anonymous agents, while maintaining clear constraints on how far permissions can be redistributed.</p>
+<p>Each <a class="reference internal" href="../api/10_models.html#caps.models.object.Object" title="caps.models.object.Object"><code class="xref py py-class docutils literal notranslate"><span class="pre">caps.models.object.Object</span></code></a> declares its own permission policy via a class-level <a class="reference internal" href="../api/10_models.html#caps.models.object.Object.root_grants" title="caps.models.object.Object.root_grants"><code class="xref py py-attr docutils literal notranslate"><span class="pre">caps.models.object.Object.root_grants</span></code></a> definition, while access instances are represented by Access entries, which may themselves be shared according to configurable depth constraints.</p>
+<p>The <a class="reference internal" href="../api/10_models.html#caps.models.access.Access" title="caps.models.access.Access"><code class="xref py py-class docutils literal notranslate"><span class="pre">caps.models.access.Access</span></code></a> defines what actions an agent can perform on a given object, and whether those permissions can be further shared. The <a class="reference internal" href="../api/10_models.html#caps.models.agent.Agent" title="caps.models.agent.Agent"><code class="xref py py-class docutils literal notranslate"><span class="pre">caps.models.agent.Agent</span></code></a> model provides a unified interface for addressing users, groups, and public (unauthenticated) access.</p>
+<figure class="align-default" id="id1">
+<img alt="../_images/caps-models.drawio.png" src="../_images/caps-models.drawio.png" />
+<figcaption>
+<p><span class="caption-text">Every Object has an owner and can provide Access to other Agents. They are addressed by their uuid (for the owner) or by the access’ uuid (for the receivers). The access provide permissions whose codename corresponds to Django’s auth Permission.</span><a class="headerlink" href="#id1" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>Django-Caps provides views that will use the provided scheme in order to grant user access or actions.</p>
+<p>Access to objects is governed as follows:</p>
+<ul class="simple">
+<li><p>The <em>owner</em> of an object can access it directly using the object’s <code class="docutils literal notranslate"><span class="pre">uuid</span></code>.</p></li>
+<li><p>Other agents must use the <code class="docutils literal notranslate"><span class="pre">uuid</span></code> of an <code class="docutils literal notranslate"><span class="pre">Access</span></code> grant they have received to interact with the object indirectly and within the scope of the permissions defined in that grant.</p></li>
+</ul>
+<section id="core-models">
+<h2>Core Models<a class="headerlink" href="#core-models" title="Link to this heading"></a></h2>
+<p>The system is composed of three core models:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">caps.models.object.Object</span></code>
+Represents the resource being protected. Each object has a globally unique <code class="docutils literal notranslate"><span class="pre">uuid</span></code> and defines its available permissions through a class-level <code class="docutils literal notranslate"><span class="pre">root_grants</span></code> dictionary. This dictionary specifies which permissions are grantable and how many levels deep each one can be reshared.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">caps.models.agent.Agent</span></code>
+A unified abstraction of a permission recipient. An <code class="docutils literal notranslate"><span class="pre">Agent</span></code> may represent a specific user, a group of users, or an anonymous entity. This model decouples access logic from Django’s built-in user and group models, enabling flexible and consistent permission targeting.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">caps.models.access.Access</span></code>
+Encapsulates a delegated permission. Each <code class="docutils literal notranslate"><span class="pre">Access</span></code> instance links a target <code class="docutils literal notranslate"><span class="pre">Object</span></code> to a receiving <code class="docutils literal notranslate"><span class="pre">Agent</span></code> and contains a <code class="docutils literal notranslate"><span class="pre">grants</span></code> dictionary, where each key is a permission codename (e.g., <code class="docutils literal notranslate"><span class="pre">&quot;app.view_object&quot;</span></code>) and each value is a reshare depth. This depth determines how many times the permission can be reshared down the access chain.</p></li>
+</ul>
+<p><a class="reference internal" href="../api/10_models.html#caps.models.object.Object" title="caps.models.object.Object"><code class="xref py py-class docutils literal notranslate"><span class="pre">Object</span></code></a> and <a class="reference internal" href="../api/10_models.html#caps.models.access.Access" title="caps.models.access.Access"><code class="xref py py-class docutils literal notranslate"><span class="pre">Access</span></code></a> models are <code class="docutils literal notranslate"><span class="pre">abstract</span></code>. When Object is subclassed in a concrete model,
+a concrete Access is generated (accessible from subclass scope). This ensure that:</p>
+<ul class="simple">
+<li><p>The Access models are associated to one object type, allowing reverse relations to be accessible (comparing to a solution involving ContentType framework). This also allows to joins table on SQL requests (thus prefetch values among other things);</p></li>
+<li><p>This ensures clear segregation for accesses and capabilities per object type and reduce tables sizes;</p></li>
+</ul>
+<section id="create-and-update-access">
+<h3>Create and update Access<a class="headerlink" href="#create-and-update-access" title="Link to this heading"></a></h3>
+<p>There are only two ways for user (through views or API) to create a Access:</p>
+<ul class="simple">
+<li><p>By creating a <code class="xref py py-class docutils literal notranslate"><span class="pre">Object</span></code>: the related view will ensure the root access is created.</p></li>
+<li><p>By derivating an already existing access;</p></li>
+</ul>
+<p>It is assumed that once a Access is created it can not be updated (nor its capabilities). This is in order to ensure the integrity of the whole chain of accesses. This is a current trade-off in Django-Caps that might change in the future even though it isn’t planned.</p>
+<p>If a user wants to update a Access (eg. add more capabilities), he should instead create a new access and eventually delete the older one. We ensure that all derived accesses will be destroyed at the same time of a parent (by cascading).</p>
+</section>
+<section id="access-expiration">
+<h3>Access expiration<a class="headerlink" href="#access-expiration" title="Link to this heading"></a></h3>
+<p>An expiration datetime can be provided for a Access. This allows to share an object for a limited time to someone else. Once the date is expired, the receiver can no longer access it.</p>
+<p>Note: all reshared Access from one with an expiration will expire at this moment max.</p>
+</section>
+</section>
+<section id="usage-example">
+<h2>Usage Example<a class="headerlink" href="#usage-example" title="Link to this heading"></a></h2>
+<p>This section illustrates how to use the permission model to delegate access and verify permissions.</p>
+<p>We use the <code class="docutils literal notranslate"><span class="pre">Post</span></code> model described in <span class="xref std std-ref">quickstart</span> (read it  for more usage examples and setup).</p>
+<section id="granting-access-from-an-object">
+<h3>Granting Access from an Object<a class="headerlink" href="#granting-access-from-an-object" title="Link to this heading"></a></h3>
+<p>An object owner can share the object with another agent using the <code class="docutils literal notranslate"><span class="pre">post.share(...)</span></code> method (<a class="reference internal" href="../api/10_models.html#caps.models.object.Object.share" title="caps.models.object.Object.share"><code class="xref py py-meth docutils literal notranslate"><span class="pre">caps.models.object.Object.share()</span></code></a>). This method creates a new <code class="docutils literal notranslate"><span class="pre">Access</span></code> instance and assigns permissions according to the object’s <code class="docutils literal notranslate"><span class="pre">root_grants</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Assuming post is an instance of Post owned by the user</span>
+<span class="c1"># and agent_b is an instance of Agent representing the receiver</span>
+
+<span class="c1"># Using default grants</span>
+<span class="n">access</span> <span class="o">=</span> <span class="n">post</span><span class="o">.</span><span class="n">share</span><span class="p">(</span><span class="n">agent_b</span><span class="p">)</span>
+
+<span class="n">grant</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;app.view_post&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s2">&quot;app.change_post&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">access</span> <span class="o">=</span> <span class="n">post</span><span class="o">.</span><span class="n">share</span><span class="p">(</span><span class="n">agent_b</span><span class="p">,</span> <span class="n">grant</span><span class="o">=</span><span class="n">grant</span><span class="p">)</span>
+
+<span class="c1"># access is now an Access instance linking obj to agent_b</span>
+</pre></div>
+</div>
+</section>
+<section id="resharing-an-access">
+<h3>Resharing an Access<a class="headerlink" href="#resharing-an-access" title="Link to this heading"></a></h3>
+<p>An agent who received access to an object can reshare it, as long as the reshare depth allows it. This is done using the <code class="docutils literal notranslate"><span class="pre">access.share(...)</span></code> method (<a class="reference internal" href="../api/10_models.html#caps.models.access.Access.share" title="caps.models.access.Access.share"><code class="xref py py-meth docutils literal notranslate"><span class="pre">caps.models.access.Access.share()</span></code></a>).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Assuming access is an Access instance received by agent_b</span>
+<span class="c1"># and agent_c is another Agent who should receive limited access</span>
+
+<span class="c1"># Using defaults: this provide allowed reshared permission with share depth minus 1</span>
+<span class="n">reshared_access</span> <span class="o">=</span> <span class="n">access</span><span class="o">.</span><span class="n">share</span><span class="p">(</span><span class="n">agent_c</span><span class="p">)</span>
+
+<span class="c1"># Using explicit permissions</span>
+<span class="n">reshared_grant</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;app.view_post&quot;</span><span class="p">:</span> <span class="mi">1</span>  <span class="c1"># Reshare depth reduced by one</span>
+<span class="p">}</span>
+
+<span class="n">reshared_access</span> <span class="o">=</span> <span class="n">access</span><span class="o">.</span><span class="n">share</span><span class="p">(</span><span class="n">agent_c</span><span class="p">,</span> <span class="n">reshared_grant</span><span class="p">)</span>
+
+<span class="c1"># reshared_access allows agent_c to view the object and possibly reshare it once more</span>
+</pre></div>
+</div>
+</section>
+<section id="permission-check">
+<h3>Permission Check<a class="headerlink" href="#permission-check" title="Link to this heading"></a></h3>
+<p>To check if a user has a given permission on an object, use Django’s standard <code class="docutils literal notranslate"><span class="pre">has_perm</span></code> API. Under the hood, your custom object permission backend should evaluate the user’s linked Agent and relevant Access entries.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">has_perm</span><span class="p">(</span><span class="s2">&quot;app.view_post&quot;</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;User is allowed to view the post&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Access denied&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The backend should resolve:</p>
+<ol class="arabic simple">
+<li><p>Whether the user is the owner of the object, or</p></li>
+<li><p>Whether the user is linked to an Agent that has an <code class="docutils literal notranslate"><span class="pre">Access</span></code> entry to the object with the given permission.</p></li>
+</ol>
+<p><code class="docutils literal notranslate"><span class="pre">has_perm</span></code> integrates cleanly with Django’s permission system and can be used consistently in views, templates, or API logic.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="00-quickstart.html" class="btn btn-neutral float-left" title="Quickstart" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="90-capability-vs-acl.html" class="btn btn-neutral float-right" title="Capability vs ACL permission systems" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Thomas.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

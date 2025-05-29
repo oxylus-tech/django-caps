@@ -160,7 +160,7 @@ class Object(models.Model, metaclass=ObjectBase):
     def has_perm(self, user, perm: str) -> bool:
         """Return True if user has provided permission for object."""
         if self.owner.is_agent(user):
-            return True
+            return perm in self.root_grants
         return self.access and self.access.has_perm(user, perm) or False
 
     def get_all_permissions(self, user) -> set[str]:
@@ -174,21 +174,21 @@ class Object(models.Model, metaclass=ObjectBase):
 
         See :py:meth:`get_shared` for parameters.
         """
-        obj = self.get_shared(receiver, grants, **kwargs)
+        obj = self.get_share(receiver, grants, **kwargs)
         obj.save()
         return obj
 
     async def ashare(self, receiver: Agent, grants: dict[str, int] | None = None, **kwargs) -> Access:
         """Share and save access to this object (async)."""
-        obj = self.get_shared(receiver, grants, **kwargs)
+        obj = self.get_share(receiver, grants, **kwargs)
         await obj.asave()
         return obj
 
-    def get_shared(self, receiver: Agent, grants: dict[str, int] | None = None, **kwargs) -> Access:
+    def get_share(self, receiver: Agent, grants: dict[str, int] | None = None, **kwargs) -> Access:
         """Share this object to this receiver.
 
         :param receiver: share's receiver
-        :param grants: allowed permissions (should be in :py:attr:`root_grant`)
+        :param grants: allowed permissions (should be in :py:attr:`root_grants`)
         :param **kwargs: extra initial arguments
         """
         if grants:

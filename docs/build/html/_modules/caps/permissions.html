@@ -1,0 +1,164 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>caps.permissions &mdash; Django-Caps 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a href="../../index.html" class="icon icon-home">
+            Django-Caps
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../guide.html">Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project.html">Project</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Django-Caps</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">caps.permissions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for caps.permissions</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">namedtuple</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">permissions</span><span class="p">,</span> <span class="n">viewsets</span>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;DjangoModelPermissions&quot;</span><span class="p">,</span> <span class="s2">&quot;ObjectPermissions&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="DjangoModelPermissions">
+<a class="viewcode-back" href="../../api/40_permissions.html#caps.permissions.DjangoModelPermissions">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DjangoModelPermissions</span><span class="p">(</span><span class="n">permissions</span><span class="o">.</span><span class="n">DjangoModelPermissions</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Subclass DRF DjangoModelPermissions in order to add &quot;view&quot; permission on GET request.&quot;&quot;&quot;</span>
+
+    <span class="n">perms_map</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="o">**</span><span class="n">permissions</span><span class="o">.</span><span class="n">DjangoModelPermissions</span><span class="o">.</span><span class="n">perms_map</span><span class="p">,</span>
+        <span class="s2">&quot;GET&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">%(app_label)s</span><span class="s2">.view_</span><span class="si">%(model_name)s</span><span class="s2">&quot;</span><span class="p">],</span>
+    <span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="ObjectPermissions">
+<a class="viewcode-back" href="../../api/40_permissions.html#caps.permissions.ObjectPermissions">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ObjectPermissions</span><span class="p">(</span><span class="n">permissions</span><span class="o">.</span><span class="n">DjangoObjectPermissions</span><span class="p">,</span> <span class="n">DjangoModelPermissions</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class provide permissions check over object using a permission map.</span>
+
+<span class="sd">    The mapped permissions can either a request method or a viewset action (in case this is used with viewsets).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">Request</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;RequestInfo&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;method&quot;</span><span class="p">,</span> <span class="s2">&quot;user&quot;</span><span class="p">])</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Fake request providing what is required to get permissions. &quot;&quot;&quot;</span>
+
+    <span class="n">perms_map</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="o">**</span><span class="n">DjangoModelPermissions</span><span class="o">.</span><span class="n">perms_map</span><span class="p">,</span>
+        <span class="s2">&quot;list&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">%(app_label)s</span><span class="s2">.view_</span><span class="si">%(model_name)s</span><span class="s2">&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;retrieve&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">%(app_label)s</span><span class="s2">.view_</span><span class="si">%(model_name)s</span><span class="s2">&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;create&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">%(app_label)s</span><span class="s2">.add_</span><span class="si">%(model_name)s</span><span class="s2">&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;update&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">%(app_label)s</span><span class="s2">.change_</span><span class="si">%(model_name)s</span><span class="s2">&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;partial_update&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">%(app_label)s</span><span class="s2">.change_</span><span class="si">%(model_name)s</span><span class="s2">&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;destroy&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">%(app_label)s</span><span class="s2">.delete_</span><span class="si">%(model_name)s</span><span class="s2">&quot;</span><span class="p">],</span>
+    <span class="p">}</span>
+
+    <span class="c1"># Implementation just mock request method by providing a fake</span>
+    <span class="c1"># request object with the viewset&#39;s action if required.</span>
+
+<div class="viewcode-block" id="ObjectPermissions.has_permission">
+<a class="viewcode-back" href="../../api/40_permissions.html#caps.permissions.ObjectPermissions.has_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">has_permission</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_request</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">),</span> <span class="n">view</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ObjectPermissions.has_object_permission">
+<a class="viewcode-back" href="../../api/40_permissions.html#caps.permissions.ObjectPermissions.has_object_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_object_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">has_object_permission</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_request</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">),</span> <span class="n">view</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">view</span><span class="p">,</span> <span class="n">viewsets</span><span class="o">.</span><span class="n">ViewSet</span><span class="p">)</span> <span class="ow">and</span> <span class="n">view</span><span class="o">.</span><span class="n">action</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">perms_map</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">action</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">request</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Thomas.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

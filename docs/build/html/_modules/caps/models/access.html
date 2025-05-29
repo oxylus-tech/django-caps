@@ -1,0 +1,434 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>caps.models.access &mdash; Django-Caps 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a href="../../../index.html" class="icon icon-home">
+            Django-Caps
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../guide.html">Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../project.html">Project</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Django-Caps</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">caps.models.access</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for caps.models.access</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.core.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">PermissionDenied</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Q</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">reverse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">timezone</span> <span class="k">as</span> <span class="n">tz</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gettext_lazy</span> <span class="k">as</span> <span class="n">_</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">caps.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_lazy_relation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">Agent</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;AccessQuerySet&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Access&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="AccessQuerySet">
+<a class="viewcode-back" href="../../../api/10_models.html#caps.models.access.AccessQuerySet">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AccessQuerySet</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">QuerySet</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;QuerySet for Access classes.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="AccessQuerySet.Meta">
+<a class="viewcode-back" href="../../../api/10_models.html#caps.models.access.AccessQuerySet.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">abstract</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">unique_together</span> <span class="o">=</span> <span class="p">((</span><span class="s2">&quot;receiver&quot;</span><span class="p">,</span> <span class="s2">&quot;target&quot;</span><span class="p">,</span> <span class="s2">&quot;emitter&quot;</span><span class="p">),)</span></div>
+
+
+<div class="viewcode-block" id="AccessQuerySet.available">
+<a class="viewcode-back" href="../../../api/10_models.html#caps.models.access.AccessQuerySet.available">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">:</span> <span class="n">Agent</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Agent</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AccessQuerySet</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return available accesses based on expiration and eventual user.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">agent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent</span><span class="p">(</span><span class="n">agent</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Q</span><span class="p">(</span><span class="n">expiration__isnull</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">|</span> <span class="n">Q</span><span class="p">(</span><span class="n">expiration__gt</span><span class="o">=</span><span class="n">tz</span><span class="o">.</span><span class="n">now</span><span class="p">()))</span></div>
+
+
+<div class="viewcode-block" id="AccessQuerySet.expired">
+<a class="viewcode-back" href="../../../api/10_models.html#caps.models.access.AccessQuerySet.expired">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">expired</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exclude</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AccessQuerySet</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Filter by expiration.</span>
+
+<span class="sd">        :param exclude: if True, exclude instead of filter.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;expiration__isnull&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;expiration__lt&quot;</span><span class="p">:</span> <span class="n">tz</span><span class="o">.</span><span class="n">now</span><span class="p">()}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="o">**</span><span class="n">q</span><span class="p">)</span> <span class="k">if</span> <span class="n">exclude</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="o">**</span><span class="n">q</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AccessQuerySet.agent">
+<a class="viewcode-back" href="../../../api/10_models.html#caps.models.access.AccessQuerySet.agent">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">agent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">:</span> <span class="n">Agent</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Agent</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AccessQuerySet</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Filter accesses that agent is either receiver or</span>
+<span class="sd">        emitter..</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">agent</span><span class="p">,</span> <span class="n">Agent</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Q</span><span class="p">(</span><span class="n">emitter</span><span class="o">=</span><span class="n">agent</span><span class="p">)</span> <span class="o">|</span> <span class="n">Q</span><span class="p">(</span><span class="n">receiver</span><span class="o">=</span><span class="n">agent</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Q</span><span class="p">(</span><span class="n">emitter__in</span><span class="o">=</span><span class="n">agent</span><span class="p">)</span> <span class="o">|</span> <span class="n">Q</span><span class="p">(</span><span class="n">receiver__in</span><span class="o">=</span><span class="n">agent</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="AccessQuerySet.emitter">
+<a class="viewcode-back" href="../../../api/10_models.html#caps.models.access.AccessQuerySet.emitter">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">emitter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">:</span> <span class="n">Agent</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Agent</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AccessQuerySet</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Accesss for the provided emitter(s).&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">agent</span><span class="p">,</span> <span class="n">Agent</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">emitter</span><span class="o">=</span><span class="n">agent</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">emitter__in</span><span class="o">=</span><span class="n">agent</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AccessQuerySet.receiver">
+<a class="viewcode-back" href="../../../api/10_models.html#caps.models.access.AccessQuerySet.receiver">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">receiver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">:</span> <span class="n">Agent</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Agent</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AccessQuerySet</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Accesss for the provided receiver(s).&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">agent</span><span class="p">,</span> <span class="n">Agent</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">receiver</span><span class="o">=</span><span class="n">agent</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">receiver__in</span><span class="o">=</span><span class="n">agent</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AccessQuerySet.access">
+<a class="viewcode-back" href="../../../api/10_models.html#caps.models.access.AccessQuerySet.access">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">access</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">receiver</span><span class="p">:</span> <span class="n">Agent</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Agent</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">uuid</span><span class="p">:</span> <span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AccessQuerySet</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Access by uuid and receiver(s).</span>
+
+<span class="sd">        Note that ``receiver`` is provided as first parameter in order to enforce its usage. It however can be ``None``: this only</span>
+<span class="sd">        should be used when queryset has already been filtered by receiver.</span>
+
+<span class="sd">        :param receiver: the agent that retrieving the access.</span>
+<span class="sd">        :param uuid: the access uuid to fetch.</span>
+<span class="sd">        :yield DoesNotExist: when the access is not found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">receiver</span><span class="p">:</span>
+            <span class="bp">self</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">receiver</span><span class="p">(</span><span class="n">receiver</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">uuid</span><span class="o">=</span><span class="n">uuid</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AccessQuerySet.accesses">
+<a class="viewcode-back" href="../../../api/10_models.html#caps.models.access.AccessQuerySet.accesses">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">accesses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">receiver</span><span class="p">:</span> <span class="n">Agent</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Agent</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">uuids</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AccessQuerySet</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Accesss by many uuid and receiver(s).</span>
+
+<span class="sd">        Please accesser to :py:meth:`AccessQuerySet.access` for more information.</span>
+
+<span class="sd">        :param receiver: the agent that retrieving the access.</span>
+<span class="sd">        :param uuids: an iterable of uuids to fetch</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">receiver</span><span class="p">:</span>
+            <span class="bp">self</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">receiver</span><span class="p">(</span><span class="n">receiver</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">uuid__in</span><span class="o">=</span><span class="n">uuids</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AccessQuerySet.bulk_create">
+<a class="viewcode-back" href="../../../api/10_models.html#caps.models.access.AccessQuerySet.bulk_create">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bulk_create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objs</span><span class="p">,</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check that objects are valid when saving models in bulk.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objs</span><span class="p">:</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">is_valid</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">bulk_create</span><span class="p">(</span><span class="n">objs</span><span class="p">,</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span></div>
+</div>
+
+
+    <span class="c1"># TODO: bulk_update -&gt; is_valid()</span>
+
+
+<div class="viewcode-block" id="Access">
+<a class="viewcode-back" href="../../../api/10_models.html#caps.models.access.Access">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Access</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Access are the entry point to access an :py:class:`Object`.</span>
+
+<span class="sd">    Access provides a set of capabilities for specific receiver.</span>
+<span class="sd">    The concrete sub-model MUST provide the ``target`` foreign key to an</span>
+<span class="sd">    Object.</span>
+
+<span class="sd">    There are two kind of access:</span>
+
+<span class="sd">    - root: the root access from which all other accesses to object</span>
+<span class="sd">      are derived. Created from the :py:meth:`create` class method. It has no :py:attr:`origin`</span>
+<span class="sd">      and **there can be only one root access per :py:class:`Object` instance.</span>
+<span class="sd">    - derived: access derived from root or another derived. Created</span>
+<span class="sd">      from the :py:meth:`derive` method.</span>
+
+<span class="sd">    This class enforce fields validation at `save()` and `bulk_create()`.</span>
+
+<span class="sd">    Concrete Access</span>
+<span class="sd">    ------------------</span>
+
+<span class="sd">    This model is implemented as an abstract in order to have a access</span>
+<span class="sd">    specific to each model (see :py:class:`Object` abstract model). The</span>
+<span class="sd">    actual concrete class is created when :py:class:`Object` is subclassed</span>
+<span class="sd">    by a concrete model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">uuid</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">UUIDField</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;UUID&quot;</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Public access id used in API.&quot;&quot;&quot;</span>
+    <span class="n">origin</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span>
+        <span class="s2">&quot;self&quot;</span><span class="p">,</span>
+        <span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span>
+        <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">related_name</span><span class="o">=</span><span class="s2">&quot;derived&quot;</span><span class="p">,</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Source Access&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Source access in accesses chain.&quot;&quot;&quot;</span>
+    <span class="n">emitter</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span>
+        <span class="n">Agent</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span> <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Emitter&quot;</span><span class="p">),</span> <span class="n">related_name</span><span class="o">=</span><span class="s2">&quot;emit_accesses&quot;</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Agent receiving capability.&quot;&quot;&quot;</span>
+    <span class="n">receiver</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span>
+        <span class="n">Agent</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span> <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Receiver&quot;</span><span class="p">),</span> <span class="n">related_name</span><span class="o">=</span><span class="s2">&quot;accesses&quot;</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Agent receiving capability.&quot;&quot;&quot;</span>
+    <span class="n">expiration</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span>
+        <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Expiration&quot;</span><span class="p">),</span>
+        <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Defines an expiration date after which the access is not longer valid.&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Date of expiration.&quot;&quot;&quot;</span>
+    <span class="n">grants</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Granted capabilities&quot;</span><span class="p">),</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Allowed permissions as a dict of ``{&quot;permission&quot;: allowed_reshare}`.</span>
+
+<span class="sd">    The integer value of ``allowed_reshare`` determines the amount of reshare can be done.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">objects</span> <span class="o">=</span> <span class="n">AccessQuerySet</span><span class="o">.</span><span class="n">as_manager</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Access.Meta">
+<a class="viewcode-back" href="../../../api/10_models.html#caps.models.access.Access.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">abstract</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">unique_together</span> <span class="o">=</span> <span class="p">((</span><span class="s2">&quot;origin&quot;</span><span class="p">,</span> <span class="s2">&quot;receiver&quot;</span><span class="p">,</span> <span class="s2">&quot;target&quot;</span><span class="p">),)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_expired</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return True if Access is expired.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">expiration</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">expiration</span> <span class="o">&lt;=</span> <span class="n">tz</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Access.get_object_class">
+<a class="viewcode-back" href="../../../api/10_models.html#caps.models.access.Access.get_object_class">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_object_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return related Object class.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">field</span><span class="o">.</span><span class="n">related_model</span></div>
+
+
+<div class="viewcode-block" id="Access.has_perm">
+<a class="viewcode-back" href="../../../api/10_models.html#caps.models.access.Access.has_perm">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_perm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span> <span class="n">User</span><span class="p">,</span> <span class="n">permission</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return True if access grants the provided permission.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">receiver</span><span class="o">.</span><span class="n">is_agent</span><span class="p">(</span><span class="n">user</span><span class="p">)</span> <span class="ow">and</span> <span class="n">permission</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grants</span></div>
+
+
+<div class="viewcode-block" id="Access.get_all_permissions">
+<a class="viewcode-back" href="../../../api/10_models.html#caps.models.access.Access.get_all_permissions">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_all_permissions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span> <span class="n">User</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return allowed permissions for this user.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">receiver</span><span class="o">.</span><span class="n">is_agent</span><span class="p">(</span><span class="n">user</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grants</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="ow">or</span> <span class="nb">set</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Access.is_valid">
+<a class="viewcode-back" href="../../../api/10_models.html#caps.models.access.Access.is_valid">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raises</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check Access values validity, throwing exception on invalid</span>
+<span class="sd">        values.</span>
+
+<span class="sd">        :returns True if valid, otherwise raise ValueError</span>
+<span class="sd">        :yield ValueError: when access is invaldi</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">origin</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">origin</span><span class="o">.</span><span class="n">receiver</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">emitter</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;origin&#39;s receiver and self&#39;s emitter are different&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="Access.share">
+<a class="viewcode-back" href="../../../api/10_models.html#caps.models.access.Access.share">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">share</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">receiver</span><span class="p">:</span> <span class="n">Agent</span><span class="p">,</span> <span class="n">grants</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new saved access shared from self.</span>
+
+<span class="sd">        See :py:meth:`get_shared` for arguments.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_shared</span><span class="p">(</span><span class="n">receiver</span><span class="p">,</span> <span class="n">grants</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">obj</span></div>
+
+
+<div class="viewcode-block" id="Access.ashare">
+<a class="viewcode-back" href="../../../api/10_models.html#caps.models.access.Access.ashare">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">ashare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">receiver</span><span class="p">:</span> <span class="n">Agent</span><span class="p">,</span> <span class="n">grants</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new saved access shared from self (async).</span>
+
+<span class="sd">        See :py:meth:`get_shared` for arguments.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_shared</span><span class="p">(</span><span class="n">receiver</span><span class="p">,</span> <span class="n">grants</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">obj</span><span class="o">.</span><span class="n">asave</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">obj</span></div>
+
+
+<div class="viewcode-block" id="Access.get_shared">
+<a class="viewcode-back" href="../../../api/10_models.html#caps.models.access.Access.get_shared">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_shared</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">receiver</span><span class="p">:</span> <span class="n">Agent</span><span class="p">,</span> <span class="n">grants</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return new access shared from self. The object is not saved.</span>
+
+<span class="sd">        :param receiver: the receiver</span>
+<span class="sd">        :param grants: optional granted permissions</span>
+<span class="sd">        :param **kwargs: extra initial arguments</span>
+<span class="sd">        :yield PermissionDenied: when access expired or no grant is shareable.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">grants</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_shared_grants</span><span class="p">(</span><span class="n">grants</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">grants</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">PermissionDenied</span><span class="p">(</span><span class="s2">&quot;Share not allowed.&quot;</span><span class="p">)</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_shared_kwargs</span><span class="p">(</span><span class="n">receiver</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="n">grants</span><span class="o">=</span><span class="n">grants</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Access.get_shared_kwargs">
+<a class="viewcode-back" href="../../../api/10_models.html#caps.models.access.Access.get_shared_kwargs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_shared_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">receiver</span><span class="p">:</span> <span class="n">Agent</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return initial argument for a derived access from self.&quot;&quot;&quot;</span>
+        <span class="n">e_key</span><span class="p">,</span> <span class="n">emitter</span> <span class="o">=</span> <span class="n">get_lazy_relation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;receiver&quot;</span><span class="p">,</span> <span class="s2">&quot;emitter&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">expiration</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_expired</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">PermissionDenied</span><span class="p">(</span><span class="s2">&quot;Access is expired.&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">expiration</span> <span class="o">:=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;expiration&quot;</span><span class="p">):</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;expiration&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">expiration</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">expiration</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;expiration&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expiration</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="s2">&quot;receiver&quot;</span><span class="p">:</span> <span class="n">receiver</span><span class="p">,</span>
+            <span class="n">e_key</span><span class="p">:</span> <span class="n">emitter</span><span class="p">,</span>
+            <span class="s2">&quot;origin&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="p">,</span>
+            <span class="s2">&quot;target&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="Access.get_shared_grants">
+<a class="viewcode-back" href="../../../api/10_models.html#caps.models.access.Access.get_shared_grants">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_shared_grants</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grants</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return :py:attr:`grants` for shared access.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">grants</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="n">key</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">value</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">grants</span><span class="p">[</span><span class="n">key</span><span class="p">])</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grants</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">grants</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">&gt;</span> <span class="mi">0</span>
+            <span class="p">}</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">grants</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">value</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="Access.get_absolute_url">
+<a class="viewcode-back" href="../../../api/10_models.html#caps.models.access.Access.get_absolute_url">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_absolute_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">detail_url_name</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Missing attribute `detail_url_name`.&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">reverse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">detail_url_name</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;uuid&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="Access.save">
+<a class="viewcode-back" href="../../../api/10_models.html#caps.models.access.Access.save">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_valid</span><span class="p">(</span><span class="n">raises</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Thomas.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

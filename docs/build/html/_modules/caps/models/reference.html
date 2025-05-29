@@ -1,0 +1,521 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>caps.models.Share &mdash; Django-Caps 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" haccess="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" haccess="../../../_static/css/theme.css?v=e59714d7" />
+
+
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" haccess="../../../genindex.html" />
+    <link rel="search" title="Search" haccess="../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a haccess="../../../index.html" class="icon icon-home">
+            Django-Caps
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="Share internal" haccess="../../../guide.html">Guide</a></li>
+<li class="toctree-l1"><a class="Share internal" haccess="../../../api.html">API</a></li>
+<li class="toctree-l1"><a class="Share internal" haccess="../../../project.html">Project</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a haccess="../../../index.html">Django-Caps</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a haccess="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a haccess="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">caps.models.Share</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for caps.models.Share</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Q</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">reverse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">timezone</span> <span class="k">as</span> <span class="n">tz</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gettext_lazy</span> <span class="k">as</span> <span class="n">_</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">caps.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_lazy_relation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.agent</span><span class="w"> </span><span class="kn">import</span> <span class="n">Agent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.capability</span><span class="w"> </span><span class="kn">import</span> <span class="n">Capability</span><span class="p">,</span> <span class="n">CapabilityQuerySet</span><span class="p">,</span> <span class="n">CanMany</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.capability_set</span><span class="w"> </span><span class="kn">import</span> <span class="n">CapabilitySet</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.nested</span><span class="w"> </span><span class="kn">import</span> <span class="n">NestedModelBase</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;ShareQuerySet&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Share&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ShareBase</span><span class="p">(</span><span class="n">NestedModelBase</span><span class="p">):</span>
+    <span class="n">nested_class</span> <span class="o">=</span> <span class="n">Capability</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_nested_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">new_class</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="p">{}):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Provide `Share` ForeignKey on nested Capability model.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ShareBase</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">create_nested_class</span><span class="p">(</span>
+            <span class="n">new_class</span><span class="p">,</span>
+            <span class="n">name</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;Share&quot;</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span>
+                    <span class="n">new_class</span><span class="p">,</span>
+                    <span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span>
+                    <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">db_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">related_name</span><span class="o">=</span><span class="s2">&quot;capabilities&quot;</span><span class="p">,</span>
+                    <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Share&quot;</span><span class="p">),</span>
+                <span class="p">),</span>
+                <span class="o">**</span><span class="n">attrs</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+
+<div class="viewcode-block" id="ShareQuerySet">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.Share.ShareQuerySet">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ShareQuerySet</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">QuerySet</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;QuerySet for Share classes.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ShareQuerySet.Meta">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.Share.ShareQuerySet.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">abstract</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">unique_together</span> <span class="o">=</span> <span class="p">((</span><span class="s2">&quot;receiver&quot;</span><span class="p">,</span> <span class="s2">&quot;target&quot;</span><span class="p">,</span> <span class="s2">&quot;emitter&quot;</span><span class="p">),)</span></div>
+
+
+<div class="viewcode-block" id="ShareQuerySet.available">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.Share.ShareQuerySet.available">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">:</span> <span class="n">Agent</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Agent</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ShareQuerySet</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return available Shares based on expiration and eventual user.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">agent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent</span><span class="p">(</span><span class="n">agent</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Q</span><span class="p">(</span><span class="n">expiration__isnull</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">|</span> <span class="n">Q</span><span class="p">(</span><span class="n">expiration__lt</span><span class="o">=</span><span class="n">tz</span><span class="o">.</span><span class="n">now</span><span class="p">()))</span></div>
+
+
+<div class="viewcode-block" id="ShareQuerySet.agent">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.Share.ShareQuerySet.agent">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">agent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">:</span> <span class="n">Agent</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Agent</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Filter Shares that agent is either receiver or</span>
+<span class="sd">        emitter..</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">agent</span><span class="p">,</span> <span class="n">Agent</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Q</span><span class="p">(</span><span class="n">emitter</span><span class="o">=</span><span class="n">agent</span><span class="p">)</span> <span class="o">|</span> <span class="n">Q</span><span class="p">(</span><span class="n">receiver</span><span class="o">=</span><span class="n">agent</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Q</span><span class="p">(</span><span class="n">emitter__in</span><span class="o">=</span><span class="n">agent</span><span class="p">)</span> <span class="o">|</span> <span class="n">Q</span><span class="p">(</span><span class="n">receiver__in</span><span class="o">=</span><span class="n">agent</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="ShareQuerySet.emitter">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.Share.ShareQuerySet.emitter">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">emitter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">:</span> <span class="n">Agent</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Agent</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ShareQuerySet</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Shares for the provided emitter(s).&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">agent</span><span class="p">,</span> <span class="n">Agent</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">emitter</span><span class="o">=</span><span class="n">agent</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">emitter__in</span><span class="o">=</span><span class="n">agent</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ShareQuerySet.receiver">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.Share.ShareQuerySet.receiver">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">receiver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">:</span> <span class="n">Agent</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Agent</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ShareQuerySet</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Shares for the provided receiver(s).&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">agent</span><span class="p">,</span> <span class="n">Agent</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">receiver</span><span class="o">=</span><span class="n">agent</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">receiver__in</span><span class="o">=</span><span class="n">agent</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ShareQuerySet.access">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.Share.ShareQuerySet.access">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">access</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">receiver</span><span class="p">:</span> <span class="n">Agent</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Agent</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">uuid</span><span class="p">:</span> <span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ShareQuerySet</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Share by uuid and receiver(s).</span>
+
+<span class="sd">        Note that ``receiver`` is provided as first parameter in order to enforce its usage. It however can be ``None``: this only</span>
+<span class="sd">        should be used when queryset has already been filtered by receiver.</span>
+
+<span class="sd">        :param receiver: the agent that retrieving the Share.</span>
+<span class="sd">        :param uuid: the Share uuid to fetch.</span>
+<span class="sd">        :yield DoesNotExist: when the Share is not found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">receiver</span><span class="p">:</span>
+            <span class="bp">self</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">receiver</span><span class="p">(</span><span class="n">receiver</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">uuid</span><span class="o">=</span><span class="n">uuid</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ShareQuerySet.accesses">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.Share.ShareQuerySet.accesses">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">accesses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">receiver</span><span class="p">:</span> <span class="n">Agent</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Agent</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">uuids</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ShareQuerySet</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Shares by many uuid and receiver(s).</span>
+
+<span class="sd">        Please accesser to :py:meth:`ShareQuerySet.access` for more information.</span>
+
+<span class="sd">        :param receiver: the agent that retrieving the Share.</span>
+<span class="sd">        :param uuids: an iterable of uuids to fetch</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">receiver</span><span class="p">:</span>
+            <span class="bp">self</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">receiver</span><span class="p">(</span><span class="n">receiver</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">uuid__in</span><span class="o">=</span><span class="n">uuids</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ShareQuerySet.can">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.Share.ShareQuerySet.can">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">can</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">permissions</span><span class="p">:</span> <span class="n">CanMany</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ShareQuerySet</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Filter Shares with the provided permission(s).</span>
+
+<span class="sd">        This call :py:meth:`.capability.CapabilityQuerySet.can`, using the same parameters. Providing</span>
+<span class="sd">        multiple values will make an OR conditional.</span>
+
+<span class="sd">        If you want to filter based on AND please use :py:meth:`can_all`.</span>
+
+<span class="sd">        :param permissions: permissions to look for</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">Capability</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">can</span><span class="p">(</span><span class="n">permissions</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">capabilities__in</span><span class="o">=</span><span class="n">query</span><span class="p">)</span><span class="o">.</span><span class="n">distinct</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ShareQuerySet.can_all">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.Share.ShareQuerySet.can_all">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">can_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">permissions</span><span class="p">:</span> <span class="n">CanMany</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ShareQuerySet</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Filter Shares with all the provided permissions.</span>
+
+<span class="sd">        :param permissions: permissions to look for, same argument type as :py:meth:`.capability.CapabilityQuerySet.can`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">can_all_q</span><span class="p">(</span><span class="n">permissions</span><span class="p">):</span>
+            <span class="bp">self</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+
+<div class="viewcode-block" id="ShareQuerySet.can_all_q">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.Share.ShareQuerySet.can_all_q">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">can_all_q</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">permissions</span><span class="p">:</span> <span class="n">CanMany</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Q</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return Q lookup for all permissions.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">CapabilityQuerySet</span><span class="o">.</span><span class="n">can_all_q</span><span class="p">(</span>
+            <span class="n">permissions</span><span class="p">,</span> <span class="s2">&quot;capabilities__permission__&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get_object_class</span><span class="p">()</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ShareQuerySet.bulk_create">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.Share.ShareQuerySet.bulk_create">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bulk_create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">objs</span><span class="p">,</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check that objects are valid when saving models in bulk.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objs</span><span class="p">:</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">is_valid</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">bulk_create</span><span class="p">(</span><span class="n">objs</span><span class="p">,</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span></div>
+</div>
+
+
+    <span class="c1"># TODO: bulk_update -&gt; is_valid()</span>
+
+
+<div class="viewcode-block" id="Share">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.Share.Share">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Share</span><span class="p">(</span><span class="n">CapabilitySet</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">ShareBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Share are the entry point to access an :py:class:`Object`.</span>
+
+<span class="sd">    Share provides a set of capabilities for specific receiver.</span>
+<span class="sd">    The concrete sub-model MUST provide the ``target`` foreign key to an</span>
+<span class="sd">    Object.</span>
+
+<span class="sd">    There are two kind of Share:</span>
+
+<span class="sd">    - root: the root Share from which all other Shares to object</span>
+<span class="sd">      are derived. Created from the :py:meth:`create` class method. It has no :py:attr:`origin`</span>
+<span class="sd">      and **there can be only one root Share per :py:class:`Object` instance.</span>
+<span class="sd">    - derived: Share derived from root or another derived. Created</span>
+<span class="sd">      from the :py:meth:`derive` method.</span>
+
+<span class="sd">    This class enforce fields validation at `save()` and `bulk_create()`.</span>
+
+<span class="sd">    Concrete Share and Capability</span>
+<span class="sd">    ---------------------------------</span>
+
+<span class="sd">    This model is implemented as an abstract in order to have a Share</span>
+<span class="sd">    specific to each model (see :py:class:`Object` abstract model).</span>
+
+<span class="sd">    The related :py:class:`Capability` subclass is created at the same</span>
+<span class="sd">    time as the concrete implementing Share model. The same mechanism</span>
+<span class="sd">    also applies on :py:class:`Object` for Share, as they both use</span>
+<span class="sd">    base metaclass :py:class:`NestedBase`. They thus can be customized</span>
+<span class="sd">    if required as this example shows:</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        from caps.models import Share, Capability</span>
+
+<span class="sd">        class MyShare(Share):</span>
+<span class="sd">            class Capability(Capability):</span>
+<span class="sd">                Share = models.ForeignKey(MyShare, models.CASCADE, null=True, related_name=&quot;capabilities&quot;)</span>
+<span class="sd">                # custom code here...</span>
+
+<span class="sd">            target = models.ForeignKey(MyObject, models.CASCADE)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">uuid</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">UUIDField</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Share&quot;</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Public Share used in API and with the external world.&quot;&quot;&quot;</span>
+    <span class="n">origin</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span>
+        <span class="s2">&quot;self&quot;</span><span class="p">,</span>
+        <span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span>
+        <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">related_name</span><span class="o">=</span><span class="s2">&quot;derived&quot;</span><span class="p">,</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Source Share&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Source Share in Shares chain.&quot;&quot;&quot;</span>
+    <span class="n">depth</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">PositiveIntegerField</span><span class="p">(</span>
+        <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Share limit&quot;</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;The amount of time a Share can be re-shared.&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Share chain&#39;s current depth.&quot;&quot;&quot;</span>
+    <span class="n">emitter</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span>
+        <span class="n">Agent</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span> <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Emitter&quot;</span><span class="p">),</span> <span class="n">related_name</span><span class="o">=</span><span class="s2">&quot;emit_Shares&quot;</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Agent receiving capability.&quot;&quot;&quot;</span>
+    <span class="n">receiver</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span>
+        <span class="n">Agent</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span> <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Receiver&quot;</span><span class="p">),</span> <span class="n">related_name</span><span class="o">=</span><span class="s2">&quot;Shares&quot;</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Agent receiving capability.&quot;&quot;&quot;</span>
+    <span class="n">expiration</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span>
+        <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Expiration&quot;</span><span class="p">),</span>
+        <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Defines an expiration date after which the Share is not longer valid.&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Date of expiration.&quot;&quot;&quot;</span>
+
+    <span class="n">objects</span> <span class="o">=</span> <span class="n">ShareQuerySet</span><span class="o">.</span><span class="n">as_manager</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Share.Meta">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.Share.Share.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">abstract</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">unique_together</span> <span class="o">=</span> <span class="p">((</span><span class="s2">&quot;origin&quot;</span><span class="p">,</span> <span class="s2">&quot;receiver&quot;</span><span class="p">,</span> <span class="s2">&quot;target&quot;</span><span class="p">),)</span></div>
+
+
+<div class="viewcode-block" id="Share.get_object_class">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.Share.Share.get_object_class">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_object_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return related Object class.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">field</span><span class="o">.</span><span class="n">related_model</span></div>
+
+
+<div class="viewcode-block" id="Share.create_root">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.Share.Share.create_root">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_root</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">emitter</span><span class="p">:</span> <span class="n">Agent</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Share</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create and save a new root Share.</span>
+
+<span class="sd">        There can be only one root Share per object.</span>
+
+<span class="sd">        New capabilities will be created by cloning default ones (which are those without an assigned Share).</span>
+
+<span class="sd">        :param emitter: the owner of the object, as it is emitter of the root Share.</span>
+<span class="sd">        :param target: target :py:class:`.object.Object` instance.</span>
+<span class="sd">        :param **kwargs: Share&#39;s initial arguments.</span>
+<span class="sd">        :return: the created root Share.</span>
+<span class="sd">        :yield ValueError: when ``origin`` is provided or a root Share already exists.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;origin&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;attribute &quot;origin&quot; can not be passed as an argument to &#39;</span> <span class="s2">&quot;`create()`: you should use derive instead&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">target</span><span class="o">.</span><span class="n">Shares</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;A Share already exists for this object.&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">emitter</span><span class="o">=</span><span class="n">emitter</span><span class="p">,</span> <span class="n">receiver</span><span class="o">=</span><span class="n">emitter</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="c1"># clone initial capabilities</span>
+        <span class="n">capabilities</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Capability</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">initials</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">cap</span> <span class="ow">in</span> <span class="n">capabilities</span><span class="p">:</span>
+            <span class="n">cap</span><span class="o">.</span><span class="n">Share</span> <span class="o">=</span> <span class="bp">self</span>
+            <span class="n">cap</span><span class="o">.</span><span class="n">pk</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">Capability</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">bulk_create</span><span class="p">(</span><span class="n">capabilities</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+
+<div class="viewcode-block" id="Share.is_valid">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.Share.Share.is_valid">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raises</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check Share values validity, throwing exception on invalid</span>
+<span class="sd">        values.</span>
+
+<span class="sd">        :returns True if valid, otherwise raise ValueError</span>
+<span class="sd">        :yield ValueError: when Share is invaldi</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">origin</span><span class="p">:</span>
+            <span class="c1"># FIXME</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">origin</span><span class="o">.</span><span class="n">receiver</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">emitter</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;origin&#39;s receiver and self&#39;s emitter are different&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">origin</span><span class="o">.</span><span class="n">depth</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">depth</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">raises</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;origin&#39;s depth is higher than self&#39;s&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="Share.is_derived">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.Share.Share.is_derived">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_derived</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Share</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">other</span><span class="o">.</span><span class="n">depth</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">depth</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">target</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">is_derived</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Share.get_capabilities">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.Share.Share.get_capabilities">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_capabilities</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CapabilityQuerySet</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">capabilities</span><span class="o">.</span><span class="n">all</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Share.derive">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.Share.Share.derive">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">derive</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">receiver</span><span class="p">:</span> <span class="n">Agent</span> <span class="o">|</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">caps</span><span class="p">:</span> <span class="n">CapabilitySet</span><span class="o">.</span><span class="n">Caps</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">raises</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">defaults</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{},</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Share</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new Share derived from self.</span>
+
+<span class="sd">        :param caps: select capabilities to be derived.</span>
+<span class="sd">        :param raises: raises PermissionDenied error instead of silent it.</span>
+<span class="sd">        :param defaults: Capability instances&#39; initial arguments.</span>
+<span class="sd">        :param **kwargs: initial arguments of the new set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_derived_kwargs</span><span class="p">(</span><span class="n">receiver</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">capabilities</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">derive_caps</span><span class="p">(</span><span class="n">caps</span><span class="p">,</span> <span class="n">raises</span><span class="o">=</span><span class="n">raises</span><span class="p">,</span> <span class="n">defaults</span><span class="o">=</span><span class="p">{</span><span class="o">**</span><span class="n">defaults</span><span class="p">,</span> <span class="s2">&quot;Share&quot;</span><span class="p">:</span> <span class="n">obj</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Capability</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">bulk_create</span><span class="p">(</span><span class="n">capabilities</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">obj</span></div>
+
+
+<div class="viewcode-block" id="Share.aderive">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.Share.Share.aderive">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">aderive</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">caps</span><span class="p">:</span> <span class="n">CapabilitySet</span><span class="o">.</span><span class="n">Caps</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">raises</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">defaults</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{},</span> <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Share</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Async version of :py:meth:`derive`.&quot;&quot;&quot;</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_derived_kwargs</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="k">await</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">acreate</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">capabilities</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">derive_caps</span><span class="p">(</span><span class="n">caps</span><span class="p">,</span> <span class="n">raises</span><span class="o">=</span><span class="n">raises</span><span class="p">,</span> <span class="n">defaults</span><span class="o">=</span><span class="p">{</span><span class="o">**</span><span class="n">defaults</span><span class="p">,</span> <span class="s2">&quot;Share&quot;</span><span class="p">:</span> <span class="n">obj</span><span class="p">})</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">Capability</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">abulk_create</span><span class="p">(</span><span class="n">capabilities</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">obj</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_derived_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">receiver</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">Agent</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return initial argument for a derived Share from self.&quot;&quot;&quot;</span>
+        <span class="n">r_key</span> <span class="o">=</span> <span class="s2">&quot;receiver_id&quot;</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">receiver</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;receiver&quot;</span>
+
+        <span class="n">e_key</span><span class="p">,</span> <span class="n">emitter</span> <span class="o">=</span> <span class="n">get_lazy_relation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;receiver&quot;</span><span class="p">,</span> <span class="s2">&quot;emitter&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="s2">&quot;emitter&quot;</span><span class="p">:</span> <span class="n">emitter</span><span class="p">,</span>
+            <span class="n">r_key</span><span class="p">:</span> <span class="n">receiver</span><span class="p">,</span>
+            <span class="n">e_key</span><span class="p">:</span> <span class="n">emitter</span><span class="p">,</span>
+            <span class="s2">&quot;depth&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;origin&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="p">,</span>
+            <span class="s2">&quot;target&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">,</span>
+        <span class="p">}</span>
+
+<div class="viewcode-block" id="Share.get_absolute_url">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.Share.Share.get_absolute_url">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_absolute_url</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return url to the related object.</span>
+
+<span class="sd">        :yield ValueError: when related object class has no `detail_url_name` provided.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">url_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">detail_url_name</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">url_name</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Missing attribute `detail_url_name` on target object.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">reverse</span><span class="p">(</span><span class="n">url_name</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;uuid&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="Share.save">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.Share.Share.save">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_valid</span><span class="p">(</span><span class="n">raises</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Thomas.</p>
+  </div>
+
+  Built with <a haccess="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a haccess="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a haccess="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

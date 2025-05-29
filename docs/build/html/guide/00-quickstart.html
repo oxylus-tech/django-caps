@@ -1,0 +1,309 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quickstart &mdash; Django-Caps 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Overview" href="01-overview.html" />
+    <link rel="prev" title="Guide" href="../guide.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a href="../index.html" class="icon icon-home">
+            Django-Caps
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../guide.html">Guide</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Quickstart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#setup">Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#view-and-urls">View and urls</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#provided-views">Provided views</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#api">API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#some-example-usage">Some example usage</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="01-overview.html">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="90-capability-vs-acl.html">Capability vs ACL permission systems</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project.html">Project</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Django-Caps</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../guide.html">Guide</a></li>
+      <li class="breadcrumb-item active">Quickstart</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/guide/00-quickstart.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <section id="quickstart">
+<h1>Quickstart<a class="headerlink" href="#quickstart" title="Link to this heading"></a></h1>
+<p>Add django-caps to installed apps and add middleware:</p>
+<section id="setup">
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading"></a></h2>
+<p>In settings, add application and middleware. The middleware is used to assign user’s <a class="reference internal" href="../api/10_models.html#caps.models.agent.Agent" title="caps.models.agent.Agent"><code class="xref py py-class docutils literal notranslate"><span class="pre">Agent</span></code></a> to the request.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># settings.py</span>
+<span class="n">INSTALLED_APPS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;caps&quot;</span>
+    <span class="c1"># add &quot;caps.tests.apps&quot; for development</span>
+    <span class="c1"># ...</span>
+<span class="p">]</span>
+
+<span class="n">MIDDLEWARE</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="c1"># we requires AuthenticationMiddleware as dependency</span>
+    <span class="s2">&quot;django.contrib.auth.middleware.AuthenticationMiddleware&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;caps.middleware.AgentMiddleware&quot;</span><span class="p">,</span>
+    <span class="c1"># ...</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>Create an object to be accessed:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># models.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gettext_lazy</span> <span class="k">as</span> <span class="n">_</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">caps.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Object</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Post&quot;</span><span class="p">,)</span>
+
+
+<span class="c1"># Create our example model. A Access and Capability model will be</span>
+<span class="c1"># generated and accessible from Post (Post.Access, Post.Capability)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Post</span><span class="p">(</span><span class="n">Object</span><span class="p">):</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Title&quot;</span><span class="p">),</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">64</span><span class="p">)</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Content&quot;</span><span class="p">))</span>
+    <span class="n">created_at</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Date of creation&quot;</span><span class="p">),</span> <span class="n">auto_now_add</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Allowed permissions with allowed reshare depth</span>
+    <span class="n">root_grants</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;app.view_post&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="c1"># can be shared then reshared</span>
+        <span class="s2">&quot;app.change_post&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="c1"># can be shared once</span>
+        <span class="s2">&quot;app.delete_post&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="c1"># can not be shared</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="view-and-urls">
+<h2>View and urls<a class="headerlink" href="#view-and-urls" title="Link to this heading"></a></h2>
+<p>Using views provided by caps, example of <code class="docutils literal notranslate"><span class="pre">urls.py</span></code> file:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">path</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">caps</span><span class="w"> </span><span class="kn">import</span> <span class="n">views</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">path</span><span class="p">(</span><span class="s2">&quot;/post/&quot;</span><span class="p">,</span> <span class="n">views</span><span class="o">.</span><span class="n">ObjectListView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">Post</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;post-list&quot;</span><span class="p">),</span>
+    <span class="n">path</span><span class="p">(</span><span class="s2">&quot;/post/&lt;uuid:uuid&gt;/&quot;</span><span class="p">,</span> <span class="n">views</span><span class="o">.</span><span class="n">ObjectDetailView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">Post</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;post-detail&quot;</span><span class="p">),</span>
+    <span class="n">path</span><span class="p">(</span><span class="s2">&quot;/post/create/&quot;</span><span class="p">,</span> <span class="n">views</span><span class="o">.</span><span class="n">ObjectCreateView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">Post</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;post-create&quot;</span><span class="p">),</span>
+    <span class="n">path</span><span class="p">(</span>
+        <span class="s2">&quot;/post/update/&lt;uuid:uuid&gt;&quot;</span><span class="p">,</span>
+        <span class="n">views</span><span class="o">.</span><span class="n">ObjectUpdateView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">Post</span><span class="p">),</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;post-update&quot;</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>Even a shorter version, providing views for object accesses too:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">caps</span><span class="w"> </span><span class="kn">import</span> <span class="n">urls</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
+
+<span class="c1"># By settings `accesses=True` you also add default views for accesses assuming related templates exists (such as `myapp/postaccess_detail.html`).</span>
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">urls</span><span class="o">.</span><span class="n">get_object_paths</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Post</span><span class="p">,</span> <span class="s1">&#39;post&#39;</span><span class="p">,</span> <span class="n">accesses</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can have custom views as:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">caps</span><span class="w"> </span><span class="kn">import</span> <span class="n">views</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span><span class="p">,</span> <span class="n">serializers</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;PostDetailView&quot;</span><span class="p">,)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">PostDetailView</span><span class="p">(</span><span class="n">views</span><span class="o">.</span><span class="n">ObjectDetailView</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Post</span>
+
+    <span class="c1"># do something here...</span>
+</pre></div>
+</div>
+</section>
+<section id="provided-views">
+<h2>Provided views<a class="headerlink" href="#provided-views" title="Link to this heading"></a></h2>
+<p>Although we provide basic views for django-caps’ models, we don’t provide template, and it will be up to you to write them according Django practices.</p>
+<p>We have views for the following models:</p>
+<ul>
+<li><p><a class="reference internal" href="../api/10_models.html#caps.models.agent.Agent" title="caps.models.agent.Agent"><code class="xref py py-class docutils literal notranslate"><span class="pre">Agent</span></code></a>: <a class="reference internal" href="../api/20_views.html#caps.views.common.AgentListView" title="caps.views.common.AgentListView"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentListView</span></code></a>, <a class="reference internal" href="../api/20_views.html#caps.views.common.AgentDetailView" title="caps.views.common.AgentDetailView"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentDetailView</span></code></a>, <a class="reference internal" href="../api/20_views.html#caps.views.common.AgentCreateView" title="caps.views.common.AgentCreateView"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentCreateView</span></code></a>, <a class="reference internal" href="../api/20_views.html#caps.views.common.AgentUpdateView" title="caps.views.common.AgentUpdateView"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentUpdateView</span></code></a>, <a class="reference internal" href="../api/20_views.html#caps.views.common.AgentDeleteView" title="caps.views.common.AgentDeleteView"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentDeleteView</span></code></a>; -</p></li>
+<li><p><a class="reference internal" href="../api/10_models.html#caps.models.object.Object" title="caps.models.object.Object"><code class="xref py py-class docutils literal notranslate"><span class="pre">Object</span></code></a>: <a class="reference internal" href="../api/20_views.html#caps.views.generics.ObjectListView" title="caps.views.generics.ObjectListView"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectListView</span></code></a>, <a class="reference internal" href="../api/20_views.html#caps.views.generics.ObjectDetailView" title="caps.views.generics.ObjectDetailView"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectDetailView</span></code></a>, <a class="reference internal" href="../api/20_views.html#caps.views.generics.ObjectCreateView" title="caps.views.generics.ObjectCreateView"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectCreateView</span></code></a>, <a class="reference internal" href="../api/20_views.html#caps.views.generics.ObjectUpdateView" title="caps.views.generics.ObjectUpdateView"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectUpdateView</span></code></a>, <a class="reference internal" href="../api/20_views.html#caps.views.generics.ObjectDeleteView" title="caps.views.generics.ObjectDeleteView"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectDeleteView</span></code></a>;</p></li>
+<li><p><a class="reference internal" href="../api/10_models.html#caps.models.access.Access" title="caps.models.access.Access"><code class="xref py py-class docutils literal notranslate"><span class="pre">Access</span></code></a>: <a class="reference internal" href="../api/20_views.html#caps.views.common.AccessListView" title="caps.views.common.AccessListView"><code class="xref py py-class docutils literal notranslate"><span class="pre">AccessListView</span></code></a>, <a class="reference internal" href="../api/20_views.html#caps.views.common.AccessDetailView" title="caps.views.common.AccessDetailView"><code class="xref py py-class docutils literal notranslate"><span class="pre">AccessDetailView</span></code></a>, <a class="reference internal" href="../api/20_views.html#caps.views.common.AccessDeleteView" title="caps.views.common.AccessDeleteView"><code class="xref py py-class docutils literal notranslate"><span class="pre">AccessDeleteView</span></code></a>;</p>
+<p>We don’t provide create and update views for access, as they should only be created when the object is created and by derivation (not provided yet). A Access should not be updated.</p>
+</li>
+</ul>
+</section>
+<section id="api">
+<h2>API<a class="headerlink" href="#api" title="Link to this heading"></a></h2>
+<p>This is simple too, in <code class="docutils literal notranslate"><span class="pre">viewsets.py</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">caps</span><span class="w"> </span><span class="kn">import</span> <span class="n">views</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span><span class="p">,</span> <span class="n">serializers</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;PostViewSet&#39;</span><span class="p">,</span> <span class="s1">&#39;PostAccessViewSet&#39;</span><span class="p">)</span>
+
+<span class="c1"># Example of viewset using DRF.</span>
+<span class="c1"># assuming you have implemented serializer for Post</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PostViewSet</span><span class="p">(</span><span class="n">viewsets</span><span class="o">.</span><span class="n">ObjectViewSet</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Post</span>
+    <span class="n">queryset</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Post</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="n">serializer_class</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">PostSerializer</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">PostAccessViewSet</span><span class="p">(</span><span class="n">viewsets</span><span class="o">.</span><span class="n">AccessViewSet</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Post</span><span class="o">.</span><span class="n">Access</span>
+    <span class="n">queryset</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Post</span><span class="o">.</span><span class="n">Access</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Serializers:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">serializers</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caps.serializers</span><span class="w"> </span><span class="kn">import</span> <span class="n">ObjectSerializer</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;PostSerializer&#39;</span><span class="p">,)</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">PostSerializer</span><span class="p">(</span><span class="n">ObjectSerializer</span><span class="p">,</span> <span class="n">serializers</span><span class="o">.</span><span class="n">ModelSerializer</span><span class="p">):</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Post</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="n">ObjectSerializer</span><span class="o">.</span><span class="n">fields</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s1">&#39;content&#39;</span><span class="p">,</span> <span class="s1">&#39;created_at&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You’ll have to manually add routes and urls for this part:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.routers</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimpleRouter</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">viewsets</span>
+
+<span class="n">router</span> <span class="o">=</span> <span class="n">SimpleRouter</span><span class="p">()</span>
+<span class="n">router</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s1">&#39;post&#39;</span><span class="p">,</span> <span class="n">viewsets</span><span class="o">.</span><span class="n">PostViewSet</span><span class="p">)</span>
+<span class="n">router</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s1">&#39;post-access&#39;</span><span class="p">,</span> <span class="n">viewsets</span><span class="o">.</span><span class="n">PostAccessViewSet</span><span class="p">)</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="c1"># ...</span>
+    <span class="n">path</span><span class="p">(</span><span class="s1">&#39;api&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="n">router</span><span class="o">.</span><span class="n">urls</span><span class="p">)</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="some-example-usage">
+<h2>Some example usage<a class="headerlink" href="#some-example-usage" title="Link to this heading"></a></h2>
+<p>Example of Django-Caps’ API usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">timedelta</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span><span class="p">,</span> <span class="n">Permission</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">timezone</span> <span class="k">as</span> <span class="n">tz</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">caps.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Agent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Post</span>
+
+<span class="c1"># We assume the users already exists</span>
+<span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">user_1</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="c1"># Create agents (this is handled by middleware).</span>
+<span class="n">agent</span> <span class="o">=</span> <span class="n">Agent</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">)</span>
+<span class="n">agent_1</span> <span class="o">=</span> <span class="n">Agent</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user_1</span><span class="p">)</span>
+
+<span class="c1"># Create the post</span>
+<span class="n">post</span> <span class="o">=</span> <span class="n">Post</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">owner</span><span class="o">=</span><span class="n">agent</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Some title&quot;</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="s2">&quot;Some content&quot;</span><span class="p">)</span>
+
+<span class="c1"># Share the post to agent 1 with default grants</span>
+<span class="n">access</span> <span class="o">=</span> <span class="n">post</span><span class="o">.</span><span class="n">share</span><span class="p">(</span><span class="n">agent_1</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">access</span><span class="o">.</span><span class="n">grants</span> <span class="o">==</span> <span class="p">{</span><span class="s2">&quot;app.view_post&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;app.change_post&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+
+<span class="c1"># Or with an expiration datetime</span>
+<span class="n">access</span> <span class="o">=</span> <span class="n">post</span><span class="o">.</span><span class="n">share</span><span class="p">(</span><span class="n">agent_1</span><span class="p">,</span> <span class="n">expiration</span><span class="o">=</span><span class="n">tz</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+
+<span class="c1"># Lets imagine there is another agent called agent_2</span>
+<span class="c1"># Lets try to escalade privilege...</span>
+<span class="n">access_2</span> <span class="o">=</span> <span class="n">access</span><span class="o">.</span><span class="n">share</span><span class="p">(</span><span class="n">agent_2</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;app.view_post&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;app.change_post&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+<span class="k">assert</span> <span class="n">access_2</span><span class="o">.</span><span class="n">grants</span> <span class="o">==</span> <span class="p">{</span><span class="s2">&quot;app.view_post&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../guide.html" class="btn btn-neutral float-left" title="Guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="01-overview.html" class="btn btn-neutral float-right" title="Overview" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Thomas.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

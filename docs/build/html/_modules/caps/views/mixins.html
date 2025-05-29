@@ -1,0 +1,309 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>caps.views.mixins &mdash; Django-Caps 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a href="../../../index.html" class="icon icon-home">
+            Django-Caps
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../guide.html">Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../project.html">Project</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Django-Caps</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">caps.views.mixins</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for caps.views.mixins</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.db.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Q</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.core.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">PermissionDenied</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.mixins</span><span class="w"> </span><span class="kn">import</span> <span class="n">PermissionRequiredMixin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.shortcuts</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_object_or_404</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..</span><span class="w"> </span><span class="kn">import</span> <span class="n">permissions</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Agent</span><span class="p">,</span> <span class="n">AccessQuerySet</span>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;ObjectMixin&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ObjectPermissionMixin&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SingleObjectMixin&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ByUUIDMixin&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AgentMixin&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AccessMixin&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="ObjectMixin">
+<a class="viewcode-back" href="../../../api/20_views.html#caps.views.mixins.ObjectMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ObjectMixin</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base mixin providing functionalities to work with :py:class:`~caps.models.object.Object` model.</span>
+
+<span class="sd">    It provides:</span>
+
+<span class="sd">        - assign self&#39;s :py:attr:`agent` and :py:attr:`agents`</span>
+<span class="sd">        - queryset to available :py:class:`~caps.models.access.Access`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">all_agents</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    When this parameter is ``True``, it filter object&#39;s access using</span>
+<span class="sd">    all user&#39;s assigned agents instead of only the current one. See :py:attr:`agents` for more information.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">agent</span><span class="p">:</span> <span class="n">Agent</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Current request&#39;s agent. &quot;&quot;&quot;</span>
+    <span class="n">agents</span><span class="p">:</span> <span class="n">Agent</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">Agent</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Receiver(s) used to fetch access. It is different from :py:attr:`agent` as the latest is used to create accesses.</span>
+
+<span class="sd">    This value is set in :py:meth:`dispatch` using :py:meth:`get_agents`. It will be either all request&#39;s user&#39;s</span>
+<span class="sd">    agents (if :py:attr:`all_agents`) or only the active one.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">access_class</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Access class (defaults to model&#39;s Access). &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ObjectMixin.get_agents">
+<a class="viewcode-back" href="../../../api/20_views.html#caps.views.mixins.ObjectMixin.get_agents">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_agents</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Agent</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">Agent</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return value to use for :py:attr:`agents`.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">agents</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_agents</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">agent</span></div>
+
+
+<div class="viewcode-block" id="ObjectMixin.get_access_queryset">
+<a class="viewcode-back" href="../../../api/20_views.html#caps.views.mixins.ObjectMixin.get_access_queryset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_access_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AccessQuerySet</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return queryset for accesses.&quot;&quot;&quot;</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">model</span> <span class="o">:=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">Access</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;queryset&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">query</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">Access</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">query</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="n">select_related</span><span class="p">(</span><span class="s2">&quot;receiver&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="ObjectMixin.get_queryset">
+<a class="viewcode-back" href="../../../api/20_views.html#caps.views.mixins.ObjectMixin.get_queryset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get Object queryset based get_access_queryset.&quot;&quot;&quot;</span>
+        <span class="n">accesses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_access_queryset</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_queryset</span><span class="p">()</span><span class="o">.</span><span class="n">available</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">agents</span><span class="p">,</span> <span class="n">accesses</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ObjectMixin.dispatch">
+<a class="viewcode-back" href="../../../api/20_views.html#caps.views.mixins.ObjectMixin.dispatch">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dispatch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">agents</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_agents</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">agent</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">agent</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">dispatch</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="c1"># This class code is mostly taken from Django Rest Framework&#39;s permissions.DjangoModelPermissions</span>
+<span class="c1"># Its code falls under the same license.</span>
+<div class="viewcode-block" id="ObjectPermissionMixin">
+<a class="viewcode-back" href="../../../api/20_views.html#caps.views.mixins.ObjectPermissionMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ObjectPermissionMixin</span><span class="p">(</span><span class="n">ObjectMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This mixin checks for object permission when ``get_object()`` is called. It raises a</span>
+<span class="sd">    ``PermissionDenied`` or ``Http404`` if user does not have access to the object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">permissions</span> <span class="o">=</span> <span class="p">[</span><span class="n">permissions</span><span class="o">.</span><span class="n">ObjectPermissions</span><span class="p">]</span>
+
+<div class="viewcode-block" id="ObjectPermissionMixin.get_object">
+<a class="viewcode-back" href="../../../api/20_views.html#caps.views.mixins.ObjectPermissionMixin.get_object">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_object</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_object_permissions</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">obj</span></div>
+
+
+<div class="viewcode-block" id="ObjectPermissionMixin.check_object_permissions">
+<a class="viewcode-back" href="../../../api/20_views.html#caps.views.mixins.ObjectPermissionMixin.check_object_permissions">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_object_permissions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">perms</span> <span class="o">:=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_permissions</span><span class="p">():</span>
+            <span class="n">allowed</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">has_object_permission</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">perms</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">allowed</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">PermissionDenied</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Permission not allowed for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">method</span><span class="si">}</span><span class="s2"> on this object.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ObjectPermissionMixin.get_permissions">
+<a class="viewcode-back" href="../../../api/20_views.html#caps.views.mixins.ObjectPermissionMixin.get_permissions">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_permissions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">p</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">permissions</span><span class="p">]</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SingleObjectMixin">
+<a class="viewcode-back" href="../../../api/20_views.html#caps.views.mixins.SingleObjectMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SingleObjectMixin</span><span class="p">(</span><span class="n">ObjectMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Detail mixin used to retrieve Object detail.</span>
+
+<span class="sd">    It requires subclass to have  a ``check_object_permissions`` method (</span>
+<span class="sd">    eg by a child of :py:class:`ObjectPermissionMixin` or DRF APIView).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">lookup_url_kwarg</span> <span class="o">=</span> <span class="s2">&quot;uuid&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; URL&#39;s kwargs argument used to retrieve access uuid. &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SingleObjectMixin.get_access_queryset">
+<a class="viewcode-back" href="../../../api/20_views.html#caps.views.mixins.SingleObjectMixin.get_access_queryset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_access_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;When ``uuid`` GET argument is provided, filter accesses on it.&quot;&quot;&quot;</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_access_queryset</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">query</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">uuid</span> <span class="o">:=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_url_kwarg</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">uuid</span><span class="o">=</span><span class="n">uuid</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">query</span></div>
+
+
+<div class="viewcode-block" id="SingleObjectMixin.get_object">
+<a class="viewcode-back" href="../../../api/20_views.html#caps.views.mixins.SingleObjectMixin.get_object">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">uuid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_url_kwarg</span><span class="p">]</span>
+
+        <span class="n">q</span> <span class="o">=</span> <span class="n">Q</span><span class="p">(</span><span class="n">uuid</span><span class="o">=</span><span class="n">uuid</span><span class="p">,</span> <span class="n">owner__in</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">agents</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">accesses</span> <span class="o">:=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_access_queryset</span><span class="p">():</span>
+            <span class="n">q</span> <span class="o">|=</span> <span class="n">Q</span><span class="p">(</span><span class="n">accesses__in</span><span class="o">=</span><span class="n">accesses</span><span class="p">)</span>
+
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_queryset</span><span class="p">(),</span> <span class="n">q</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_object_permissions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">obj</span></div>
+</div>
+
+
+
+<span class="c1"># ---- Other mixins</span>
+<div class="viewcode-block" id="ByUUIDMixin">
+<a class="viewcode-back" href="../../../api/20_views.html#caps.views.mixins.ByUUIDMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ByUUIDMixin</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch a model by UUID.&quot;&quot;&quot;</span>
+
+    <span class="n">lookup_url_kwarg</span> <span class="o">=</span> <span class="s2">&quot;uuid&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; URL&#39;s kwargs argument used to retrieve access uuid. &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ByUUIDMixin.get_object">
+<a class="viewcode-back" href="../../../api/20_views.html#caps.views.mixins.ByUUIDMixin.get_object">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_queryset</span><span class="p">(),</span> <span class="n">uuid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_url_kwarg</span><span class="p">])</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="AgentMixin">
+<a class="viewcode-back" href="../../../api/20_views.html#caps.views.mixins.AgentMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AgentMixin</span><span class="p">(</span><span class="n">ByUUIDMixin</span><span class="p">,</span> <span class="n">PermissionRequiredMixin</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Agent</span></div>
+
+
+
+<div class="viewcode-block" id="AccessMixin">
+<a class="viewcode-back" href="../../../api/20_views.html#caps.views.mixins.AccessMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AccessMixin</span><span class="p">(</span><span class="n">ByUUIDMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mixin used by Access views and viewsets.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="AccessMixin.get_queryset">
+<a class="viewcode-back" href="../../../api/20_views.html#caps.views.mixins.AccessMixin.get_queryset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># FIXME: owner shall be able to remove any access</span>
+        <span class="c1"># a user can view/delete only access for which he is</span>
+        <span class="c1"># either receiver or emitter.</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_queryset</span><span class="p">()</span><span class="o">.</span><span class="n">agent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">agents</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Thomas.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

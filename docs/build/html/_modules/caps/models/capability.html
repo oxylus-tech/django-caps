@@ -1,0 +1,410 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>caps.models.capability &mdash; Django-Caps 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" haccess="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" haccess="../../../_static/css/theme.css?v=e59714d7" />
+
+
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" haccess="../../../genindex.html" />
+    <link rel="search" title="Search" haccess="../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a haccess="../../../index.html" class="icon icon-home">
+            Django-Caps
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="Share internal" haccess="../../../guide.html">Guide</a></li>
+<li class="toctree-l1"><a class="Share internal" haccess="../../../api.html">API</a></li>
+<li class="toctree-l1"><a class="Share internal" haccess="../../../project.html">Project</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a haccess="../../../index.html">Django-Caps</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a haccess="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a haccess="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">caps.models.capability</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for caps.models.capability</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TypeAlias</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.core.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">PermissionDenied</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Permission</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.contenttypes.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">ContentType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Q</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gettext</span> <span class="k">as</span> <span class="n">__</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gettext_lazy</span> <span class="k">as</span> <span class="n">_</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;CapabilityQuerySet&quot;</span><span class="p">,</span> <span class="s2">&quot;Capability&quot;</span><span class="p">)</span>
+
+
+<span class="n">CanOne</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Permission</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ContentType</span> <span class="o">|</span> <span class="nb">type</span><span class="p">]</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Describe lookup for a capability&#39;s permission. It is used by :py:meth:`CapabilityQuerySet.can` and all related methods (:py:meth:`CapabilityQuerySet.can_one_lookup`, :py:meth:`CapabilityQuerySet.can_q`, etc.)</span>
+
+<span class="sd">It either can be:</span>
+
+<span class="sd">    - A Permission or a permission id;</span>
+<span class="sd">    - A tuple with Permission action, and content type (ContentType instance, or model class);</span>
+<span class="sd">    - A single action combined with provided `model` argument.</span>
+
+<span class="sd">An action is the part of the Django&#39;s ``Permission.codename`` specifying a verb. Based on the provided model</span>
+<span class="sd">(or content type), the codename will be constructed as: ``permission_codename = f&quot;{action}_{model_name}&quot;``.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">CanMany</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">CanOne</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">CanOne</span><span class="p">]</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Describe lookup value for multiple capabilities&#39; description.</span>
+
+<span class="sd">It is used by :py:meth:`CapabilityQuerySet.can`</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="CapabilityQuerySet">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.capability.CapabilityQuerySet">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CapabilityQuerySet</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">QuerySet</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Queryset and manager used by Capability models.</span>
+
+<span class="sd">    It provide `can` filter method + other utilities methods</span>
+<span class="sd">    in order to build up filter&#39;s lookups (used by :py:class:`~.Share.Share`).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CapabilityQuerySet.can">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.capability.CapabilityQuerySet.can">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">can</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">permissions</span><span class="p">:</span> <span class="n">CanMany</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CapabilityQuerySet</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Filter using provided permission(s).</span>
+
+<span class="sd">        Permissions provided as action string are matched with capability&#39;s concrete :py:class:`~.object.Object` model:</span>
+
+<span class="sd">        .. code-block::</span>
+
+<span class="sd">            # We assume: app.MyObject &lt;- Share &lt;- Capability</span>
+
+<span class="sd">            # Look up for `app.view_myobject`.</span>
+<span class="sd">            query = Capability.objects.can(&quot;view&quot;)</span>
+
+<span class="sd">            # Look up for capabilities with an OR joint on permissions.</span>
+<span class="sd">            permission = Permission.objects.all().first()</span>
+<span class="sd">            query = Capability.objects.can((</span>
+<span class="sd">                &#39;view&#39;,</span>
+<span class="sd">                # with an instance of permission</span>
+<span class="sd">                permission,</span>
+<span class="sd">                # with an action and some other model</span>
+<span class="sd">                (&#39;change&#39;, SomeModel),</span>
+<span class="sd">            ))</span>
+
+<span class="sd">        :param permissions: the permissions to look for.</span>
+<span class="sd">        :yield: from :py:meth:`can_one_lookup`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">can_q</span><span class="p">(</span><span class="n">permissions</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get_object_class</span><span class="p">()))</span></div>
+
+
+<div class="viewcode-block" id="CapabilityQuerySet.can_all_q">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.capability.CapabilityQuerySet.can_all_q">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">can_all_q</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">permissions</span><span class="p">:</span> <span class="n">CanMany</span><span class="p">,</span> <span class="n">paccessix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;permission__&quot;</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">type</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Q</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a list of Q objects for each provided permissions, using : py:meth:`can_one_lookup`.</span>
+
+<span class="sd">        :param permissions: the permissions to look for.</span>
+<span class="sd">        :param paccessix: passed down to :py:meth:`can_one_lookup`.</span>
+<span class="sd">        :param model: passed down to :py:meth:`can_one_lookup`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">permissions</span><span class="p">,</span> <span class="p">(</span><span class="n">Permission</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">Q</span><span class="p">(</span><span class="o">**</span><span class="bp">cls</span><span class="o">.</span><span class="n">can_one_lookup</span><span class="p">(</span><span class="n">permissions</span><span class="p">,</span> <span class="n">paccessix</span><span class="p">,</span> <span class="n">model</span><span class="p">))]</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">Q</span><span class="p">(</span><span class="o">**</span><span class="bp">cls</span><span class="o">.</span><span class="n">can_one_lookup</span><span class="p">(</span><span class="n">perm</span><span class="p">,</span> <span class="n">paccessix</span><span class="p">,</span> <span class="n">model</span><span class="p">))</span> <span class="k">for</span> <span class="n">perm</span> <span class="ow">in</span> <span class="n">permissions</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="CapabilityQuerySet.can_q">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.capability.CapabilityQuerySet.can_q">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">can_q</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">permissions</span><span class="p">:</span> <span class="n">CanMany</span><span class="p">,</span> <span class="n">paccessix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;permission__&quot;</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">type</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Q</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return Q lookup for multiple permissions joined with `|`, using  :py:meth:`can_one_lookup`.</span>
+
+<span class="sd">        :param permissions: the permissions to look for.</span>
+<span class="sd">        :param paccessix: passed down to :py:meth:`can_one_lookup`.</span>
+<span class="sd">        :param model: passed down to :py:meth:`can_one_lookup`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">permissions</span><span class="p">,</span> <span class="p">(</span><span class="n">Permission</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="n">Q</span><span class="p">(</span><span class="o">**</span><span class="bp">cls</span><span class="o">.</span><span class="n">can_one_lookup</span><span class="p">(</span><span class="n">permissions</span><span class="p">,</span> <span class="n">paccessix</span><span class="p">,</span> <span class="n">model</span><span class="p">))</span>
+
+        <span class="n">q</span> <span class="o">=</span> <span class="n">Q</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">perm</span> <span class="ow">in</span> <span class="n">permissions</span><span class="p">:</span>
+            <span class="n">q</span> <span class="o">|=</span> <span class="n">Q</span><span class="p">(</span><span class="o">**</span><span class="bp">cls</span><span class="o">.</span><span class="n">can_one_lookup</span><span class="p">(</span><span class="n">perm</span><span class="p">,</span> <span class="n">paccessix</span><span class="p">,</span> <span class="n">model</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">q</span></div>
+
+
+<div class="viewcode-block" id="CapabilityQuerySet.can_one_lookup">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.capability.CapabilityQuerySet.can_one_lookup">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">can_one_lookup</span><span class="p">(</span>
+        <span class="n">permission</span><span class="p">:</span> <span class="n">CanOne</span><span class="p">,</span> <span class="n">paccessix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;permission__&quot;</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">type</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return lookup for one permission.</span>
+
+<span class="sd">        :param permission: to get lookup for.</span>
+<span class="sd">        :param paccessix: paccessix keys with this value.</span>
+<span class="sd">        :param model: model class to use when only action is provided.</span>
+<span class="sd">        :return lookup argument dictionnary.</span>
+
+<span class="sd">        :yield ValueError: on unsupported ``permission`` types.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">permission</span><span class="p">,</span> <span class="n">Permission</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">paccessix</span><span class="si">}</span><span class="s2">id&quot;</span><span class="p">:</span> <span class="n">permission</span><span class="o">.</span><span class="n">id</span><span class="p">}</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">permission</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">paccessix</span><span class="si">}</span><span class="s2">id&quot;</span><span class="p">:</span> <span class="n">permission</span><span class="p">}</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">permission</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;You must provide a `model` when specifying a permission codename.&quot;</span><span class="p">)</span>
+            <span class="n">action</span><span class="p">,</span> <span class="n">ct</span> <span class="o">=</span> <span class="n">permission</span><span class="p">,</span> <span class="n">ContentType</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_for_model</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">permission</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
+            <span class="n">action</span><span class="p">,</span> <span class="n">ct</span> <span class="o">=</span> <span class="n">permission</span>
+            <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">ct</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">ct</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+                <span class="n">ct</span> <span class="o">=</span> <span class="n">ContentType</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_for_model</span><span class="p">(</span><span class="n">ct</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ct</span><span class="p">,</span> <span class="n">ContentType</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid type for permission (`</span><span class="si">{</span><span class="n">ct</span><span class="si">}</span><span class="s2">`): it must be a ContentType or model class&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid type for permission: `</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">permission</span><span class="p">)</span><span class="si">}</span><span class="s2">`&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">paccessix</span><span class="si">}</span><span class="s2">codename&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">action</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">ct</span><span class="o">.</span><span class="n">model</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">paccessix</span><span class="si">}</span><span class="s2">content_type&quot;</span><span class="p">:</span> <span class="n">ct</span><span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="CapabilityQuerySet.initials">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.capability.CapabilityQuerySet.initials">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">initials</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Filter capabilities used as initial values of a Share.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Share__isnull</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Capability">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.capability.Capability">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Capability</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A single capability providing permission for executing a single action.</span>
+
+<span class="sd">    It is linked to an object by a :py:class:`~.Share.Share`. The Share</span>
+<span class="sd">    is the entry point for user to address/access the object. The capability represent</span>
+<span class="sd">    what he can do.</span>
+
+<span class="sd">    This model is provided as abstract model whose implementation MUST provide</span>
+<span class="sd">    a ``Share`` foreign key to a :py:class:`~.Share.Share` (reverse</span>
+<span class="sd">    relation: `capabilities`). The foreign key is nullable, ``None`` have special</span>
+<span class="sd">    meaning: it represents default assigned capabilities to newly created root Share instances. They can be fetched using :py:meth:`CapabilityQuerySet.get_initials`.</span>
+
+<span class="sd">    See :py:class:`~.Share.Share` documentation for more information.</span>
+
+<span class="sd">    It is recommanded to ``select_related`` permission in order to read</span>
+<span class="sd">    :py:attr:`name` and :py:attr:`codename`.</span>
+
+<span class="sd">    Derivation</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    Capability can derived: it means the permission is shared to another agent.</span>
+<span class="sd">    To be allowed to share, :py:attr:`max_derive` must be greater than 0. When sharing</span>
+<span class="sd">    only a lower value is allowed to the new capability&#39;s field.</span>
+
+<span class="sd">    Lets see what it does:</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        from models import MyObject</span>
+
+<span class="sd">        permission = Permission.objects.all().first()</span>
+<span class="sd">        cap = MyObject.Capability(permission=permission, max_derive=2)</span>
+<span class="sd">        #  `cap` is not saved, we don&#39;t core to provide a Share for this example.</span>
+
+<span class="sd">        # providing no max_derive defaults to 0</span>
+<span class="sd">        cap_1 = cap.derive(0)</span>
+<span class="sd">        assert cap_1.max_derive == 0</span>
+
+<span class="sd">        # this raises PermissionDenied</span>
+<span class="sd">        cap_1.derive()</span>
+
+<span class="sd">        # max_derive reduced by 1</span>
+<span class="sd">        cap_1 = cap.derive()</span>
+<span class="sd">        assert cap_1.max_derive == 1</span>
+
+<span class="sd">        cap_2 = cap_1.derive()</span>
+<span class="sd">        assert cap_2.max_derive == 0</span>
+
+<span class="sd">    **Note:** You&#39;ll more work over Shares for derivation than capabilities themselves.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">permission</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Permission</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s2">&quot;capabilities&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Related permission &quot;&quot;&quot;</span>
+    <span class="n">max_derive</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">PositiveIntegerField</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Maximum Derivation&quot;</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Maximum allowed derivations. &quot;&quot;&quot;</span>
+
+    <span class="n">objects</span> <span class="o">=</span> <span class="n">CapabilityQuerySet</span><span class="o">.</span><span class="n">as_manager</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Capability.Meta">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.capability.Capability.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">abstract</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">unique_together</span> <span class="o">=</span> <span class="p">((</span><span class="s2">&quot;Share&quot;</span><span class="p">,</span> <span class="s2">&quot;permission_id&quot;</span><span class="p">),)</span>
+        <span class="n">verbose_name</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;Capability&#39;</span><span class="p">)</span>
+        <span class="n">verbose_name_plural</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;Capabilities&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Capability.get_Share_class">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.capability.Capability.get_Share_class">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_Share_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return related Share class.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">Share</span><span class="o">.</span><span class="n">field</span><span class="o">.</span><span class="n">related_model</span></div>
+
+
+<div class="viewcode-block" id="Capability.get_object_class">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.capability.Capability.get_object_class">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_object_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return related Object class.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_Share_class</span><span class="p">()</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">field</span><span class="o">.</span><span class="n">related_model</span></div>
+
+
+<div class="viewcode-block" id="Capability.can_derive">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.capability.Capability.can_derive">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">can_derive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_derive</span><span class="p">:</span> <span class="kc">None</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return True if this capability can be derived.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_derive</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="p">(</span><span class="n">max_derive</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">max_derive</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_derive</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Capability.derive">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.capability.Capability.derive">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">derive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_derive</span><span class="p">:</span> <span class="kc">None</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">Share</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Capability</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Derive a new capability from self (without checking existence in</span>
+<span class="sd">        database).</span>
+
+<span class="sd">        :param max_derive: when value is None, it will based the value on self&#39;s \</span>
+<span class="sd">                py:attr:`max_derive` minus 1.</span>
+<span class="sd">        :param **kwargs: extra initial argument of the new Capability</span>
+<span class="sd">        :return: the new unsaved Capability.</span>
+
+<span class="sd">        :yield PermissionDenied: when Capability derivation is not allowed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># disallowed values as they are provided by self.</span>
+        <span class="k">if</span> <span class="s2">&quot;permission&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">or</span> <span class="s2">&quot;permission_id&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Providing `permission_id` or `permission` is forbidden.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">Share</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">Share</span><span class="o">.</span><span class="n">target</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Share</span><span class="o">.</span><span class="n">target</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;New capability&#39;s Share must target the same object as current one&#39;s.&quot;</span><span class="p">)</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;Share&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Share</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">can_derive</span><span class="p">(</span><span class="n">max_derive</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">PermissionDenied</span><span class="p">(</span><span class="n">__</span><span class="p">(</span><span class="s2">&quot;Can not derive capability </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">max_derive</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">max_derive</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_derive</span> <span class="o">-</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="s2">&quot;permission&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;permission&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">permission</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;permission_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">permission_id</span>
+
+        <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="n">max_derive</span><span class="o">=</span><span class="n">max_derive</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Capability.is_derived">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.capability.Capability.is_derived">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_derived</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">capability</span><span class="p">:</span> <span class="n">Capability</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return True if `capability` is derived from this one.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">permission_id</span> <span class="o">==</span> <span class="n">capability</span><span class="o">.</span><span class="n">permission_id</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">can_derive</span><span class="p">(</span><span class="n">capability</span><span class="o">.</span><span class="n">max_derive</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(pk=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">pk</span><span class="si">}</span><span class="s2">, permission=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">permission_id</span><span class="si">}</span><span class="s2">, max_derive=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_derive</span><span class="si">}</span><span class="s2">)&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Capability</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return True if other `capability` is derived from `self`.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_derived</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Capability</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Capability</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pk</span> <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">pk</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pk</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">pk</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">permission_id</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">permission_id</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_derive</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">max_derive</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Thomas.</p>
+  </div>
+
+  Built with <a haccess="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a haccess="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a haccess="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

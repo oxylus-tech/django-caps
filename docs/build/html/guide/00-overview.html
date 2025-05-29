@@ -1,0 +1,198 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Overview &mdash; Django-Caps 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" haccess="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" haccess="../_static/css/theme.css?v=e59714d7" />
+
+
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" haccess="../genindex.html" />
+    <link rel="search" title="Search" haccess="../search.html" />
+    <link rel="next" title="Capability vs ACL permission systems" haccess="90-capability-vs-acl.html" />
+    <link rel="prev" title="Guide" haccess="../guide.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a haccess="../index.html" class="icon icon-home">
+            Django-Caps
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="Share internal" haccess="../guide.html">Guide</a><ul class="current">
+<li class="toctree-l2 current"><a class="current Share internal" haccess="#">Overview</a><ul>
+<li class="toctree-l3"><a class="Share internal" haccess="#Share">Share</a><ul>
+<li class="toctree-l4"><a class="Share internal" haccess="#create-and-update-Shares">Create and update Shares</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="Share internal" haccess="#capability">Capability</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="Share internal" haccess="90-capability-vs-acl.html">Capability vs ACL permission systems</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="Share internal" haccess="../api.html">API</a></li>
+<li class="toctree-l1"><a class="Share internal" haccess="../project.html">Project</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a haccess="../index.html">Django-Caps</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a haccess="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a haccess="../guide.html">Guide</a></li>
+      <li class="breadcrumb-item active">Overview</li>
+      <li class="wy-breadcrumbs-aside">
+            <a haccess="../_sources/guide/00-overview.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <section id="overview">
+<h1>Overview<a class="headerlink" haccess="#overview" title="Link to this heading"></a></h1>
+<p>As explained before capabilities permission system provide access to objects only based on a <a class="Share internal" haccess="../api/10_models.html#caps.models.Share.Share" title="caps.models.Share.Share"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">Share</span></code></a>. This element provide: an identifier (uuid), a set of allowed actions to users (aka <code class="xaccess py py-class docutils literal notranslate"><span class="pre">Capability</span></code>), and eventually an expiration date.</p>
+<p>This figure shows how is it implemented in Django-Caps:</p>
+<figure class="align-default" id="id1">
+<img alt="../_images/caps-models.drawio.png" src="../_images/caps-models.drawio.png" />
+<figcaption>
+<p><span class="caption-text">The Object is accessed through its Share. A Share is assigned to an Agent which identifies the user. The Share provides capabilities which are linked to Django’s auth Permission.</span><a class="headerlink" haccess="#id1" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>Django-Caps provides views that will use the provided scheme in order to grant user access or actions.</p>
+<p><a class="Share internal" haccess="../api/10_models.html#caps.models.object.Object" title="caps.models.object.Object"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">Object</span></code></a>, <a class="Share internal" haccess="../api/10_models.html#caps.models.Share.Share" title="caps.models.Share.Share"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">Share</span></code></a>,
+<a class="Share internal" haccess="../api/10_models.html#caps.models.capability.Capability" title="caps.models.capability.Capability"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">Capability</span></code></a> models are <code class="docutils literal notranslate"><span class="pre">abstract</span></code>. When Object is subclassed in a concrete model,
+a concrete Share is generated (accessible from subclass scope). The same occurs between Share and Capability.
+This mechanism ensure different things:</p>
+<ul class="simple">
+<li><p>The Share and Capability models are associated to one object type, allowing reverse relations to be accessible (comparing for example over a solution using ContentType framework). This also allows to joins table on SQL requests (thus paccessetch values among other things);</p></li>
+<li><p>This ensure clear segregation for Shares and capabilities per object type and reduce tables sizes;</p></li>
+<li><p>We can exploit this mechanism for eg. default Share capabilities;</p></li>
+</ul>
+<section id="Share">
+<h2>Share<a class="headerlink" haccess="#Share" title="Link to this heading"></a></h2>
+<p>An Object is always accessed through a Share. An Object without a Share must not be accessible to the user. This also means that once when an object is returned through API, the Share MUST be provided.</p>
+<p>As told, a Share provides a set of capabilities. Each capability grants two things: permission (access or action) and this permission to be share (or not).</p>
+<p>A Share can be shared, which means that a new one will be created based one the current one. This creates a chains of parent-child Shares, ensuring control over the accesses. In Django-Caps, this process is called <em>derivation</em>, as a Share is <em>derived</em> from another one.</p>
+<p>The first Share of this chain is the <em>root Share</em>. There only can be one Share for each object, which is owned by a single agent.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Taking the example from index page</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">caps.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Agent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Post</span>
+
+<span class="n">agent</span> <span class="o">=</span> <span class="n">Agent</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">agent_2</span> <span class="o">=</span> <span class="n">Agent</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span>
+
+<span class="c1"># this raises ValueError: only one Share is allowed</span>
+<span class="n">post</span> <span class="o">=</span> <span class="n">Post</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Shares__isnull</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+<span class="n">access</span> <span class="o">=</span> <span class="n">Post</span><span class="o">.</span><span class="n">Share</span><span class="o">.</span><span class="n">create_root</span><span class="p">(</span><span class="n">agent</span><span class="p">,</span> <span class="n">post</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The root Share will use the default capabilities as initial ones.</p>
+<section id="create-and-update-Shares">
+<h3>Create and update Shares<a class="headerlink" haccess="#create-and-update-Shares" title="Link to this heading"></a></h3>
+<p>There are only two ways for user (through views or API) to create a Share:</p>
+<ul class="simple">
+<li><p>By creating a <code class="xaccess py py-class docutils literal notranslate"><span class="pre">Object</span></code>: the related view will ensure the root Share is created.</p></li>
+<li><p>By derivating an already existing Share;</p></li>
+</ul>
+<p>It is assumed that once a Share is created it can not be updated (nor its capabilities). This is in order to ensure the integrity of the whole chain of Shares. This is a current trade-off in Django-Caps that might change in the future even though it isn’t planned.</p>
+<p>If a user wants to update a Share (eg. add more capabilities), he should instead create a new Share and eventually delete the older one. We ensure that all derived Shares will be destroyed at the same time of a parent (by cascading).</p>
+</section>
+</section>
+<section id="capability">
+<h2>Capability<a class="headerlink" haccess="#capability" title="Link to this heading"></a></h2>
+<p>A Capability represent a single action or access to be granted. It also can grant sharing this permission. It can in
+some way be looked as a through table of a Django’s <code class="docutils literal notranslate"><span class="pre">ManyToManyField</span></code> although it not implemented as is
+(due to technical reasons).</p>
+<p>A default capability is the one provided by default when creating a root Share. It is simply a capability without an assigned Share. Since a Capability table is created for each Object concrete sub-model, we are sure they will only target this sub-model.</p>
+<p>When user derives a Share, eg for allowing Alice to access the object, he can provide her the ability to reshare it
+using <a class="Share internal" haccess="../api/10_models.html#caps.models.capability.Capability.max_derive" title="caps.models.capability.Capability.max_derive"><code class="xaccess py py-attr docutils literal notranslate"><span class="pre">max_derive</span></code></a> provide the maximum amount of derivation as an absolute
+value relative to root. Each time a Share is derived, the <code class="docutils literal notranslate"><span class="pre">max_derive</span></code> is decremented by one.</p>
+<p>This implies that:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">access</span> <span class="o">=</span> <span class="n">Share</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+<span class="n">capability</span> <span class="o">=</span> <span class="n">access</span><span class="o">.</span><span class="n">capabilities</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="n">capability</span><span class="o">.</span><span class="n">max_derive</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="c1"># this means that derived capability can&#39;t be reshared</span>
+    <span class="k">assert</span> <span class="n">capability</span><span class="o">.</span><span class="n">derive</span><span class="p">()</span><span class="o">.</span><span class="n">max_derive</span> <span class="o">==</span> <span class="mi">0</span>
+<span class="k">elif</span> <span class="n">capability</span><span class="o">.</span><span class="n">max_derive</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="c1"># this raises PermissionDenied, as capability can&#39;t be derived</span>
+    <span class="n">capability</span><span class="o">.</span><span class="n">derive</span><span class="p">()</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="c1"># this means that derived capability can&#39;t be shared</span>
+    <span class="k">assert</span> <span class="ow">not</span> <span class="n">capability</span><span class="o">.</span><span class="n">derive</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">can_derive</span><span class="p">()</span>
+
+    <span class="c1"># this means that derived capability can be reshared, as max_derive &gt; 1</span>
+    <span class="k">assert</span> <span class="n">capability</span><span class="o">.</span><span class="n">derive</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">can_derive</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a haccess="../guide.html" class="btn btn-neutral float-left" title="Guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a haccess="90-capability-vs-acl.html" class="btn btn-neutral float-right" title="Capability vs ACL permission systems" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Thomas.</p>
+  </div>
+
+  Built with <a haccess="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a haccess="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a haccess="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,162 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Django-Caps &mdash; Django-Caps 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Guide" href="guide.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a href="#" class="icon icon-home">
+            Django-Caps
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="guide.html">Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="project.html">Project</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">Django-Caps</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Django-Caps</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <section id="django-caps">
+<h1>Django-Caps<a class="headerlink" href="#django-caps" title="Link to this heading"></a></h1>
+<p>Django-Caps provides capability based object permission system for Django applications.
+This project is inspired by <a class="reference external" href="https://capnproto.org">Capn’Proto documentation</a> (<a class="reference external" href="http://www.erights.org/elib/capability/ode/ode.pdf">interesting paper</a>).</p>
+<p>A capability is a permission provided for a specific object. It can be <em>derived</em> (shared) a limited amount of time. Users never directly access the targeted object, but through a <em>access</em> that defines allowed capabilities for it.</p>
+<p>In short, why use capabilities?</p>
+<ul class="simple">
+<li><p><em>Granularity over objects permissions</em></p></li>
+<li><p><em>Reduced risk of privilege escalation</em></p></li>
+<li><p><em>Avoid direct access to database objects</em></p></li>
+</ul>
+<p>More in the guide, <a class="reference internal" href="guide/90-capability-vs-acl.html#capability-vs-acl-permission-systems"><span class="std std-ref">Capability vs ACL permission systems</span></a>.</p>
+<section id="features">
+<h2>Features<a class="headerlink" href="#features" title="Link to this heading"></a></h2>
+<p>Here is what we provide:</p>
+<ul class="simple">
+<li><p><strong>Capability based object permissions system</strong>: objects can be shared with specific permissions to user/group. The object is then accessed by this shared object rather than directly (except for its owner).</p></li>
+<li><p><strong>Access sharing</strong>: Objects’ accesses can be shared with granular control on permissions.</p></li>
+<li><p><strong>Integration</strong>: authentication/permission backend is provided both for Django and Django Rest Framework. Views, viewsets and serializers too.</p></li>
+<li><p><strong>Agents</strong>: users can act under different profiles, as a user or group. The accesses always target other agents.</p></li>
+</ul>
+<p>Among other things:</p>
+<ul class="simple">
+<li><p><strong>Database id obfuscation</strong>: object internal id are never exposed to the outside world. Instead uuid are used to reference them in API and urls. This mitigate attacks on predictive id.</p></li>
+</ul>
+</section>
+<section id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="guide.html">Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="guide/00-quickstart.html">Quickstart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guide/01-overview.html">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guide/90-capability-vs-acl.html">Capability vs ACL permission systems</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/10_models.html">caps.models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/20_views.html">caps.views</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/30_serializers.html">caps.serializers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/40_permissions.html">caps.permissions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/60_backends.html">caps.backends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/70_admin.html">caps.admin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/71_urls.html">caps.urls</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/80_utils.html">caps.utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/90_middleware.html">caps.middleware</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="project.html">Project</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="project/10-principles.html">Principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="project/90_todo.html">TODO</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="guide.html" class="btn btn-neutral float-right" title="Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Thomas.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

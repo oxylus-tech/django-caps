@@ -1,0 +1,142 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>caps.utils &mdash; Django-Caps 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" haccess="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" haccess="../../_static/css/theme.css?v=e59714d7" />
+
+
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" haccess="../../genindex.html" />
+    <link rel="search" title="Search" haccess="../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a haccess="../../index.html" class="icon icon-home">
+            Django-Caps
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="Share internal" haccess="../../guide.html">Guide</a></li>
+<li class="toctree-l1"><a class="Share internal" haccess="../../api.html">API</a></li>
+<li class="toctree-l1"><a class="Share internal" haccess="../../project.html">Project</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a haccess="../../index.html">Django-Caps</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a haccess="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a haccess="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">caps.utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for caps.utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+
+<div class="viewcode-block" id="get_lazy_relation">
+<a class="viewcode-back" haccess="../../api/80_utils.html#caps.utils.get_lazy_relation">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_lazy_relation</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">out_field</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For the provided model instance, return an attribute name and value for field.</span>
+
+<span class="sd">    It returns relation id if the relation hasn&#39;t been fetched from the db. Otherwise, it returns the relation object:</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        access = Share.objects.all().first()</span>
+
+<span class="sd">        # relation has not been fetched</span>
+<span class="sd">        k, v = get_lazy_relation(access, &#39;origin&#39;)</span>
+<span class="sd">        assert k == &#39;origin_id&#39; and isinstance(v, int)</span>
+
+<span class="sd">        # fetch from db:</span>
+<span class="sd">        access.origin</span>
+<span class="sd">        k, v = get_lazy_relation(access, &#39;origin&#39;)</span>
+<span class="sd">        assert k == &#39;origin&#39; and isinstance(v, Share)</span>
+
+<span class="sd">        # map a name:</span>
+<span class="sd">        k, v = get_lazy_relation(access, &#39;origin&#39;, &#39;dest&#39;)</span>
+<span class="sd">        assert k == &#39;dest&#39; and isinstance(v, Share)</span>
+
+<span class="sd">    :param obj: object to get value on</span>
+<span class="sd">    :param field: object&#39;s field to lookup</span>
+<span class="sd">    :param out_field: output field (default to object&#39;s)</span>
+
+<span class="sd">    :return a tuple with field name and value.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">out_field</span> <span class="o">=</span> <span class="n">out_field</span> <span class="ow">or</span> <span class="n">field</span>
+    <span class="k">if</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">out_field</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">out_field</span><span class="si">}</span><span class="s2">_id&quot;</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">field</span><span class="si">}</span><span class="s2">_id&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Thomas.</p>
+  </div>
+
+  Built with <a haccess="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a haccess="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a haccess="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

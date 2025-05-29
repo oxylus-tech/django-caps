@@ -1,0 +1,1317 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>caps.models &mdash; Django-Caps 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" haccess="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" haccess="../_static/css/theme.css?v=e59714d7" />
+
+
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" haccess="../genindex.html" />
+    <link rel="search" title="Search" haccess="../search.html" />
+    <link rel="next" title="Project" haccess="../project.html" />
+    <link rel="prev" title="&lt;no title&gt;" haccess="90_middleware.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a haccess="../index.html" class="icon icon-home">
+            Django-Caps
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="Share internal" haccess="../guide.html">Guide</a></li>
+<li class="toctree-l1 current"><a class="Share internal" haccess="../api.html">API</a><ul class="current">
+<li class="toctree-l2"><a class="Share internal" haccess="10_models.html">caps.models</a></li>
+<li class="toctree-l2 current"><a class="current Share internal" haccess="#">caps.models</a><ul>
+<li class="toctree-l3"><a class="Share internal" haccess="#module-caps.models.agent">caps.models.agent</a><ul>
+<li class="toctree-l4"><a class="Share internal" haccess="#caps.models.agent.Agent"><code class="docutils literal notranslate"><span class="pre">Agent</span></code></a></li>
+<li class="toctree-l4"><a class="Share internal" haccess="#caps.models.agent.AgentQuerySet"><code class="docutils literal notranslate"><span class="pre">AgentQuerySet</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="Share internal" haccess="#caps-models-capability">caps.models.capability</a><ul>
+<li class="toctree-l4"><a class="Share internal" haccess="#caps.models.capability.CanOne"><code class="docutils literal notranslate"><span class="pre">CanOne</span></code></a></li>
+<li class="toctree-l4"><a class="Share internal" haccess="#caps.models.capability.CanMany"><code class="docutils literal notranslate"><span class="pre">CanMany</span></code></a></li>
+<li class="toctree-l4"><a class="Share internal" haccess="#caps.models.capability.Capability"><code class="docutils literal notranslate"><span class="pre">Capability</span></code></a></li>
+<li class="toctree-l4"><a class="Share internal" haccess="#caps.models.capability.CapabilityQuerySet"><code class="docutils literal notranslate"><span class="pre">CapabilityQuerySet</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="Share internal" haccess="#module-caps.models.capability_set">caps.models.capability_set</a><ul>
+<li class="toctree-l4"><a class="Share internal" haccess="#caps.models.capability_set.CapabilitySet"><code class="docutils literal notranslate"><span class="pre">CapabilitySet</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="Share internal" haccess="#module-caps.models.Share">caps.models.Share</a><ul>
+<li class="toctree-l4"><a class="Share internal" haccess="#caps.models.Share.Share"><code class="docutils literal notranslate"><span class="pre">Share</span></code></a></li>
+<li class="toctree-l4"><a class="Share internal" haccess="#caps.models.Share.ShareQuerySet"><code class="docutils literal notranslate"><span class="pre">ShareQuerySet</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="Share internal" haccess="#module-caps.models.object">caps.models.object</a><ul>
+<li class="toctree-l4"><a class="Share internal" haccess="#caps.models.object.Object"><code class="docutils literal notranslate"><span class="pre">Object</span></code></a></li>
+<li class="toctree-l4"><a class="Share internal" haccess="#caps.models.object.ObjectBase"><code class="docutils literal notranslate"><span class="pre">ObjectBase</span></code></a></li>
+<li class="toctree-l4"><a class="Share internal" haccess="#caps.models.object.ObjectQuerySet"><code class="docutils literal notranslate"><span class="pre">ObjectQuerySet</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="Share internal" haccess="#module-caps.models.nested">caps.models.nested</a><ul>
+<li class="toctree-l4"><a class="Share internal" haccess="#caps.models.nested.NestedBase"><code class="docutils literal notranslate"><span class="pre">NestedBase</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="Share internal" haccess="../project.html">Project</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a haccess="../index.html">Django-Caps</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a haccess="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a haccess="../api.html">API</a></li>
+      <li class="breadcrumb-item active">caps.models</li>
+      <li class="wy-breadcrumbs-aside">
+            <a haccess="../_sources/api/models.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <section id="caps-models">
+<h1>caps.models<a class="headerlink" haccess="#caps-models" title="Link to this heading"></a></h1>
+<section id="module-caps.models.agent">
+<span id="caps-models-agent"></span><h2>caps.models.agent<a class="headerlink" haccess="#module-caps.models.agent" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="caps.models.agent.Agent">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Agent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/agent.html#Agent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.agent.Agent" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xaccess py py-class docutils literal notranslate"><span class="pre">Model</span></code></p>
+<p>An agent is the one executing an action. It can either be related to
+a specific user (anonymous included) or group.</p>
+<p>A user can impersonate multiple agent.</p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="caps.models.agent.Agent.DoesNotExist">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" haccess="#caps.models.agent.Agent.DoesNotExist" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xaccess py py-class docutils literal notranslate"><span class="pre">ObjectDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="caps.models.agent.Agent.MultipleObjectsReturned">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" haccess="#caps.models.agent.Agent.MultipleObjectsReturned" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xaccess py py-class docutils literal notranslate"><span class="pre">MultipleObjectsReturned</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.agent.Agent.clean">
+<span class="sig-name descname"><span class="pre">clean</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/agent.html#Agent.clean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.agent.Agent.clean" title="Link to this definition"></a></dt>
+<dd><p>Hook for doing any extra model-wide validation after clean() has been
+called on every field by self.clean_fields. Any ValidationError raised
+by this method will not be associated with a particular field; it will
+have a special-case association with the field defined by NON_FIELD_ERRORS.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.agent.Agent.concreteobjectShare_set">
+<span class="sig-name descname"><span class="pre">concreteobjectShare_set</span></span><a class="headerlink" haccess="#caps.models.agent.Agent.concreteobjectShare_set" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.agent.Agent.group">
+<span class="sig-name descname"><span class="pre">group</span></span><a class="headerlink" haccess="#caps.models.agent.Agent.group" title="Link to this definition"></a></dt>
+<dd><p>Agent targets this group.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.agent.Agent.group_id">
+<span class="sig-name descname"><span class="pre">group_id</span></span><a class="headerlink" haccess="#caps.models.agent.Agent.group_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.agent.Agent.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" haccess="#caps.models.agent.Agent.id" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="caps.models.agent.Agent.is_anonymous">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_anonymous</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" haccess="#caps.models.agent.Agent.is_anonymous" title="Link to this definition"></a></dt>
+<dd><p>Return True when Agent targets anonymous users.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.agent.Agent.is_default">
+<span class="sig-name descname"><span class="pre">is_default</span></span><a class="headerlink" haccess="#caps.models.agent.Agent.is_default" title="Link to this definition"></a></dt>
+<dd><p>If True, use this Agent as user’s default.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.agent.Agent.objects">
+<span class="sig-name descname"><span class="pre">objects</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;django.db.models.manager.ManagerFromAgentQuerySet</span> <span class="pre">object&gt;</span></em><a class="headerlink" haccess="#caps.models.agent.Agent.objects" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.agent.Agent.access">
+<span class="sig-name descname"><span class="pre">access</span></span><a class="headerlink" haccess="#caps.models.agent.Agent.access" title="Link to this definition"></a></dt>
+<dd><p>Public Share to agent.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.agent.Agent.user">
+<span class="sig-name descname"><span class="pre">user</span></span><a class="headerlink" haccess="#caps.models.agent.Agent.user" title="Link to this definition"></a></dt>
+<dd><p>Agent targets this user.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.agent.Agent.user_id">
+<span class="sig-name descname"><span class="pre">user_id</span></span><a class="headerlink" haccess="#caps.models.agent.Agent.user_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="caps.models.agent.AgentQuerySet">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AgentQuerySet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">using</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/agent.html#AgentQuerySet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.agent.AgentQuerySet" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xaccess py py-class docutils literal notranslate"><span class="pre">QuerySet</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.agent.AgentQuerySet.group">
+<span class="sig-name descname"><span class="pre">group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/agent.html#AgentQuerySet.group"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.agent.AgentQuerySet.group" title="Link to this definition"></a></dt>
+<dd><p>Filter by group.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="Share internal" haccess="#caps.models.agent.AgentQuerySet" title="caps.models.agent.AgentQuerySet"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">AgentQuerySet</span></code></a></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>group</strong> (<em>Group</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.agent.AgentQuerySet.user">
+<span class="sig-name descname"><span class="pre">user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/agent.html#AgentQuerySet.user"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.agent.AgentQuerySet.user" title="Link to this definition"></a></dt>
+<dd><p>Filter by user or its groups.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">User</span></code></span>) – User</p></li>
+<li><p><strong>strict</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – if False, search on user’s groups.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="Share internal" haccess="#caps.models.agent.AgentQuerySet" title="caps.models.agent.AgentQuerySet"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">AgentQuerySet</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="caps-models-capability">
+<h2>caps.models.capability<a class="headerlink" haccess="#caps-models-capability" title="Link to this heading"></a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="caps.models.capability.CanOne">
+<span class="sig-name descname"><span class="pre">CanOne</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">TypeAlias</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">django.contrib.auth.models.Permission</span> <span class="pre">|</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">tuple[str,</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">django.contrib.contenttypes.models.ContentType</span> <span class="pre">|</span> <span class="pre">type]</span></em><a class="headerlink" haccess="#caps.models.capability.CanOne" title="Link to this definition"></a></dt>
+<dd><p>Describe lookup for a capability’s permission.</p>
+<p>It either can be:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>A Permission or a permission id;</p></li>
+<li><p>A tuple with Permission codename, and content type (id,       ContentType instance, or model class);</p></li>
+</ul>
+</div></blockquote>
+<p>It is used by <a class="Share internal" haccess="#caps.models.capability.CapabilityQuerySet.can" title="caps.models.capability.CapabilityQuerySet.can"><code class="xaccess py py-meth docutils literal notranslate"><span class="pre">CapabilityQuerySet.can()</span></code></a></p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="caps.models.capability.CanMany">
+<span class="sig-name descname"><span class="pre">CanMany</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">TypeAlias</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">django.contrib.auth.models.Permission</span> <span class="pre">|</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">tuple[str,</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">django.contrib.contenttypes.models.ContentType</span> <span class="pre">|</span> <span class="pre">type]</span> <span class="pre">|</span> <span class="pre">collections.abc.Iterable[django.contrib.auth.models.Permission</span> <span class="pre">|</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">tuple[str,</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">django.contrib.contenttypes.models.ContentType</span> <span class="pre">|</span> <span class="pre">type]]</span></em><a class="headerlink" haccess="#caps.models.capability.CanMany" title="Link to this definition"></a></dt>
+<dd><p>Describe lookup value for multiple capabilities’ description.</p>
+<p>It is used by <a class="Share internal" haccess="#caps.models.capability.CapabilityQuerySet.can" title="caps.models.capability.CapabilityQuerySet.can"><code class="xaccess py py-meth docutils literal notranslate"><span class="pre">CapabilityQuerySet.can()</span></code></a></p>
+</dd></dl>
+
+<dl class="py class" id="module-caps.models.capability">
+<dt class="sig sig-object py" id="caps.models.capability.Capability">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Capability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/capability.html#Capability"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.capability.Capability" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xaccess py py-class docutils literal notranslate"><span class="pre">Model</span></code></p>
+<p>A single capability providing permission for executing a single action.</p>
+<p>It is linked to an object by a <a class="Share internal" haccess="#caps.models.Share.Share" title="caps.models.Share.Share"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">Share</span></code></a>. The Share
+is the entry point for user to address/access the object. The capability represent
+what he can do.</p>
+<p>This model is provided as abstract model whose implementation MUST provide
+a <code class="docutils literal notranslate"><span class="pre">Share</span></code> foreign key to a <a class="Share internal" haccess="#caps.models.Share.Share" title="caps.models.Share.Share"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">Share</span></code></a> (reverse
+relation: <cite>capabilities</cite>). The foreign key is nullable, <code class="docutils literal notranslate"><span class="pre">None</span></code> have special
+meaning: it represents default assigned capabilities to newly created root Share instances. They can be fetched using <code class="xaccess py py-meth docutils literal notranslate"><span class="pre">CapabilityQuerySet.get_initials()</span></code>.</p>
+<p>See <a class="Share internal" haccess="#caps.models.Share.Share" title="caps.models.Share.Share"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">Share</span></code></a> documentation for more information.</p>
+<p>It is recommanded to <code class="docutils literal notranslate"><span class="pre">select_related</span></code> permission in order to read
+<code class="xaccess py py-attr docutils literal notranslate"><span class="pre">name</span></code> and <code class="xaccess py py-attr docutils literal notranslate"><span class="pre">codename</span></code>.</p>
+<section id="derivation">
+<h3>Derivation<a class="headerlink" haccess="#derivation" title="Link to this heading"></a></h3>
+<p>Capability can derived: it means the permission is shared to another agent.
+To be allowed to share, <a class="Share internal" haccess="#caps.models.capability.Capability.max_derive" title="caps.models.capability.Capability.max_derive"><code class="xaccess py py-attr docutils literal notranslate"><span class="pre">max_derive</span></code></a> must be greater than 0. When sharing
+only a lower value is allowed to the new capability’s field.</p>
+<p>Lets see what it does:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">models</span><span class="w"> </span><span class="kn">import</span> <span class="n">MyObject</span>
+
+<span class="n">permission</span> <span class="o">=</span> <span class="n">Permission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+<span class="n">cap</span> <span class="o">=</span> <span class="n">MyObject</span><span class="o">.</span><span class="n">Capability</span><span class="p">(</span><span class="n">permission</span><span class="o">=</span><span class="n">permission</span><span class="p">,</span> <span class="n">max_derive</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="c1">#  `cap` is not saved, we don&#39;t core to provide a Share for this example.</span>
+
+<span class="c1"># providing no max_derive defaults to 0</span>
+<span class="n">cap_1</span> <span class="o">=</span> <span class="n">cap</span><span class="o">.</span><span class="n">derive</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">cap_1</span><span class="o">.</span><span class="n">max_derive</span> <span class="o">==</span> <span class="mi">0</span>
+
+<span class="c1"># this raises PermissionDenied</span>
+<span class="n">cap_1</span><span class="o">.</span><span class="n">derive</span><span class="p">()</span>
+
+<span class="c1"># max_derive reduced by 1</span>
+<span class="n">cap_1</span> <span class="o">=</span> <span class="n">cap</span><span class="o">.</span><span class="n">derive</span><span class="p">()</span>
+<span class="k">assert</span> <span class="n">cap_1</span><span class="o">.</span><span class="n">max_derive</span> <span class="o">==</span> <span class="mi">1</span>
+
+<span class="n">cap_2</span> <span class="o">=</span> <span class="n">cap_1</span><span class="o">.</span><span class="n">derive</span><span class="p">()</span>
+<span class="k">assert</span> <span class="n">cap_2</span><span class="o">.</span><span class="n">max_derive</span> <span class="o">==</span> <span class="mi">0</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="caps.models.capability.Capability.Meta">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Meta</span></span><a class="Share internal" haccess="../_modules/caps/models/capability.html#Capability.Meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.capability.Capability.Meta" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xaccess py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.capability.Capability.Meta.abstract">
+<span class="sig-name descname"><span class="pre">abstract</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" haccess="#caps.models.capability.Capability.Meta.abstract" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.capability.Capability.Meta.unique_together">
+<span class="sig-name descname"><span class="pre">unique_together</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(('Share',</span> <span class="pre">'permission_id'),)</span></em><a class="headerlink" haccess="#caps.models.capability.Capability.Meta.unique_together" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.capability.Capability.can_derive">
+<span class="sig-name descname"><span class="pre">can_derive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_derive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/capability.html#Capability.can_derive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.capability.Capability.can_derive" title="Link to this definition"></a></dt>
+<dd><p>Return True if this capability can be derived.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">bool</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>max_derive</strong> (<em>None</em><em> | </em><em>int</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.capability.Capability.derive">
+<span class="sig-name descname"><span class="pre">derive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_derive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Share</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/capability.html#Capability.derive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.capability.Capability.derive" title="Link to this definition"></a></dt>
+<dd><p>Derive a new capability from self (without checking existence in
+database).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="Share internal" haccess="#caps.models.capability.Capability" title="caps.models.capability.Capability"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">Capability</span></code></a></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>max_derive</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xaccess py py-obj docutils literal notranslate"><span class="pre">None</span></code> | <code class="xaccess py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – when value is None, it will based the value on self’s                 py:attr:<cite>max_derive</cite> minus 1.</p></li>
+<li><p><strong>**kwargs</strong> – <p>extra initial argument of the new Capability</p>
+</p></li>
+</ul>
+</dd>
+</dl>
+<p>:return the new unsaved Capability.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Yield PermissionDenied<span class="colon">:</span></dt>
+<dd class="field-odd"><p>when Capability derivation is not allowed.</p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>max_derive</strong> (<em>None</em><em> | </em><em>int</em>)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="Share internal" haccess="#caps.models.capability.Capability" title="caps.models.capability.Capability"><em>Capability</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.capability.Capability.get_object_class">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_object_class</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/capability.html#Capability.get_object_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.capability.Capability.get_object_class" title="Link to this definition"></a></dt>
+<dd><p>Return related Object class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.capability.Capability.get_Share_class">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_Share_class</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/capability.html#Capability.get_Share_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.capability.Capability.get_Share_class" title="Link to this definition"></a></dt>
+<dd><p>Return related Share class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.capability.Capability.is_derived">
+<span class="sig-name descname"><span class="pre">is_derived</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">capability</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/capability.html#Capability.is_derived"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.capability.Capability.is_derived" title="Link to this definition"></a></dt>
+<dd><p>Return True if <cite>capability</cite> is derived from this one.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">bool</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>capability</strong> (<a class="Share internal" haccess="#caps.models.capability.Capability" title="caps.models.capability.Capability"><em>Capability</em></a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.capability.Capability.max_derive">
+<span class="sig-name descname"><span class="pre">max_derive</span></span><a class="headerlink" haccess="#caps.models.capability.Capability.max_derive" title="Link to this definition"></a></dt>
+<dd><p>Maximum allowed derivations.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.capability.Capability.objects">
+<span class="sig-name descname"><span class="pre">objects</span></span><a class="headerlink" haccess="#caps.models.capability.Capability.objects" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.capability.Capability.permission">
+<span class="sig-name descname"><span class="pre">permission</span></span><a class="headerlink" haccess="#caps.models.capability.Capability.permission" title="Link to this definition"></a></dt>
+<dd><p>Related permission</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.capability.Capability.permission_id">
+<span class="sig-name descname"><span class="pre">permission_id</span></span><a class="headerlink" haccess="#caps.models.capability.Capability.permission_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="caps.models.capability.CapabilityQuerySet">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CapabilityQuerySet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">using</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/capability.html#CapabilityQuerySet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.capability.CapabilityQuerySet" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xaccess py py-class docutils literal notranslate"><span class="pre">QuerySet</span></code></p>
+<p>Queryset and manager used by Capability models.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.capability.CapabilityQuerySet.can">
+<span class="sig-name descname"><span class="pre">can</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">permissions</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/capability.html#CapabilityQuerySet.can"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.capability.CapabilityQuerySet.can" title="Link to this definition"></a></dt>
+<dd><p>Filter using provided permission.</p>
+<p>When permission is an iterable, it will perform an OR conditional statement
+between all provided values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>permissions</strong> (<span class="sphinx_autodoc_typehints-type">CanMany</span>) – permissions to filter.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="Share internal" haccess="#caps.models.capability.CapabilityQuerySet" title="caps.models.capability.CapabilityQuerySet"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">CapabilityQuerySet</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.capability.CapabilityQuerySet.can_one_lookup">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">can_one_lookup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">permission</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">paccessix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'permission__'</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/capability.html#CapabilityQuerySet.can_one_lookup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.capability.CapabilityQuerySet.can_one_lookup" title="Link to this definition"></a></dt>
+<dd><p>Return lookup for one permission.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xaccess py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xaccess py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xaccess py py-class docutils literal notranslate"><span class="pre">int</span></code>]</span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>permission</strong> (<span class="sphinx_autodoc_typehints-type">CanOne</span>) – to get lookup for.</p></li>
+<li><p><strong>paccessix</strong> – paccessix keys with this value.</p></li>
+</ul>
+</dd>
+</dl>
+<p>:return lookup argument dictionnary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Yield ValueError<span class="colon">:</span></dt>
+<dd class="field-odd"><p>on unsupported <code class="docutils literal notranslate"><span class="pre">permission</span></code> types.</p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>permission</strong> (<em>CanOne</em>)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[str, str | int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.capability.CapabilityQuerySet.initials">
+<span class="sig-name descname"><span class="pre">initials</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/capability.html#CapabilityQuerySet.initials"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.capability.CapabilityQuerySet.initials" title="Link to this definition"></a></dt>
+<dd><p>Filter capabilities used as initial values of a Share.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-caps.models.capability_set">
+<span id="caps-models-capability-set"></span><h2>caps.models.capability_set<a class="headerlink" haccess="#module-caps.models.capability_set" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="caps.models.capability_set.CapabilitySet">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CapabilitySet</span></span><a class="Share internal" haccess="../_modules/caps/models/capability_set.html#CapabilitySet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.capability_set.CapabilitySet" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xaccess py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base class to handle set of capabilities.</p>
+<p>This class should not be used per se.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.capability_set.CapabilitySet.Cap">
+<span class="sig-name descname"><span class="pre">Cap</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span> <span class="pre">|</span> <span class="pre">tuple[int,</span> <span class="pre">int]</span></em><a class="headerlink" haccess="#caps.models.capability_set.CapabilitySet.Cap" title="Link to this definition"></a></dt>
+<dd><p>Capability information, as tuple of <code class="docutils literal notranslate"><span class="pre">(permission_id,</span> <span class="pre">max_derive)</span></code> or single permission
+id (then <code class="docutils literal notranslate"><span class="pre">max_derive</span> <span class="pre">is</span> <span class="pre">None</span></code>).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.capability_set.CapabilitySet.Capability">
+<span class="sig-name descname"><span class="pre">Capability</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">type[Capability]</span> <span class="pre">|</span> <span class="pre">Permission</span></em><a class="headerlink" haccess="#caps.models.capability_set.CapabilitySet.Capability" title="Link to this definition"></a></dt>
+<dd><p>Capability class to use. It must be set in order to use CapabilitySet.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.capability_set.CapabilitySet.Caps">
+<span class="sig-name descname"><span class="pre">Caps</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Iterable[CapabilitySet.Cap]</span></em><a class="headerlink" haccess="#caps.models.capability_set.CapabilitySet.Caps" title="Link to this definition"></a></dt>
+<dd><p>Many capability information.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.capability_set.CapabilitySet.capabilities">
+<span class="sig-name descname"><span class="pre">capabilities</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Iterable[Capability]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" haccess="#caps.models.capability_set.CapabilitySet.capabilities" title="Link to this definition"></a></dt>
+<dd><p>Capabilities contained in the CapabilitySet.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.capability_set.CapabilitySet.create_capabilities">
+<span class="sig-name descname"><span class="pre">create_capabilities</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">caps</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/capability_set.html#CapabilitySet.create_capabilities"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.capability_set.CapabilitySet.create_capabilities" title="Link to this definition"></a></dt>
+<dd><p>Create multiple capabilities based on descriptors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>caps</strong> – capabilities’ informations</p></li>
+<li><p><strong>**kwargs</strong> – <p>extra initial arguments</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[CapabilitySet.Capability]</p>
+</dd>
+</dl>
+<p>:return a list of unsaved capabilities instances.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.capability_set.CapabilitySet.create_capability">
+<span class="sig-name descname"><span class="pre">create_capability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cap</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/capability_set.html#CapabilitySet.create_capability"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.capability_set.CapabilitySet.create_capability" title="Link to this definition"></a></dt>
+<dd><p>Create a single (unsaved) capability.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cap</strong> – capability information</p></li>
+<li><p><strong>**kwargs</strong> – <p>extra initial arguments</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>CapabilitySet.Capability</p>
+</dd>
+</dl>
+<p>:return the new unsaved capability instance.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.capability_set.CapabilitySet.derive_caps">
+<span class="sig-name descname"><span class="pre">derive_caps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">caps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raises</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/capability_set.html#CapabilitySet.derive_caps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.capability_set.CapabilitySet.derive_caps" title="Link to this definition"></a></dt>
+<dd><p>Derive capabilities from this set.</p>
+<p>When <cite>caps</cite> is provided, it will only derive allowed derivations for declared capabilities.</p>
+<p>When <cite>caps</cite> is not provided, it derives all allowed capabilities of the set.</p>
+<p>The created capabilities are not saved to the db.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source</strong> – capabilities to derive</p></li>
+<li><p><strong>caps</strong> – specify which capabilities to derive</p></li>
+<li><p><strong>raises</strong> – if True, raise exception when there are denied derivation.</p></li>
+<li><p><strong>defaults</strong> – initial arguments to pass to all generated capabilities.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[<a class="Share internal" haccess="#caps.models.capability.Capability" title="caps.models.capability.Capability">Capability</a>]</p>
+</dd>
+</dl>
+<p>:return the list of derived capabilities.
+:yield PermissionDenied: when there are unauthorized derivation and <a haccess="#id7"><span class="problematic" id="id8">:py:param:`raises`</span></a> is True.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.capability_set.CapabilitySet.get_capabilities">
+<span class="sig-name descname"><span class="pre">get_capabilities</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/capability_set.html#CapabilitySet.get_capabilities"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.capability_set.CapabilitySet.get_capabilities" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<a class="Share internal" haccess="#caps.models.capability.Capability" title="caps.models.capability.Capability"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">Capability</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.capability_set.CapabilitySet.get_capability">
+<span class="sig-name descname"><span class="pre">get_capability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">codename</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/capability_set.html#CapabilitySet.get_capability"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.capability_set.CapabilitySet.get_capability" title="Link to this definition"></a></dt>
+<dd><p>Get capability by name or None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="Share internal" haccess="#caps.models.capability.Capability" title="caps.models.capability.Capability"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">Capability</span></code></a> | <code class="xaccess py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>codename</strong> (<em>str</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.capability_set.CapabilitySet.get_capability_kwargs">
+<span class="sig-name descname"><span class="pre">get_capability_kwargs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/capability_set.html#CapabilitySet.get_capability_kwargs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.capability_set.CapabilitySet.get_capability_kwargs" title="Link to this definition"></a></dt>
+<dd><p>From provided <code class="docutils literal notranslate"><span class="pre">cap</span></code> description, return a tuple with permission id and <code class="xaccess py py-meth docutils literal notranslate"><span class="pre">Capability.derive()</span></code> arguments.</p>
+<p>We return a tuple because permission id can not be provided
+to the derive method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cap</strong> – the capability descriptor;</p></li>
+<li><p><strong>**kwargs</strong> – <p>extra arguments to pass down to the method;</p>
+</p></li>
+<li><p><strong>defaults</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple[int, dict[str, Any]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.capability_set.CapabilitySet.is_derived">
+<span class="sig-name descname"><span class="pre">is_derived</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/capability_set.html#CapabilitySet.is_derived"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.capability_set.CapabilitySet.is_derived" title="Link to this definition"></a></dt>
+<dd><p>Return True if <cite>capabilities</cite> iterable is a subset of self.</p>
+<p>Set is a subset of another one if and only if:
+- all capabilities of subset are in set and derived from set           (cf. <cite>Capability.is_subset</cite>)
+- there is no capability inside subset that are not in set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">bool</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>other</strong> (<a class="Share internal" haccess="#caps.models.capability_set.CapabilitySet" title="caps.models.capability_set.CapabilitySet"><em>CapabilitySet</em></a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-caps.models.Share">
+<span id="caps-models-Share"></span><h2>caps.models.Share<a class="headerlink" haccess="#module-caps.models.Share" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="caps.models.Share.Share">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Share</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/Share.html#Share"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.Share.Share" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="Share internal" haccess="#caps.models.capability_set.CapabilitySet" title="caps.models.capability_set.CapabilitySet"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">CapabilitySet</span></code></a>, <code class="xaccess py py-class docutils literal notranslate"><span class="pre">Model</span></code></p>
+<p>Share are the entry point to access an <code class="xaccess py py-class docutils literal notranslate"><span class="pre">Object</span></code>.</p>
+<p>Share provides a set of capabilities for specific receiver.
+The concrete sub-model MUST provide the <code class="docutils literal notranslate"><span class="pre">target</span></code> foreign key to an
+Object.</p>
+<p>There are two kind of Share:</p>
+<ul class="simple">
+<li><p>root: the root Share from which all other Shares to object
+are derived. Created from the <code class="xaccess py py-meth docutils literal notranslate"><span class="pre">create()</span></code> class method.</p></li>
+<li><p>derived: Share derived from root or another derived. Created
+from the <a class="Share internal" haccess="#caps.models.Share.Share.derive" title="caps.models.Share.Share.derive"><code class="xaccess py py-meth docutils literal notranslate"><span class="pre">derive()</span></code></a> method.</p></li>
+</ul>
+<p>This class enforce fields validation at <cite>save()</cite> and <cite>bulk_create()</cite>.</p>
+<section id="concrete-Share-and-capability">
+<h3>Concrete Share and Capability<a class="headerlink" haccess="#concrete-Share-and-capability" title="Link to this heading"></a></h3>
+<p>This model is implemented as an abstract in order to have a Share
+specific to each model (see <code class="xaccess py py-class docutils literal notranslate"><span class="pre">Object</span></code> abstract model).</p>
+<p>The related <a class="Share internal" haccess="#caps.models.Share.Share.Capability" title="caps.models.Share.Share.Capability"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">Capability</span></code></a> subclass is created at the same
+time as the concrete implementing Share model. The same mechanism
+also applies on <code class="xaccess py py-class docutils literal notranslate"><span class="pre">Object</span></code> for Share, as they both use
+base metaclass <code class="xaccess py py-class docutils literal notranslate"><span class="pre">NestedBase</span></code>. They thus can be customized
+if required as this example shows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">caps.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Share</span><span class="p">,</span> <span class="n">Capability</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MyShare</span><span class="p">(</span><span class="n">Share</span><span class="p">):</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Capability</span><span class="p">(</span><span class="n">Capability</span><span class="p">):</span>
+        <span class="n">Share</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">MyShare</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s2">&quot;capabilities&quot;</span><span class="p">)</span>
+        <span class="c1"># custom code here...</span>
+
+    <span class="n">target</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">MyObject</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.Share.Share.Cap">
+<span class="sig-name descname"><span class="pre">Cap</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span> <span class="pre">|</span> <span class="pre">tuple[int,</span> <span class="pre">int]</span></em><a class="headerlink" haccess="#caps.models.Share.Share.Cap" title="Link to this definition"></a></dt>
+<dd><p>Capability information, as tuple of <code class="docutils literal notranslate"><span class="pre">(permission_id,</span> <span class="pre">max_derive)</span></code> or single permission
+id (then <code class="docutils literal notranslate"><span class="pre">max_derive</span> <span class="pre">is</span> <span class="pre">None</span></code>).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.Share.Share.Capability">
+<span class="sig-name descname"><span class="pre">Capability</span></span><a class="headerlink" haccess="#caps.models.Share.Share.Capability" title="Link to this definition"></a></dt>
+<dd><p>alias of <code class="xaccess py py-class docutils literal notranslate"><span class="pre">ShareCapability</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.Share.Share.Caps">
+<span class="sig-name descname"><span class="pre">Caps</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Iterable[CapabilitySet.Cap]</span></em><a class="headerlink" haccess="#caps.models.Share.Share.Caps" title="Link to this definition"></a></dt>
+<dd><p>Many capability information.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="caps.models.Share.Share.Meta">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Meta</span></span><a class="Share internal" haccess="../_modules/caps/models/Share.html#Share.Meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.Share.Share.Meta" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xaccess py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.Share.Share.Meta.abstract">
+<span class="sig-name descname"><span class="pre">abstract</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" haccess="#caps.models.Share.Share.Meta.abstract" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.Share.Share.Meta.unique_together">
+<span class="sig-name descname"><span class="pre">unique_together</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(('origin',</span> <span class="pre">'receiver',</span> <span class="pre">'target'),)</span></em><a class="headerlink" haccess="#caps.models.Share.Share.Meta.unique_together" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.Share.Share.aderive">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">aderive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">items</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raises</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/Share.html#Share.aderive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.Share.Share.aderive" title="Link to this definition"></a></dt>
+<dd><p>Async version of <a class="Share internal" haccess="#caps.models.Share.Share.derive" title="caps.models.Share.Share.derive"><code class="xaccess py py-meth docutils literal notranslate"><span class="pre">derive()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>items</strong> (<em>CapabilitySet.Caps</em>)</p></li>
+<li><p><strong>raises</strong> (<em>bool</em>)</p></li>
+<li><p><strong>defaults</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="Share internal" haccess="#caps.models.Share.Share" title="caps.models.Share.Share">Share</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.Share.Share.create_root">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_root</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">emitter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/Share.html#Share.create_root"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.Share.Share.create_root" title="Link to this definition"></a></dt>
+<dd><p>Create and save a new root Share with provided capabilities.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="Share internal" haccess="#caps.models.Share.Share" title="caps.models.Share.Share"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">Share</span></code></a></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>emitter</strong> (<a class="Share internal" haccess="#caps.models.agent.Agent" title="caps.models.agent.Agent"><em>Agent</em></a>)</p></li>
+<li><p><strong>target</strong> (<em>object</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.Share.Share.depth">
+<span class="sig-name descname"><span class="pre">depth</span></span><a class="headerlink" haccess="#caps.models.Share.Share.depth" title="Link to this definition"></a></dt>
+<dd><p>Share chain’s current depth.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.Share.Share.derive">
+<span class="sig-name descname"><span class="pre">derive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">receiver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">items</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raises</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/Share.html#Share.derive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.Share.Share.derive" title="Link to this definition"></a></dt>
+<dd><p>Create a new Share derived from self.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>items</strong> – select capabilities to be derived.</p></li>
+<li><p><strong>raises</strong> – raises PermissionDenied error instead of silent it.</p></li>
+<li><p><strong>defaults</strong> – Capability instances’ initial arguments.</p></li>
+<li><p><strong>**kwargs</strong> – <p>initial arguments of the new set.</p>
+</p></li>
+<li><p><strong>receiver</strong> (<a class="Share internal" haccess="#caps.models.agent.Agent" title="caps.models.agent.Agent"><em>Agent</em></a><em> | </em><em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="Share internal" haccess="#caps.models.Share.Share" title="caps.models.Share.Share">Share</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="caps.models.Share.Share.emitter">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">emitter</span></span><a class="headerlink" haccess="#caps.models.Share.Share.emitter" title="Link to this definition"></a></dt>
+<dd><p>Agent emitting the Share.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.Share.Share.expiration">
+<span class="sig-name descname"><span class="pre">expiration</span></span><a class="headerlink" haccess="#caps.models.Share.Share.expiration" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.Share.Share.get_capabilities">
+<span class="sig-name descname"><span class="pre">get_capabilities</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/Share.html#Share.get_capabilities"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.Share.Share.get_capabilities" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="Share internal" haccess="#caps.models.capability.CapabilityQuerySet" title="caps.models.capability.CapabilityQuerySet"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">CapabilityQuerySet</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.Share.Share.is_derived">
+<span class="sig-name descname"><span class="pre">is_derived</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/Share.html#Share.is_derived"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.Share.Share.is_derived" title="Link to this definition"></a></dt>
+<dd><p>Return True if <cite>capabilities</cite> iterable is a subset of self.</p>
+<p>Set is a subset of another one if and only if:
+- all capabilities of subset are in set and derived from set           (cf. <cite>Capability.is_subset</cite>)
+- there is no capability inside subset that are not in set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">bool</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>other</strong> (<a class="Share internal" haccess="#caps.models.Share.Share" title="caps.models.Share.Share"><em>Share</em></a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.Share.Share.is_valid">
+<span class="sig-name descname"><span class="pre">is_valid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raises</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/Share.html#Share.is_valid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.Share.Share.is_valid" title="Link to this definition"></a></dt>
+<dd><p>Check Share values validity, throwing exception on invalid
+values.</p>
+<p>:returns True if valid, otherwise raise ValueError
+:yield ValueError: when Share is invaldi</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">bool</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>raises</strong> (<em>bool</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.Share.Share.objects">
+<span class="sig-name descname"><span class="pre">objects</span></span><a class="headerlink" haccess="#caps.models.Share.Share.objects" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.Share.Share.origin">
+<span class="sig-name descname"><span class="pre">origin</span></span><a class="headerlink" haccess="#caps.models.Share.Share.origin" title="Link to this definition"></a></dt>
+<dd><p>Source Share in Shares chain.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.Share.Share.origin_id">
+<span class="sig-name descname"><span class="pre">origin_id</span></span><a class="headerlink" haccess="#caps.models.Share.Share.origin_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.Share.Share.receiver">
+<span class="sig-name descname"><span class="pre">receiver</span></span><a class="headerlink" haccess="#caps.models.Share.Share.receiver" title="Link to this definition"></a></dt>
+<dd><p>Agent receiving capability.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.Share.Share.receiver_id">
+<span class="sig-name descname"><span class="pre">receiver_id</span></span><a class="headerlink" haccess="#caps.models.Share.Share.receiver_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.Share.Share.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/Share.html#Share.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.Share.Share.save" title="Link to this definition"></a></dt>
+<dd><p>Save the current instance. Override this in a subclass if you want to
+control the saving process.</p>
+<p>The ‘force_insert’ and ‘force_update’ parameters can be used to insist
+that the “save” must be an SQL insert or update (or equivalent for
+non-SQL backends), respectively. Normally, they should not be set.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.Share.Share.uuid">
+<span class="sig-name descname"><span class="pre">uuid</span></span><a class="headerlink" haccess="#caps.models.Share.Share.uuid" title="Link to this definition"></a></dt>
+<dd><p>Public Share used in API and with the external world.</p>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="caps.models.Share.ShareQuerySet">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ShareQuerySet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">using</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/Share.html#ShareQuerySet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.Share.ShareQuerySet" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xaccess py py-class docutils literal notranslate"><span class="pre">QuerySet</span></code></p>
+<p>QuerySet for Share classes.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="caps.models.Share.ShareQuerySet.Meta">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Meta</span></span><a class="Share internal" haccess="../_modules/caps/models/Share.html#ShareQuerySet.Meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.Share.ShareQuerySet.Meta" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xaccess py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.Share.ShareQuerySet.Meta.abstract">
+<span class="sig-name descname"><span class="pre">abstract</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" haccess="#caps.models.Share.ShareQuerySet.Meta.abstract" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.Share.ShareQuerySet.Meta.unique_together">
+<span class="sig-name descname"><span class="pre">unique_together</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(('receiver',</span> <span class="pre">'target',</span> <span class="pre">'emitter'),)</span></em><a class="headerlink" haccess="#caps.models.Share.ShareQuerySet.Meta.unique_together" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.Share.ShareQuerySet.bulk_create">
+<span class="sig-name descname"><span class="pre">bulk_create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">objs</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/Share.html#ShareQuerySet.bulk_create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.Share.ShareQuerySet.bulk_create" title="Link to this definition"></a></dt>
+<dd><p>Insert each of the instances into the database. Do <em>not</em> call
+save() on each of the instances, do not send any pre/post_save
+signals, and do not set the primary key attribute if it is an
+autoincrement field (except if features.can_return_rows_from_bulk_insert=True).
+Multi-table models are not supported.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.Share.ShareQuerySet.can">
+<span class="sig-name descname"><span class="pre">can</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">permissions</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/Share.html#ShareQuerySet.can"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.Share.ShareQuerySet.can" title="Link to this definition"></a></dt>
+<dd><p>Filter Shares with the provided permission(s).</p>
+<p>This call <a class="Share internal" haccess="#caps.models.capability.CapabilityQuerySet.can" title="caps.models.capability.CapabilityQuerySet.can"><code class="xaccess py py-meth docutils literal notranslate"><span class="pre">capability.CapabilityQuerySet.can()</span></code></a>, using the same parameters. Providing
+multiple values will make an OR conditional.</p>
+<p>If you want to filter based on AND please use <a class="Share internal" haccess="#caps.models.Share.ShareQuerySet.can_all" title="caps.models.Share.ShareQuerySet.can_all"><code class="xaccess py py-meth docutils literal notranslate"><span class="pre">can_all()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>permissions</strong> (<span class="sphinx_autodoc_typehints-type">CanMany</span>) – permissions to look for</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="Share internal" haccess="#caps.models.Share.ShareQuerySet" title="caps.models.Share.ShareQuerySet"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">ShareQuerySet</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.Share.ShareQuerySet.can_all">
+<span class="sig-name descname"><span class="pre">can_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">permissions</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/Share.html#ShareQuerySet.can_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.Share.ShareQuerySet.can_all" title="Link to this definition"></a></dt>
+<dd><p>Filter Shares with all the provided permissions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>permissions</strong> (<span class="sphinx_autodoc_typehints-type">CanMany</span>) – permissions to look for, same argument type as <a class="Share internal" haccess="#caps.models.capability.CapabilityQuerySet.can" title="caps.models.capability.CapabilityQuerySet.can"><code class="xaccess py py-meth docutils literal notranslate"><span class="pre">capability.CapabilityQuerySet.can()</span></code></a>.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="Share internal" haccess="#caps.models.Share.ShareQuerySet" title="caps.models.Share.ShareQuerySet"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">ShareQuerySet</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.Share.ShareQuerySet.emitter">
+<span class="sig-name descname"><span class="pre">emitter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">agent</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/Share.html#ShareQuerySet.emitter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.Share.ShareQuerySet.emitter" title="Link to this definition"></a></dt>
+<dd><p>Shares for the provided emitter(s).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="Share internal" haccess="#caps.models.Share.ShareQuerySet" title="caps.models.Share.ShareQuerySet"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">ShareQuerySet</span></code></a></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>agent</strong> (<a class="Share internal" haccess="#caps.models.agent.Agent" title="caps.models.agent.Agent"><em>Agent</em></a><em> | </em><em>Iterable</em><em>[</em><a class="Share internal" haccess="#caps.models.agent.Agent" title="caps.models.agent.Agent"><em>Agent</em></a><em>]</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.Share.ShareQuerySet.receiver">
+<span class="sig-name descname"><span class="pre">receiver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">agent</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/Share.html#ShareQuerySet.receiver"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.Share.ShareQuerySet.receiver" title="Link to this definition"></a></dt>
+<dd><p>Shares for the provided receiver(s).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="Share internal" haccess="#caps.models.Share.ShareQuerySet" title="caps.models.Share.ShareQuerySet"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">ShareQuerySet</span></code></a></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>agent</strong> (<a class="Share internal" haccess="#caps.models.agent.Agent" title="caps.models.agent.Agent"><em>Agent</em></a><em> | </em><em>Iterable</em><em>[</em><a class="Share internal" haccess="#caps.models.agent.Agent" title="caps.models.agent.Agent"><em>Agent</em></a><em>]</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.Share.ShareQuerySet.access">
+<span class="sig-name descname"><span class="pre">access</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">receiver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uuid</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/Share.html#ShareQuerySet.access"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.Share.ShareQuerySet.access" title="Link to this definition"></a></dt>
+<dd><p>Share by uuid and receiver(s).</p>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">receiver</span></code> is provided as first parameter in order to enforce its usage. It however can be <code class="docutils literal notranslate"><span class="pre">None</span></code>: this only
+should be used when queryset has already been filtered by receiver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>receiver</strong> (<span class="sphinx_autodoc_typehints-type"><a class="Share internal" haccess="#caps.models.agent.Agent" title="caps.models.agent.Agent"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">Agent</span></code></a> | <code class="xaccess py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<a class="Share internal" haccess="#caps.models.agent.Agent" title="caps.models.agent.Agent"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">Agent</span></code></a>] | <code class="xaccess py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – the agent that retrieving the Share.</p></li>
+<li><p><strong>uuid</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">UUID</span></code></span>) – the Share uuid to fetch.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Yield DoesNotExist<span class="colon">:</span></dt>
+<dd class="field-even"><p>when the Share is not found.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="Share internal" haccess="#caps.models.Share.ShareQuerySet" title="caps.models.Share.ShareQuerySet"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">ShareQuerySet</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.Share.ShareQuerySet.accesses">
+<span class="sig-name descname"><span class="pre">accesses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">receiver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uuids</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/Share.html#ShareQuerySet.accesses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.Share.ShareQuerySet.accesses" title="Link to this definition"></a></dt>
+<dd><p>Shares by many uuid and receiver(s).</p>
+<p>Please accesser to <a class="Share internal" haccess="#caps.models.Share.ShareQuerySet.access" title="caps.models.Share.ShareQuerySet.access"><code class="xaccess py py-meth docutils literal notranslate"><span class="pre">ShareQuerySet.access()</span></code></a> for more information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>receiver</strong> (<span class="sphinx_autodoc_typehints-type"><a class="Share internal" haccess="#caps.models.agent.Agent" title="caps.models.agent.Agent"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">Agent</span></code></a> | <code class="xaccess py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<a class="Share internal" haccess="#caps.models.agent.Agent" title="caps.models.agent.Agent"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">Agent</span></code></a>] | <code class="xaccess py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – the agent that retrieving the Share.</p></li>
+<li><p><strong>uuids</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xaccess py py-class docutils literal notranslate"><span class="pre">UUID</span></code>]</span>) – an iterable of uuids to fetch</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="Share internal" haccess="#caps.models.Share.ShareQuerySet" title="caps.models.Share.ShareQuerySet"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">ShareQuerySet</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-caps.models.object">
+<span id="caps-models-object"></span><h2>caps.models.object<a class="headerlink" haccess="#module-caps.models.object" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="caps.models.object.Object">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/object.html#Object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.object.Object" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xaccess py py-class docutils literal notranslate"><span class="pre">Model</span></code></p>
+<p>An object accessible through Shares.</p>
+<p>It can have a member <cite>Share</cite> (subclass of
+<cite>caps.models.Share</cite>) that is used as object’s specific
+Share. If none is provided, a it will be generated automatically
+for concrete classes.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">Capability</span></code> concrete model class will be set at creation, when
+the related <a class="Share internal" haccess="#caps.models.object.Object.Share" title="caps.models.object.Object.Share"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">Share</span></code></a> is created.</p>
+<p>This provides:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="Share internal" haccess="#caps.models.object.Object.Share" title="caps.models.object.Object.Share"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">Share</span></code></a> concrete model accessible from the <a class="Share internal" haccess="#caps.models.object.Object" title="caps.models.object.Object"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">Object</span></code></a> concrete subclass;</p></li>
+<li><p><a class="Share internal" haccess="#caps.models.object.Object.Capability" title="caps.models.object.Object.Capability"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">Capability</span></code></a> concrete model accessible from the <a class="Share internal" haccess="#caps.models.object.Object" title="caps.models.object.Object"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">Object</span></code></a> concrete subclass;</p></li>
+</ul>
+</div></blockquote>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.object.Object.Capability">
+<span class="sig-name descname"><span class="pre">Capability</span></span><a class="headerlink" haccess="#caps.models.object.Object.Capability" title="Link to this definition"></a></dt>
+<dd><p>alias of <code class="xaccess py py-class docutils literal notranslate"><span class="pre">ObjectShareCapability</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="caps.models.object.Object.Meta">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Meta</span></span><a class="Share internal" haccess="../_modules/caps/models/object.html#Object.Meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.object.Object.Meta" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xaccess py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.object.Object.Meta.abstract">
+<span class="sig-name descname"><span class="pre">abstract</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" haccess="#caps.models.object.Object.Meta.abstract" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.object.Object.Share">
+<span class="sig-name descname"><span class="pre">Share</span></span><a class="headerlink" haccess="#caps.models.object.Object.Share" title="Link to this definition"></a></dt>
+<dd><p>alias of <code class="xaccess py py-class docutils literal notranslate"><span class="pre">ObjectShare</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.object.Object.objects">
+<span class="sig-name descname"><span class="pre">objects</span></span><a class="headerlink" haccess="#caps.models.object.Object.objects" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.object.Object.Share">
+<span class="sig-name descname"><span class="pre">Share</span></span><a class="headerlink" haccess="#caps.models.object.Object.Share" title="Link to this definition"></a></dt>
+<dd><p>Return Share to this object for receiver provided to
+ObjectQuerySet’s <cite>access()</cite> or <cite>accesses()</cite>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="caps.models.object.ObjectBase">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ObjectBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/object.html#ObjectBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.object.ObjectBase" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="Share internal" haccess="#caps.models.nested.NestedBase" title="caps.models.nested.NestedBase"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">NestedBase</span></code></a></p>
+<p>Metaclass for Object model classes.</p>
+<p>It subclass Share if no <cite>Share</cite> member is provided.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.object.ObjectBase.create_nested_class">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_nested_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_class</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/object.html#ObjectBase.create_nested_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.object.ObjectBase.create_nested_class" title="Link to this definition"></a></dt>
+<dd><p>Provide <cite>target</cite> ForeignKey on nested Share model.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.object.ObjectBase.nested_class">
+<span class="sig-name descname"><span class="pre">nested_class</span></span><a class="headerlink" haccess="#caps.models.object.ObjectBase.nested_class" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="Share internal" haccess="#caps.models.Share.Share" title="caps.models.Share.Share"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">Share</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.object.ObjectBase.nested_name">
+<span class="sig-name descname"><span class="pre">nested_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xaccess py py-class docutils literal notranslate"><span class="pre">str</span></code> <span class="pre">|</span> <code class="xaccess py py-obj docutils literal notranslate"><span class="pre">None</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Share'</span></em><a class="headerlink" haccess="#caps.models.object.ObjectBase.nested_name" title="Link to this definition"></a></dt>
+<dd><p>Attribute and class name of the nested class. If not provided, takes it from <a class="Share internal" haccess="#caps.models.object.ObjectBase.nested_class" title="caps.models.object.ObjectBase.nested_class"><code class="xaccess py py-attr docutils literal notranslate"><span class="pre">nested_class</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="caps.models.object.ObjectQuerySet">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ObjectQuerySet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">using</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/object.html#ObjectQuerySet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.object.ObjectQuerySet" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xaccess py py-class docutils literal notranslate"><span class="pre">QuerySet</span></code></p>
+<p>QuerySet for Objects.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.object.ObjectQuerySet.receiver">
+<span class="sig-name descname"><span class="pre">receiver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">receiver</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/object.html#ObjectQuerySet.receiver"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.object.ObjectQuerySet.receiver" title="Link to this definition"></a></dt>
+<dd><p>Filter object for provided.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="Share internal" haccess="#caps.models.object.ObjectQuerySet" title="caps.models.object.ObjectQuerySet"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">ObjectQuerySet</span></code></a></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>receiver</strong> (<a class="Share internal" haccess="#caps.models.agent.Agent" title="caps.models.agent.Agent"><em>Agent</em></a><em> | </em><em>Iterable</em><em>[</em><a class="Share internal" haccess="#caps.models.agent.Agent" title="caps.models.agent.Agent"><em>Agent</em></a><em>]</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.object.ObjectQuerySet.access">
+<span class="sig-name descname"><span class="pre">access</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">receiver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uuid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accesses</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/object.html#ObjectQuerySet.access"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.object.ObjectQuerySet.access" title="Link to this definition"></a></dt>
+<dd><p>Return Share for provided receiver and uuid.</p>
+<p>This method annotates the Object with <code class="docutils literal notranslate"><span class="pre">agent_Share_set</span></code> whose value
+is set to relevant Share(s). This allows to use <code class="xaccess py py-attr docutils literal notranslate"><span class="pre">Share</span></code> property.</p>
+<p>Please accesser to <code class="xaccess py py-meth docutils literal notranslate"><span class="pre">ShareQuerySet.access()</span></code> for more information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>receiver</strong> (<span class="sphinx_autodoc_typehints-type"><a class="Share internal" haccess="#caps.models.agent.Agent" title="caps.models.agent.Agent"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">Agent</span></code></a> | <code class="xaccess py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<a class="Share internal" haccess="#caps.models.agent.Agent" title="caps.models.agent.Agent"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">Agent</span></code></a>] | <code class="xaccess py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – the Share’s receiver</p></li>
+<li><p><strong>uuid</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">UUID</span></code></span>) – Share uuid</p></li>
+<li><p><strong>accesses</strong> (<span class="sphinx_autodoc_typehints-type"><a class="Share internal" haccess="#caps.models.Share.ShareQuerySet" title="caps.models.Share.ShareQuerySet"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">ShareQuerySet</span></code></a> | <code class="xaccess py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – use this Share QuerySet</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="Share internal" haccess="#caps.models.object.ObjectQuerySet" title="caps.models.object.ObjectQuerySet"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">ObjectQuerySet</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.object.ObjectQuerySet.accesses">
+<span class="sig-name descname"><span class="pre">accesses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">receiver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uuids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accesses</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/object.html#ObjectQuerySet.accesses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.object.ObjectQuerySet.accesses" title="Link to this definition"></a></dt>
+<dd><p>Return Shares for provided receiver and uuids.</p>
+<p>Please accesser to <a class="Share internal" haccess="#caps.models.object.ObjectQuerySet.access" title="caps.models.object.ObjectQuerySet.access"><code class="xaccess py py-meth docutils literal notranslate"><span class="pre">access()</span></code></a> and <code class="xaccess py py-meth docutils literal notranslate"><span class="pre">ShareQuerySet.accesses()</span></code> for more information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>receiver</strong> (<span class="sphinx_autodoc_typehints-type"><a class="Share internal" haccess="#caps.models.agent.Agent" title="caps.models.agent.Agent"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">Agent</span></code></a> | <code class="xaccess py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<a class="Share internal" haccess="#caps.models.agent.Agent" title="caps.models.agent.Agent"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">Agent</span></code></a>] | <code class="xaccess py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – the Share’s receiver</p></li>
+<li><p><strong>uuids</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xaccess py py-class docutils literal notranslate"><span class="pre">UUID</span></code>]</span>) – Share uuids</p></li>
+<li><p><strong>accesses</strong> (<span class="sphinx_autodoc_typehints-type"><a class="Share internal" haccess="#caps.models.Share.ShareQuerySet" title="caps.models.Share.ShareQuerySet"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">ShareQuerySet</span></code></a> | <code class="xaccess py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – use this Share QuerySet</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="Share internal" haccess="#caps.models.object.ObjectQuerySet" title="caps.models.object.ObjectQuerySet"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">ObjectQuerySet</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.object.ObjectQuerySet.with_accesses">
+<span class="sig-name descname"><span class="pre">with_accesses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">accesses_queryset</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/object.html#ObjectQuerySet.with_accesses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.object.ObjectQuerySet.with_accesses" title="Link to this definition"></a></dt>
+<dd><p>Paccessetch provided Shares. Add Shares paccessetch for objects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="Share internal" haccess="#caps.models.object.ObjectQuerySet" title="caps.models.object.ObjectQuerySet"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">ObjectQuerySet</span></code></a></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>accesses_queryset</strong> (<em>QuerySet</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-caps.models.nested">
+<span id="caps-models-nested"></span><h2>caps.models.nested<a class="headerlink" haccess="#module-caps.models.nested" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="caps.models.nested.NestedBase">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NestedBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/nested.html#NestedBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.nested.NestedBase" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xaccess py py-class docutils literal notranslate"><span class="pre">ModelBase</span></code></p>
+<p>This metaclass allows to create nested model class based from parent one.</p>
+<p>By default, the method will first look for an existing declaration.
+If none is found it will create one with only the declared <a class="Share internal" haccess="#caps.models.nested.NestedBase.nested_class" title="caps.models.nested.NestedBase.nested_class"><code class="xaccess py py-attr docutils literal notranslate"><span class="pre">nested_class</span></code></a> as base. This means that you must manually declare any other parent class:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Nested</span><span class="p">:</span>
+    <span class="k">pass</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ParentBase</span><span class="p">(</span><span class="n">NestedBase</span><span class="p">):</span>
+    <span class="n">nested_class</span> <span class="o">=</span> <span class="n">Nested</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_nested_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="p">{}):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">create_nested_class</span><span class="p">(</span>
+            <span class="n">name</span><span class="p">,</span>
+            <span class="p">{</span><span class="s2">&quot;custom_field&quot;</span><span class="p">:</span> <span class="n">ForeignKey</span><span class="p">()}</span>
+        <span class="p">)</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Parent</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">NestedBase</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">A</span><span class="p">(</span><span class="n">Parent</span><span class="p">):</span>
+    <span class="c1"># you must declare its bases</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Nested</span><span class="p">(</span><span class="n">Nested</span><span class="p">):</span>
+        <span class="c1"># customize code here</span>
+        <span class="k">pass</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">C</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
+    <span class="c1"># you need to be explicit</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Nested</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">Nested</span><span class="p">):</span>
+        <span class="k">pass</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.nested.NestedBase.create_nested_class">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_nested_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_class</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/nested.html#NestedBase.create_nested_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.nested.NestedBase.create_nested_class" title="Link to this definition"></a></dt>
+<dd><p>Create the nested class for the provided container one to-be-created.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>new_class</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">type</span></code>[<code class="xaccess py py-class docutils literal notranslate"><span class="pre">object</span></code>]</span>) – the parent class that just has been created</p></li>
+<li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – nested class name</p></li>
+<li><p><strong>attrs</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xaccess py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xaccess py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</span>) – nested class attributes</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">type</span></code></span></p>
+</dd>
+</dl>
+<p>:return the newly created class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.nested.NestedBase.get_nested_class">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_nested_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_class</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/nested.html#NestedBase.get_nested_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.nested.NestedBase.get_nested_class" title="Link to this definition"></a></dt>
+<dd><p>Get nested model class or creates a new one.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>new_class</strong> (<em>type</em><em>[</em><em>object</em><em>]</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.nested.NestedBase.nested_class">
+<span class="sig-name descname"><span class="pre">nested_class</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xaccess py py-class docutils literal notranslate"><span class="pre">type</span></code><span class="pre">[</span><code class="xaccess py py-class docutils literal notranslate"><span class="pre">object</span></code><span class="pre">]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" haccess="#caps.models.nested.NestedBase.nested_class" title="Link to this definition"></a></dt>
+<dd><p>Nested class base to create.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.nested.NestedBase.nested_name">
+<span class="sig-name descname"><span class="pre">nested_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xaccess py py-class docutils literal notranslate"><span class="pre">str</span></code> <span class="pre">|</span> <code class="xaccess py py-obj docutils literal notranslate"><span class="pre">None</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" haccess="#caps.models.nested.NestedBase.nested_name" title="Link to this definition"></a></dt>
+<dd><p>Attribute and class name of the nested class. If not provided, takes it from <a class="Share internal" haccess="#caps.models.nested.NestedBase.nested_class" title="caps.models.nested.NestedBase.nested_class"><code class="xaccess py py-attr docutils literal notranslate"><span class="pre">nested_class</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.nested.NestedBase.new_name">
+<span class="sig-name descname"><span class="pre">new_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xaccess py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'{class_name}{nested_name}'</span></em><a class="headerlink" haccess="#caps.models.nested.NestedBase.new_name" title="Link to this definition"></a></dt>
+<dd><p>Name format for newly created classes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.nested.NestedBase.set_meta">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_meta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attrs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">set</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="Share internal" haccess="../_modules/caps/models/nested.html#NestedBase.set_meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" haccess="#caps.models.nested.NestedBase.set_meta" title="Link to this definition"></a></dt>
+<dd><p>Get or create new meta class assigning to it the provided attributes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>attrs</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xaccess py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xaccess py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</span>) – attribute to look into</p></li>
+<li><p><strong>set</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xaccess py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xaccess py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</span>) – attributes to set to the class</p></li>
+<li><p><strong>defaults</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xaccess py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xaccess py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</span>) – attributes to set to the class if not present</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xaccess py py-class docutils literal notranslate"><span class="pre">type</span></code></span></p>
+</dd>
+</dl>
+<p>:return the Meta class.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a haccess="90_middleware.html" class="btn btn-neutral float-left" title="&lt;no title&gt;" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a haccess="../project.html" class="btn btn-neutral float-right" title="Project" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Thomas.</p>
+  </div>
+
+  Built with <a haccess="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a haccess="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a haccess="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

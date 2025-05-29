@@ -1,0 +1,252 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>caps.utils &mdash; Django-Caps 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="caps.middleware" href="90_middleware.html" />
+    <link rel="prev" title="caps.urls" href="71_urls.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a href="../index.html" class="icon icon-home">
+            Django-Caps
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../guide.html">Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="10_models.html">caps.models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="20_views.html">caps.views</a></li>
+<li class="toctree-l2"><a class="reference internal" href="30_serializers.html">caps.serializers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="40_permissions.html">caps.permissions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="70_admin.html">caps.admin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="71_urls.html">caps.urls</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">caps.utils</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#caps.utils.get_lazy_relation"><code class="docutils literal notranslate"><span class="pre">get_lazy_relation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-caps.utils.nested">caps.utils.nested</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#caps.utils.nested.NestedBase"><code class="docutils literal notranslate"><span class="pre">NestedBase</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="90_middleware.html">caps.middleware</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../project.html">Project</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Django-Caps</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API</a></li>
+      <li class="breadcrumb-item active">caps.utils</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/80_utils.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <section id="module-caps.utils">
+<span id="caps-utils"></span><h1>caps.utils<a class="headerlink" href="#module-caps.utils" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="caps.utils.get_lazy_relation">
+<span class="sig-name descname"><span class="pre">get_lazy_relation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/utils.html#get_lazy_relation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.utils.get_lazy_relation" title="Link to this definition"></a></dt>
+<dd><p>For the provided model instance, return an attribute name and value for field.</p>
+<p>It returns relation id if the relation hasn’t been fetched from the db. Otherwise, it returns the relation object:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">access</span> <span class="o">=</span> <span class="n">Access</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+
+<span class="c1"># relation has not been fetched</span>
+<span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">get_lazy_relation</span><span class="p">(</span><span class="n">access</span><span class="p">,</span> <span class="s1">&#39;origin&#39;</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;origin_id&#39;</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+
+<span class="c1"># fetch from db:</span>
+<span class="n">access</span><span class="o">.</span><span class="n">origin</span>
+<span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">get_lazy_relation</span><span class="p">(</span><span class="n">access</span><span class="p">,</span> <span class="s1">&#39;origin&#39;</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;origin&#39;</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">Access</span><span class="p">)</span>
+
+<span class="c1"># map a name:</span>
+<span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">get_lazy_relation</span><span class="p">(</span><span class="n">access</span><span class="p">,</span> <span class="s1">&#39;origin&#39;</span><span class="p">,</span> <span class="s1">&#39;dest&#39;</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;dest&#39;</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">Access</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obj</strong> – object to get value on</p></li>
+<li><p><strong>field</strong> – object’s field to lookup</p></li>
+<li><p><strong>out_field</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – output field (default to object’s)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</span></p>
+</dd>
+</dl>
+<p>:return a tuple with field name and value.</p>
+</dd></dl>
+
+<section id="module-caps.utils.nested">
+<span id="caps-utils-nested"></span><h2>caps.utils.nested<a class="headerlink" href="#module-caps.utils.nested" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="caps.utils.nested.NestedBase">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NestedBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/utils/nested.html#NestedBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.utils.nested.NestedBase" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This metaclass allows to create nested class based from parent one.</p>
+<p>By default, the method will first look for an existing declaration.
+If none is found it will create one with only the declared <a class="reference internal" href="#caps.utils.nested.NestedBase.nested_class" title="caps.utils.nested.NestedBase.nested_class"><code class="xref py py-attr docutils literal notranslate"><span class="pre">nested_class</span></code></a> as base. This means that you must manually declare any other parent class:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Nested</span><span class="p">:</span>
+    <span class="k">pass</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ParentBase</span><span class="p">(</span><span class="n">NestedBase</span><span class="p">):</span>
+    <span class="n">nested_class</span> <span class="o">=</span> <span class="n">Nested</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_nested_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="p">{}):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">create_nested_class</span><span class="p">(</span>
+            <span class="n">name</span><span class="p">,</span>
+            <span class="p">{</span><span class="s2">&quot;custom_field&quot;</span><span class="p">:</span> <span class="n">ForeignKey</span><span class="p">()}</span>
+        <span class="p">)</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Parent</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">NestedBase</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">A</span><span class="p">(</span><span class="n">Parent</span><span class="p">):</span>
+    <span class="c1"># you must declare its bases</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Nested</span><span class="p">(</span><span class="n">Nested</span><span class="p">):</span>
+        <span class="c1"># customize code here</span>
+        <span class="k">pass</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">C</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
+    <span class="c1"># you need to be explicit</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Nested</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">Nested</span><span class="p">):</span>
+        <span class="k">pass</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.utils.nested.NestedBase.create_nested_class">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_nested_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_class</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/utils/nested.html#NestedBase.create_nested_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.utils.nested.NestedBase.create_nested_class" title="Link to this definition"></a></dt>
+<dd><p>Create the nested class for the provided container one to-be-created.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>new_class</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code>]</span>) – the parent class that just has been created</p></li>
+<li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – nested class name</p></li>
+<li><p><strong>attrs</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</span>) – nested class attributes</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></span></p>
+</dd>
+</dl>
+<p>:return the newly created class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.utils.nested.NestedBase.get_nested_class">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_nested_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_class</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/utils/nested.html#NestedBase.get_nested_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.utils.nested.NestedBase.get_nested_class" title="Link to this definition"></a></dt>
+<dd><p>Get nested model class or creates a new one.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>new_class</strong> (<em>type</em><em>[</em><em>object</em><em>]</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.utils.nested.NestedBase.nested_class">
+<span class="sig-name descname"><span class="pre">nested_class</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code><span class="pre">]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#caps.utils.nested.NestedBase.nested_class" title="Link to this definition"></a></dt>
+<dd><p>Nested class base to create.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.utils.nested.NestedBase.nested_name">
+<span class="sig-name descname"><span class="pre">nested_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> <span class="pre">|</span> <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#caps.utils.nested.NestedBase.nested_name" title="Link to this definition"></a></dt>
+<dd><p>Attribute and class name of the nested class. If not provided, takes it from <a class="reference internal" href="#caps.utils.nested.NestedBase.nested_class" title="caps.utils.nested.NestedBase.nested_class"><code class="xref py py-attr docutils literal notranslate"><span class="pre">nested_class</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.utils.nested.NestedBase.new_name">
+<span class="sig-name descname"><span class="pre">new_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'{class_name}{nested_name}'</span></em><a class="headerlink" href="#caps.utils.nested.NestedBase.new_name" title="Link to this definition"></a></dt>
+<dd><p>Name format for newly created classes.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="71_urls.html" class="btn btn-neutral float-left" title="caps.urls" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="90_middleware.html" class="btn btn-neutral float-right" title="caps.middleware" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Thomas.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

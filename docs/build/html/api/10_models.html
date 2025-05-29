@@ -1,0 +1,1060 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>caps.models &mdash; Django-Caps 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="caps.views" href="20_views.html" />
+    <link rel="prev" title="API" href="../api.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a href="../index.html" class="icon icon-home">
+            Django-Caps
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../guide.html">Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">caps.models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-caps.models.agent">caps.models.agent</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#caps.models.agent.Agent"><code class="docutils literal notranslate"><span class="pre">Agent</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#caps.models.agent.AgentQuerySet"><code class="docutils literal notranslate"><span class="pre">AgentQuerySet</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-caps.models.access">caps.models.access</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#caps.models.access.Access"><code class="docutils literal notranslate"><span class="pre">Access</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#caps.models.access.AccessQuerySet"><code class="docutils literal notranslate"><span class="pre">AccessQuerySet</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-caps.models.object">caps.models.object</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#caps.models.object.Object"><code class="docutils literal notranslate"><span class="pre">Object</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#caps.models.object.ObjectBase"><code class="docutils literal notranslate"><span class="pre">ObjectBase</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#caps.models.object.ObjectQuerySet"><code class="docutils literal notranslate"><span class="pre">ObjectQuerySet</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-caps.models.nested">caps.models.nested</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#caps.models.nested.NestedModelBase"><code class="docutils literal notranslate"><span class="pre">NestedModelBase</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="20_views.html">caps.views</a></li>
+<li class="toctree-l2"><a class="reference internal" href="30_serializers.html">caps.serializers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="40_permissions.html">caps.permissions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="70_admin.html">caps.admin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="71_urls.html">caps.urls</a></li>
+<li class="toctree-l2"><a class="reference internal" href="80_utils.html">caps.utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="90_middleware.html">caps.middleware</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../project.html">Project</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Django-Caps</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API</a></li>
+      <li class="breadcrumb-item active">caps.models</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/10_models.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <section id="caps-models">
+<h1>caps.models<a class="headerlink" href="#caps-models" title="Link to this heading"></a></h1>
+<section id="module-caps.models.agent">
+<span id="caps-models-agent"></span><h2>caps.models.agent<a class="headerlink" href="#module-caps.models.agent" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="caps.models.agent.Agent">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Agent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/agent.html#Agent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.agent.Agent" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></p>
+<p>An agent is the one executing an action. It can either be related to
+a specific user (anonymous included) or group.</p>
+<p>A user can impersonate multiple agent.</p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="caps.models.agent.Agent.DoesNotExist">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#caps.models.agent.Agent.DoesNotExist" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="caps.models.agent.Agent.MultipleObjectsReturned">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#caps.models.agent.Agent.MultipleObjectsReturned" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">MultipleObjectsReturned</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.agent.Agent.accesses">
+<span class="sig-name descname"><span class="pre">accesses</span></span><a class="headerlink" href="#caps.models.agent.Agent.accesses" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.agent.Agent.clean">
+<span class="sig-name descname"><span class="pre">clean</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/agent.html#Agent.clean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.agent.Agent.clean" title="Link to this definition"></a></dt>
+<dd><p>Hook for doing any extra model-wide validation after clean() has been
+called on every field by self.clean_fields. Any ValidationError raised
+by this method will not be associated with a particular field; it will
+have a special-case association with the field defined by NON_FIELD_ERRORS.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.agent.Agent.concreteobject_set">
+<span class="sig-name descname"><span class="pre">concreteobject_set</span></span><a class="headerlink" href="#caps.models.agent.Agent.concreteobject_set" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.agent.Agent.emit_accesses">
+<span class="sig-name descname"><span class="pre">emit_accesses</span></span><a class="headerlink" href="#caps.models.agent.Agent.emit_accesses" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.agent.Agent.group">
+<span class="sig-name descname"><span class="pre">group</span></span><a class="headerlink" href="#caps.models.agent.Agent.group" title="Link to this definition"></a></dt>
+<dd><p>Agent targets this group. Related name: ‘agents’.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.agent.Agent.group_id">
+<span class="sig-name descname"><span class="pre">group_id</span></span><a class="headerlink" href="#caps.models.agent.Agent.group_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.agent.Agent.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#caps.models.agent.Agent.id" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.agent.Agent.is_agent">
+<span class="sig-name descname"><span class="pre">is_agent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/agent.html#Agent.is_agent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.agent.Agent.is_agent" title="Link to this definition"></a></dt>
+<dd><p>Return True if user can act as this agent.</p>
+<p>This methods also check based on user’s group and anonymity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>user</strong> (<em>User</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="caps.models.agent.Agent.is_anonymous">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_anonymous</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#caps.models.agent.Agent.is_anonymous" title="Link to this definition"></a></dt>
+<dd><p>Return True when Agent targets anonymous users.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.agent.Agent.is_default">
+<span class="sig-name descname"><span class="pre">is_default</span></span><a class="headerlink" href="#caps.models.agent.Agent.is_default" title="Link to this definition"></a></dt>
+<dd><p>If True, use this Agent as user’s default.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.agent.Agent.objects">
+<span class="sig-name descname"><span class="pre">objects</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;django.db.models.manager.ManagerFromAgentQuerySet</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#caps.models.agent.Agent.objects" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.agent.Agent.user">
+<span class="sig-name descname"><span class="pre">user</span></span><a class="headerlink" href="#caps.models.agent.Agent.user" title="Link to this definition"></a></dt>
+<dd><p>Agent targets this user. Related name: ‘agents’.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.agent.Agent.user_id">
+<span class="sig-name descname"><span class="pre">user_id</span></span><a class="headerlink" href="#caps.models.agent.Agent.user_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.agent.Agent.uuid">
+<span class="sig-name descname"><span class="pre">uuid</span></span><a class="headerlink" href="#caps.models.agent.Agent.uuid" title="Link to this definition"></a></dt>
+<dd><p>Public access to agent.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="caps.models.agent.AgentQuerySet">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AgentQuerySet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">using</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/agent.html#AgentQuerySet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.agent.AgentQuerySet" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QuerySet</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.agent.AgentQuerySet.create_for_groups">
+<span class="sig-name descname"><span class="pre">create_for_groups</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groups</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/agent.html#AgentQuerySet.create_for_groups"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.agent.AgentQuerySet.create_for_groups" title="Link to this definition"></a></dt>
+<dd><p>Create Agent for all users that don’t have one assigned yet.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>users</strong> – if provided only for those users</p></li>
+<li><p><strong>groups</strong> (<em>QuerySet</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#caps.models.agent.AgentQuerySet" title="caps.models.agent.AgentQuerySet"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentQuerySet</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>newly created agent (excluding existing ones)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.agent.AgentQuerySet.create_for_users">
+<span class="sig-name descname"><span class="pre">create_for_users</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">users</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/agent.html#AgentQuerySet.create_for_users"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.agent.AgentQuerySet.create_for_users" title="Link to this definition"></a></dt>
+<dd><p>Create Agent for all users that don’t have one assigned yet.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>users</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">QuerySet</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – if provided only for those users</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#caps.models.agent.AgentQuerySet" title="caps.models.agent.AgentQuerySet"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentQuerySet</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>newly created agent (excluding existing ones)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.agent.AgentQuerySet.group">
+<span class="sig-name descname"><span class="pre">group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/agent.html#AgentQuerySet.group"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.agent.AgentQuerySet.group" title="Link to this definition"></a></dt>
+<dd><p>Filter by group.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#caps.models.agent.AgentQuerySet" title="caps.models.agent.AgentQuerySet"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentQuerySet</span></code></a></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>group</strong> (<em>Group</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.agent.AgentQuerySet.user">
+<span class="sig-name descname"><span class="pre">user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/agent.html#AgentQuerySet.user"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.agent.AgentQuerySet.user" title="Link to this definition"></a></dt>
+<dd><p>Filter by user or its groups.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">User</span></code></span>) – User</p></li>
+<li><p><strong>strict</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – if False, search on user’s groups.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#caps.models.agent.AgentQuerySet" title="caps.models.agent.AgentQuerySet"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentQuerySet</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-caps.models.access">
+<span id="caps-models-access"></span><h2>caps.models.access<a class="headerlink" href="#module-caps.models.access" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="caps.models.access.Access">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Access</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/access.html#Access"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.access.Access" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></p>
+<p>Access are the entry point to access an <code class="xref py py-class docutils literal notranslate"><span class="pre">Object</span></code>.</p>
+<p>Access provides a set of capabilities for specific receiver.
+The concrete sub-model MUST provide the <code class="docutils literal notranslate"><span class="pre">target</span></code> foreign key to an
+Object.</p>
+<p>There are two kind of access:</p>
+<ul class="simple">
+<li><p>root: the root access from which all other accesses to object
+are derived. Created from the <code class="xref py py-meth docutils literal notranslate"><span class="pre">create()</span></code> class method. It has no <a class="reference internal" href="#caps.models.access.Access.origin" title="caps.models.access.Access.origin"><code class="xref py py-attr docutils literal notranslate"><span class="pre">origin</span></code></a>
+and <a href="#id1"><span class="problematic" id="id2">**</span></a>there can be only one root access per <code class="xref py py-class docutils literal notranslate"><span class="pre">Object</span></code> instance.</p></li>
+<li><p>derived: access derived from root or another derived. Created
+from the <code class="xref py py-meth docutils literal notranslate"><span class="pre">derive()</span></code> method.</p></li>
+</ul>
+<p>This class enforce fields validation at <cite>save()</cite> and <cite>bulk_create()</cite>.</p>
+<section id="concrete-access">
+<h3>Concrete Access<a class="headerlink" href="#concrete-access" title="Link to this heading"></a></h3>
+<p>This model is implemented as an abstract in order to have a access
+specific to each model (see <code class="xref py py-class docutils literal notranslate"><span class="pre">Object</span></code> abstract model). The
+actual concrete class is created when <code class="xref py py-class docutils literal notranslate"><span class="pre">Object</span></code> is subclassed
+by a concrete model.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="caps.models.access.Access.Meta">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Meta</span></span><a class="reference internal" href="../_modules/caps/models/access.html#Access.Meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.access.Access.Meta" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.access.Access.Meta.abstract">
+<span class="sig-name descname"><span class="pre">abstract</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#caps.models.access.Access.Meta.abstract" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.access.Access.Meta.unique_together">
+<span class="sig-name descname"><span class="pre">unique_together</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(('origin',</span> <span class="pre">'receiver',</span> <span class="pre">'target'),)</span></em><a class="headerlink" href="#caps.models.access.Access.Meta.unique_together" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.access.Access.ashare">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ashare</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">receiver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grants</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/access.html#Access.ashare"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.access.Access.ashare" title="Link to this definition"></a></dt>
+<dd><p>Create a new saved access shared from self (async).</p>
+<p>See <a class="reference internal" href="#caps.models.access.Access.get_shared" title="caps.models.access.Access.get_shared"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_shared()</span></code></a> for arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>receiver</strong> (<a class="reference internal" href="#caps.models.agent.Agent" title="caps.models.agent.Agent"><em>Agent</em></a>)</p></li>
+<li><p><strong>grants</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>int</em><em>] </em><em>| </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.access.Access.emitter">
+<span class="sig-name descname"><span class="pre">emitter</span></span><a class="headerlink" href="#caps.models.access.Access.emitter" title="Link to this definition"></a></dt>
+<dd><p>Agent receiving capability.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.access.Access.emitter_id">
+<span class="sig-name descname"><span class="pre">emitter_id</span></span><a class="headerlink" href="#caps.models.access.Access.emitter_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.access.Access.expiration">
+<span class="sig-name descname"><span class="pre">expiration</span></span><a class="headerlink" href="#caps.models.access.Access.expiration" title="Link to this definition"></a></dt>
+<dd><p>Date of expiration.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.access.Access.get_absolute_url">
+<span class="sig-name descname"><span class="pre">get_absolute_url</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/access.html#Access.get_absolute_url"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.access.Access.get_absolute_url" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.access.Access.get_all_permissions">
+<span class="sig-name descname"><span class="pre">get_all_permissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/access.html#Access.get_all_permissions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.access.Access.get_all_permissions" title="Link to this definition"></a></dt>
+<dd><p>Return allowed permissions for this user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>user</strong> (<em>User</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.access.Access.get_object_class">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_object_class</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/access.html#Access.get_object_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.access.Access.get_object_class" title="Link to this definition"></a></dt>
+<dd><p>Return related Object class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.access.Access.get_shared">
+<span class="sig-name descname"><span class="pre">get_shared</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">receiver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grants</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/access.html#Access.get_shared"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.access.Access.get_shared" title="Link to this definition"></a></dt>
+<dd><p>Return new access shared from self. The object is not saved.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>receiver</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#caps.models.agent.Agent" title="caps.models.agent.Agent"><code class="xref py py-class docutils literal notranslate"><span class="pre">Agent</span></code></a></span>) – the receiver</p></li>
+<li><p><strong>grants</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – optional granted permissions</p></li>
+<li><p><strong>**kwargs</strong> – <p>extra initial arguments</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Yield PermissionDenied<span class="colon">:</span></dt>
+<dd class="field-even"><p>when access expired or no grant is shareable.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.access.Access.get_shared_grants">
+<span class="sig-name descname"><span class="pre">get_shared_grants</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grants</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/access.html#Access.get_shared_grants"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.access.Access.get_shared_grants" title="Link to this definition"></a></dt>
+<dd><p>Return <a class="reference internal" href="#caps.models.access.Access.grants" title="caps.models.access.Access.grants"><code class="xref py py-attr docutils literal notranslate"><span class="pre">grants</span></code></a> for shared access.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]</span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>grants</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>int</em><em>] </em><em>| </em><em>None</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.access.Access.get_shared_kwargs">
+<span class="sig-name descname"><span class="pre">get_shared_kwargs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">receiver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/access.html#Access.get_shared_kwargs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.access.Access.get_shared_kwargs" title="Link to this definition"></a></dt>
+<dd><p>Return initial argument for a derived access from self.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>receiver</strong> (<a class="reference internal" href="#caps.models.agent.Agent" title="caps.models.agent.Agent"><em>Agent</em></a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.access.Access.grants">
+<span class="sig-name descname"><span class="pre">grants</span></span><a class="headerlink" href="#caps.models.access.Access.grants" title="Link to this definition"></a></dt>
+<dd><p>Allowed permissions as a dict of <a href="#id5"><span class="problematic" id="id6">``</span></a>{“permission”: allowed_reshare}`.</p>
+<p>The integer value of <code class="docutils literal notranslate"><span class="pre">allowed_reshare</span></code> determines the amount of reshare can be done.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.access.Access.has_perm">
+<span class="sig-name descname"><span class="pre">has_perm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">permission</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/access.html#Access.has_perm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.access.Access.has_perm" title="Link to this definition"></a></dt>
+<dd><p>Return True if access grants the provided permission.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>user</strong> (<em>User</em>)</p></li>
+<li><p><strong>permission</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="caps.models.access.Access.is_expired">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_expired</span></span><a class="headerlink" href="#caps.models.access.Access.is_expired" title="Link to this definition"></a></dt>
+<dd><p>Return True if Access is expired.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.access.Access.is_valid">
+<span class="sig-name descname"><span class="pre">is_valid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raises</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/access.html#Access.is_valid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.access.Access.is_valid" title="Link to this definition"></a></dt>
+<dd><p>Check Access values validity, throwing exception on invalid
+values.</p>
+<p>:returns True if valid, otherwise raise ValueError
+:yield ValueError: when access is invaldi</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>raises</strong> (<em>bool</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.access.Access.objects">
+<span class="sig-name descname"><span class="pre">objects</span></span><a class="headerlink" href="#caps.models.access.Access.objects" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.access.Access.origin">
+<span class="sig-name descname"><span class="pre">origin</span></span><a class="headerlink" href="#caps.models.access.Access.origin" title="Link to this definition"></a></dt>
+<dd><p>Source access in accesses chain.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.access.Access.origin_id">
+<span class="sig-name descname"><span class="pre">origin_id</span></span><a class="headerlink" href="#caps.models.access.Access.origin_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.access.Access.receiver">
+<span class="sig-name descname"><span class="pre">receiver</span></span><a class="headerlink" href="#caps.models.access.Access.receiver" title="Link to this definition"></a></dt>
+<dd><p>Agent receiving capability.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.access.Access.receiver_id">
+<span class="sig-name descname"><span class="pre">receiver_id</span></span><a class="headerlink" href="#caps.models.access.Access.receiver_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.access.Access.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/access.html#Access.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.access.Access.save" title="Link to this definition"></a></dt>
+<dd><p>Save the current instance. Override this in a subclass if you want to
+control the saving process.</p>
+<p>The ‘force_insert’ and ‘force_update’ parameters can be used to insist
+that the “save” must be an SQL insert or update (or equivalent for
+non-SQL backends), respectively. Normally, they should not be set.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.access.Access.share">
+<span class="sig-name descname"><span class="pre">share</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">receiver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grants</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/access.html#Access.share"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.access.Access.share" title="Link to this definition"></a></dt>
+<dd><p>Create a new saved access shared from self.</p>
+<p>See <a class="reference internal" href="#caps.models.access.Access.get_shared" title="caps.models.access.Access.get_shared"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_shared()</span></code></a> for arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>receiver</strong> (<a class="reference internal" href="#caps.models.agent.Agent" title="caps.models.agent.Agent"><em>Agent</em></a>)</p></li>
+<li><p><strong>grants</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>int</em><em>] </em><em>| </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.access.Access.uuid">
+<span class="sig-name descname"><span class="pre">uuid</span></span><a class="headerlink" href="#caps.models.access.Access.uuid" title="Link to this definition"></a></dt>
+<dd><p>Public access id used in API.</p>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="caps.models.access.AccessQuerySet">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AccessQuerySet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">using</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/access.html#AccessQuerySet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.access.AccessQuerySet" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QuerySet</span></code></p>
+<p>QuerySet for Access classes.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="caps.models.access.AccessQuerySet.Meta">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Meta</span></span><a class="reference internal" href="../_modules/caps/models/access.html#AccessQuerySet.Meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.access.AccessQuerySet.Meta" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.access.AccessQuerySet.Meta.abstract">
+<span class="sig-name descname"><span class="pre">abstract</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#caps.models.access.AccessQuerySet.Meta.abstract" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.access.AccessQuerySet.Meta.unique_together">
+<span class="sig-name descname"><span class="pre">unique_together</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(('receiver',</span> <span class="pre">'target',</span> <span class="pre">'emitter'),)</span></em><a class="headerlink" href="#caps.models.access.AccessQuerySet.Meta.unique_together" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.access.AccessQuerySet.access">
+<span class="sig-name descname"><span class="pre">access</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">receiver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uuid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/access.html#AccessQuerySet.access"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.access.AccessQuerySet.access" title="Link to this definition"></a></dt>
+<dd><p>Access by uuid and receiver(s).</p>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">receiver</span></code> is provided as first parameter in order to enforce its usage. It however can be <code class="docutils literal notranslate"><span class="pre">None</span></code>: this only
+should be used when queryset has already been filtered by receiver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>receiver</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#caps.models.agent.Agent" title="caps.models.agent.Agent"><code class="xref py py-class docutils literal notranslate"><span class="pre">Agent</span></code></a> | <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<a class="reference internal" href="#caps.models.agent.Agent" title="caps.models.agent.Agent"><code class="xref py py-class docutils literal notranslate"><span class="pre">Agent</span></code></a>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – the agent that retrieving the access.</p></li>
+<li><p><strong>uuid</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">UUID</span></code></span>) – the access uuid to fetch.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Yield DoesNotExist<span class="colon">:</span></dt>
+<dd class="field-even"><p>when the access is not found.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#caps.models.access.AccessQuerySet" title="caps.models.access.AccessQuerySet"><code class="xref py py-class docutils literal notranslate"><span class="pre">AccessQuerySet</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.access.AccessQuerySet.accesses">
+<span class="sig-name descname"><span class="pre">accesses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">receiver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uuids</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/access.html#AccessQuerySet.accesses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.access.AccessQuerySet.accesses" title="Link to this definition"></a></dt>
+<dd><p>Accesss by many uuid and receiver(s).</p>
+<p>Please accesser to <a class="reference internal" href="#caps.models.access.AccessQuerySet.access" title="caps.models.access.AccessQuerySet.access"><code class="xref py py-meth docutils literal notranslate"><span class="pre">AccessQuerySet.access()</span></code></a> for more information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>receiver</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#caps.models.agent.Agent" title="caps.models.agent.Agent"><code class="xref py py-class docutils literal notranslate"><span class="pre">Agent</span></code></a> | <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<a class="reference internal" href="#caps.models.agent.Agent" title="caps.models.agent.Agent"><code class="xref py py-class docutils literal notranslate"><span class="pre">Agent</span></code></a>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – the agent that retrieving the access.</p></li>
+<li><p><strong>uuids</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">UUID</span></code>]</span>) – an iterable of uuids to fetch</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#caps.models.access.AccessQuerySet" title="caps.models.access.AccessQuerySet"><code class="xref py py-class docutils literal notranslate"><span class="pre">AccessQuerySet</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.access.AccessQuerySet.agent">
+<span class="sig-name descname"><span class="pre">agent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">agent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/access.html#AccessQuerySet.agent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.access.AccessQuerySet.agent" title="Link to this definition"></a></dt>
+<dd><p>Filter accesses that agent is either receiver or
+emitter..</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#caps.models.access.AccessQuerySet" title="caps.models.access.AccessQuerySet"><code class="xref py py-class docutils literal notranslate"><span class="pre">AccessQuerySet</span></code></a></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>agent</strong> (<a class="reference internal" href="#caps.models.agent.Agent" title="caps.models.agent.Agent"><em>Agent</em></a><em> | </em><em>Iterable</em><em>[</em><a class="reference internal" href="#caps.models.agent.Agent" title="caps.models.agent.Agent"><em>Agent</em></a><em>]</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.access.AccessQuerySet.available">
+<span class="sig-name descname"><span class="pre">available</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">agent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/access.html#AccessQuerySet.available"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.access.AccessQuerySet.available" title="Link to this definition"></a></dt>
+<dd><p>Return available accesses based on expiration and eventual user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#caps.models.access.AccessQuerySet" title="caps.models.access.AccessQuerySet"><code class="xref py py-class docutils literal notranslate"><span class="pre">AccessQuerySet</span></code></a></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>agent</strong> (<a class="reference internal" href="#caps.models.agent.Agent" title="caps.models.agent.Agent"><em>Agent</em></a><em> | </em><em>Iterable</em><em>[</em><a class="reference internal" href="#caps.models.agent.Agent" title="caps.models.agent.Agent"><em>Agent</em></a><em>] </em><em>| </em><em>None</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.access.AccessQuerySet.bulk_create">
+<span class="sig-name descname"><span class="pre">bulk_create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">objs</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/access.html#AccessQuerySet.bulk_create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.access.AccessQuerySet.bulk_create" title="Link to this definition"></a></dt>
+<dd><p>Check that objects are valid when saving models in bulk.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.access.AccessQuerySet.emitter">
+<span class="sig-name descname"><span class="pre">emitter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">agent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/access.html#AccessQuerySet.emitter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.access.AccessQuerySet.emitter" title="Link to this definition"></a></dt>
+<dd><p>Accesss for the provided emitter(s).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#caps.models.access.AccessQuerySet" title="caps.models.access.AccessQuerySet"><code class="xref py py-class docutils literal notranslate"><span class="pre">AccessQuerySet</span></code></a></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>agent</strong> (<a class="reference internal" href="#caps.models.agent.Agent" title="caps.models.agent.Agent"><em>Agent</em></a><em> | </em><em>Iterable</em><em>[</em><a class="reference internal" href="#caps.models.agent.Agent" title="caps.models.agent.Agent"><em>Agent</em></a><em>]</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.access.AccessQuerySet.expired">
+<span class="sig-name descname"><span class="pre">expired</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exclude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/access.html#AccessQuerySet.expired"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.access.AccessQuerySet.expired" title="Link to this definition"></a></dt>
+<dd><p>Filter by expiration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>exclude</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – if True, exclude instead of filter.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#caps.models.access.AccessQuerySet" title="caps.models.access.AccessQuerySet"><code class="xref py py-class docutils literal notranslate"><span class="pre">AccessQuerySet</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.access.AccessQuerySet.receiver">
+<span class="sig-name descname"><span class="pre">receiver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">agent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/access.html#AccessQuerySet.receiver"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.access.AccessQuerySet.receiver" title="Link to this definition"></a></dt>
+<dd><p>Accesss for the provided receiver(s).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#caps.models.access.AccessQuerySet" title="caps.models.access.AccessQuerySet"><code class="xref py py-class docutils literal notranslate"><span class="pre">AccessQuerySet</span></code></a></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>agent</strong> (<a class="reference internal" href="#caps.models.agent.Agent" title="caps.models.agent.Agent"><em>Agent</em></a><em> | </em><em>Iterable</em><em>[</em><a class="reference internal" href="#caps.models.agent.Agent" title="caps.models.agent.Agent"><em>Agent</em></a><em>]</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-caps.models.object">
+<span id="caps-models-object"></span><h2>caps.models.object<a class="headerlink" href="#module-caps.models.object" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="caps.models.object.Object">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/object.html#Object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.object.Object" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></p>
+<p>An object accessible through Accesss.</p>
+<p>It can have a member <cite>Access</cite> (subclass of
+<cite>caps.models.Access</cite>) that is used as object’s specific
+access. If none is provided, a it will be generated automatically
+for concrete classes.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">Capability</span></code> concrete model class will be set at creation, when
+the related <a class="reference internal" href="#caps.models.object.Object.Access" title="caps.models.object.Object.Access"><code class="xref py py-class docutils literal notranslate"><span class="pre">Access</span></code></a> is created.</p>
+<p>This provides:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="#caps.models.object.Object.Access" title="caps.models.object.Object.Access"><code class="xref py py-class docutils literal notranslate"><span class="pre">Access</span></code></a> concrete model accessible from the <a class="reference internal" href="#caps.models.object.Object" title="caps.models.object.Object"><code class="xref py py-class docutils literal notranslate"><span class="pre">Object</span></code></a> concrete subclass;</p></li>
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Capability</span></code> concrete model accessible from the <a class="reference internal" href="#caps.models.object.Object" title="caps.models.object.Object"><code class="xref py py-class docutils literal notranslate"><span class="pre">Object</span></code></a> concrete subclass;</p></li>
+</ul>
+</div></blockquote>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.object.Object.Access">
+<span class="sig-name descname"><span class="pre">Access</span></span><a class="headerlink" href="#caps.models.object.Object.Access" title="Link to this definition"></a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectAccess</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="caps.models.object.Object.Meta">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Meta</span></span><a class="reference internal" href="../_modules/caps/models/object.html#Object.Meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.object.Object.Meta" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.object.Object.Meta.abstract">
+<span class="sig-name descname"><span class="pre">abstract</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#caps.models.object.Object.Meta.abstract" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.object.Object.access">
+<span class="sig-name descname"><span class="pre">access</span></span><a class="headerlink" href="#caps.models.object.Object.access" title="Link to this definition"></a></dt>
+<dd><p>Return Access to this object for receiver provided to
+ObjectQuerySet’s <cite>access()</cite> or <cite>accesses()</cite>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.object.Object.ashare">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ashare</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">receiver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grants</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/object.html#Object.ashare"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.object.Object.ashare" title="Link to this definition"></a></dt>
+<dd><p>Share and save access to this object (async).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#caps.models.access.Access" title="caps.models.access.Access"><code class="xref py py-class docutils literal notranslate"><span class="pre">Access</span></code></a></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>receiver</strong> (<a class="reference internal" href="#caps.models.agent.Agent" title="caps.models.agent.Agent"><em>Agent</em></a>)</p></li>
+<li><p><strong>grants</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>int</em><em>] </em><em>| </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.object.Object.check_root_grants">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">check_root_grants</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/object.html#Object.check_root_grants"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.object.Object.check_root_grants" title="Link to this definition"></a></dt>
+<dd><p>Lookup for declared permissions of <a class="reference internal" href="#caps.models.object.Object.root_grants" title="caps.models.object.Object.root_grants"><code class="xref py py-attr docutils literal notranslate"><span class="pre">root_grants</span></code></a>, raising ValueError if
+there are declared permissions not present in database.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.object.Object.detail_url_name">
+<span class="sig-name descname"><span class="pre">detail_url_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#caps.models.object.Object.detail_url_name" title="Link to this definition"></a></dt>
+<dd><p>Provide url name used for get_absolute_url.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.object.Object.get_absolute_url">
+<span class="sig-name descname"><span class="pre">get_absolute_url</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/object.html#Object.get_absolute_url"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.object.Object.get_absolute_url" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.object.Object.get_all_permissions">
+<span class="sig-name descname"><span class="pre">get_all_permissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/object.html#Object.get_all_permissions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.object.Object.get_all_permissions" title="Link to this definition"></a></dt>
+<dd><p>Return allowed permissions for this user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.object.Object.get_share">
+<span class="sig-name descname"><span class="pre">get_share</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">receiver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grants</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/object.html#Object.get_share"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.object.Object.get_share" title="Link to this definition"></a></dt>
+<dd><p>Share this object to this receiver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>receiver</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#caps.models.agent.Agent" title="caps.models.agent.Agent"><code class="xref py py-class docutils literal notranslate"><span class="pre">Agent</span></code></a></span>) – share’s receiver</p></li>
+<li><p><strong>grants</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – allowed permissions (should be in <a class="reference internal" href="#caps.models.object.Object.root_grants" title="caps.models.object.Object.root_grants"><code class="xref py py-attr docutils literal notranslate"><span class="pre">root_grants</span></code></a>)</p></li>
+<li><p><strong>**kwargs</strong> – <p>extra initial arguments</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#caps.models.access.Access" title="caps.models.access.Access"><code class="xref py py-class docutils literal notranslate"><span class="pre">Access</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.object.Object.has_perm">
+<span class="sig-name descname"><span class="pre">has_perm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perm</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/object.html#Object.has_perm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.object.Object.has_perm" title="Link to this definition"></a></dt>
+<dd><p>Return True if user has provided permission for object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>perm</strong> (<em>str</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.object.Object.objects">
+<span class="sig-name descname"><span class="pre">objects</span></span><a class="headerlink" href="#caps.models.object.Object.objects" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.object.Object.owner">
+<span class="sig-name descname"><span class="pre">owner</span></span><a class="headerlink" href="#caps.models.object.Object.owner" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.object.Object.owner_id">
+<span class="sig-name descname"><span class="pre">owner_id</span></span><a class="headerlink" href="#caps.models.object.Object.owner_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.object.Object.root_grants">
+<span class="sig-name descname"><span class="pre">root_grants</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#caps.models.object.Object.root_grants" title="Link to this definition"></a></dt>
+<dd><p>This class attribute provide the default value for grant object.
+It should follows the structure of <a class="reference internal" href="#caps.models.access.Access.grants" title="caps.models.access.Access.grants"><code class="xref py py-attr docutils literal notranslate"><span class="pre">grants</span></code></a> field, such as:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">root_grants</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;auth.view_user&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;app.change_mymodel&quot;</span><span class="p">:</span> <span class="mi">2</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.object.Object.share">
+<span class="sig-name descname"><span class="pre">share</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">receiver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grants</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/object.html#Object.share"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.object.Object.share" title="Link to this definition"></a></dt>
+<dd><p>Share and save access to this object.</p>
+<p>See <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_shared()</span></code> for parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#caps.models.access.Access" title="caps.models.access.Access"><code class="xref py py-class docutils literal notranslate"><span class="pre">Access</span></code></a></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>receiver</strong> (<a class="reference internal" href="#caps.models.agent.Agent" title="caps.models.agent.Agent"><em>Agent</em></a>)</p></li>
+<li><p><strong>grants</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>int</em><em>] </em><em>| </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.object.Object.uuid">
+<span class="sig-name descname"><span class="pre">uuid</span></span><a class="headerlink" href="#caps.models.object.Object.uuid" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="caps.models.object.ObjectBase">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ObjectBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/object.html#ObjectBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.object.ObjectBase" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#caps.models.nested.NestedModelBase" title="caps.models.nested.NestedModelBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">NestedModelBase</span></code></a></p>
+<p>Metaclass for Object model classes.</p>
+<p>It subclass Access if no <cite>Access</cite> member is provided.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.object.ObjectBase.create_nested_class">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_nested_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_class</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/object.html#ObjectBase.create_nested_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.object.ObjectBase.create_nested_class" title="Link to this definition"></a></dt>
+<dd><p>Provide <cite>target</cite> ForeignKey on nested Access model.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.object.ObjectBase.nested_class">
+<span class="sig-name descname"><span class="pre">nested_class</span></span><a class="headerlink" href="#caps.models.object.ObjectBase.nested_class" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#caps.models.access.Access" title="caps.models.access.Access"><code class="xref py py-class docutils literal notranslate"><span class="pre">Access</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.object.ObjectBase.nested_name">
+<span class="sig-name descname"><span class="pre">nested_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> <span class="pre">|</span> <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Access'</span></em><a class="headerlink" href="#caps.models.object.ObjectBase.nested_name" title="Link to this definition"></a></dt>
+<dd><p>Attribute and class name of the nested class. If not provided, takes it from <a class="reference internal" href="#caps.models.object.ObjectBase.nested_class" title="caps.models.object.ObjectBase.nested_class"><code class="xref py py-attr docutils literal notranslate"><span class="pre">nested_class</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="caps.models.object.ObjectQuerySet">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ObjectQuerySet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">using</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/object.html#ObjectQuerySet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.object.ObjectQuerySet" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QuerySet</span></code></p>
+<p>QuerySet for Objects.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.object.ObjectQuerySet.access">
+<span class="sig-name descname"><span class="pre">access</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">access</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/object.html#ObjectQuerySet.access"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.object.ObjectQuerySet.access" title="Link to this definition"></a></dt>
+<dd><p>Prefetch object with accesses from the provided queryset (as <code class="docutils literal notranslate"><span class="pre">agent_accesses</span></code>).</p>
+<p>The items are annotated with <code class="docutils literal notranslate"><span class="pre">access_uuid</span></code> corresponding to the access.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>access</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#caps.models.access.AccessQuerySet" title="caps.models.access.AccessQuerySet"><code class="xref py py-class docutils literal notranslate"><span class="pre">AccessQuerySet</span></code></a> | <a class="reference internal" href="#caps.models.access.Access" title="caps.models.access.Access"><code class="xref py py-class docutils literal notranslate"><span class="pre">Access</span></code></a></span>) – use this Access QuerySet or instance</p></li>
+<li><p><strong>strict</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – if True, filter only items with prefetched access</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#caps.models.object.ObjectQuerySet" title="caps.models.object.ObjectQuerySet"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectQuerySet</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the annotated and prefetched queryset.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.object.ObjectQuerySet.available">
+<span class="sig-name descname"><span class="pre">available</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">agents</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accesses</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/object.html#ObjectQuerySet.available"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.object.ObjectQuerySet.available" title="Link to this definition"></a></dt>
+<dd><p>Return object available to provided agents as owner or receiver (when <code class="docutils literal notranslate"><span class="pre">accesses</span></code> is provided).</p>
+<p>It prefetch/annotates the resulting items using <a class="reference internal" href="#caps.models.object.ObjectQuerySet.access" title="caps.models.object.ObjectQuerySet.access"><code class="xref py py-meth docutils literal notranslate"><span class="pre">access()</span></code></a>, if accesses is provided.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>agents</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<a class="reference internal" href="#caps.models.agent.Agent" title="caps.models.agent.Agent"><code class="xref py py-class docutils literal notranslate"><span class="pre">Agent</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<a class="reference internal" href="#caps.models.agent.Agent" title="caps.models.agent.Agent"><code class="xref py py-class docutils literal notranslate"><span class="pre">Agent</span></code></a>]]</span>) – for the provided agent</p></li>
+<li><p><strong>accesses</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#caps.models.access.AccessQuerySet" title="caps.models.access.AccessQuerySet"><code class="xref py py-class docutils literal notranslate"><span class="pre">AccessQuerySet</span></code></a> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – use this queryset for accesses</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-caps.models.nested">
+<span id="caps-models-nested"></span><h2>caps.models.nested<a class="headerlink" href="#module-caps.models.nested" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="caps.models.nested.NestedModelBase">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NestedModelBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/nested.html#NestedModelBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.nested.NestedModelBase" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="80_utils.html#caps.utils.nested.NestedBase" title="caps.utils.nested.NestedBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">NestedBase</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelBase</span></code></p>
+<p>This metaclass allows to create nested model class based from parent one.</p>
+<p>See <a class="reference internal" href="80_utils.html#caps.utils.nested.NestedBase" title="caps.utils.nested.NestedBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">NestedBase</span></code></a> for more information about usage.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.nested.NestedModelBase.create_nested_class">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_nested_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_class</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/nested.html#NestedModelBase.create_nested_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.nested.NestedModelBase.create_nested_class" title="Link to this definition"></a></dt>
+<dd><p>Create the nested class for the provided container one to-be-created.</p>
+<p>It ensures the <code class="docutils literal notranslate"><span class="pre">Meta</span></code> class to have default values based on the new class (for app_label, abstract, etc.).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>new_class</strong> (<em>type</em><em>[</em><em>object</em><em>]</em>)</p></li>
+<li><p><strong>name</strong> (<em>str</em>)</p></li>
+<li><p><strong>attrs</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.models.nested.NestedModelBase.set_meta">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_meta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attrs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">set</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">defaults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/nested.html#NestedModelBase.set_meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.nested.NestedModelBase.set_meta" title="Link to this definition"></a></dt>
+<dd><p>Get or create new meta class assigning to it the provided attributes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>attrs</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</span>) – attribute to look into</p></li>
+<li><p><strong>set</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</span>) – attributes to set to the class</p></li>
+<li><p><strong>defaults</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</span>) – attributes to set to the class if not present</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></span></p>
+</dd>
+</dl>
+<p>:return the Meta class.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../api.html" class="btn btn-neutral float-left" title="API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="20_views.html" class="btn btn-neutral float-right" title="caps.views" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Thomas.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

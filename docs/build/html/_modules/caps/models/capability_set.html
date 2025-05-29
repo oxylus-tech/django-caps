@@ -1,0 +1,261 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>caps.models.capability_set &mdash; Django-Caps 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" haccess="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" haccess="../../../_static/css/theme.css?v=e59714d7" />
+
+
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" haccess="../../../genindex.html" />
+    <link rel="search" title="Search" haccess="../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+
+
+          <a haccess="../../../index.html" class="icon icon-home">
+            Django-Caps
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="Share internal" haccess="../../../guide.html">Guide</a></li>
+<li class="toctree-l1"><a class="Share internal" haccess="../../../api.html">API</a></li>
+<li class="toctree-l1"><a class="Share internal" haccess="../../../project.html">Project</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a haccess="../../../index.html">Django-Caps</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a haccess="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a haccess="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">caps.models.capability_set</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for caps.models.capability_set</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.core.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">PermissionDenied</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Permission</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gettext</span> <span class="k">as</span> <span class="n">__</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.capability</span><span class="w"> </span><span class="kn">import</span> <span class="n">Capability</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;CapabilitySet&quot;</span><span class="p">,)</span>
+
+
+<div class="viewcode-block" id="CapabilitySet">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.capability_set.CapabilitySet">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CapabilitySet</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class to handle set of capabilities. It is one of the bases of :py:class:`Share`.</span>
+
+<span class="sd">    This class should not be used per se.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">Capability</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Capability</span><span class="p">]</span> <span class="o">|</span> <span class="n">Permission</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Capability class to use. It must be set in order to use CapabilitySet. &quot;&quot;&quot;</span>
+    <span class="n">Cap</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Capability information, as tuple of ``(permission_id, max_derive)`` or single permission</span>
+<span class="sd">    id (then ``max_derive is None``).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Caps</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">CapabilitySet</span><span class="o">.</span><span class="n">Cap</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Many capability information. &quot;&quot;&quot;</span>
+    <span class="n">capabilities</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Capability</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Capabilities contained in the CapabilitySet. &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CapabilitySet.get_capabilities">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.capability_set.CapabilitySet.get_capabilities">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_capabilities</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Capability</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">capabilities</span></div>
+
+
+    <span class="c1"># FIXME: remove?</span>
+<div class="viewcode-block" id="CapabilitySet.get_capability">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.capability_set.CapabilitySet.get_capability">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_capability</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">codename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Capability</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get capability by name or None.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">next</span><span class="p">((</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_capabilities</span><span class="p">()</span> <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">codename</span> <span class="o">==</span> <span class="n">codename</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CapabilitySet.is_derived">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.capability_set.CapabilitySet.is_derived">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_derived</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">CapabilitySet</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return True if `capabilities` iterable is a subset of self.</span>
+
+<span class="sd">        Set is a subset of another one if and only if:</span>
+<span class="sd">        - all capabilities of subset are in set and derived from set \</span>
+<span class="sd">          (cf. `Capability.is_subset`)</span>
+<span class="sd">        - there is no capability inside subset that are not in set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">capabilities</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="o">.</span><span class="n">permission_id</span><span class="p">:</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_capabilities</span><span class="p">()}</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">get_capabilities</span><span class="p">():</span>
+            <span class="n">capability</span> <span class="o">=</span> <span class="n">capabilities</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">permission_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">capability</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">capability</span><span class="o">.</span><span class="n">is_derived</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="CapabilitySet.create_capability">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.capability_set.CapabilitySet.create_capability">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_capability</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cap</span><span class="p">:</span> <span class="n">CapabilitySet</span><span class="o">.</span><span class="n">Cap</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CapabilitySet</span><span class="o">.</span><span class="n">Capability</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a single (unsaved) capability.</span>
+
+<span class="sd">        :param cap: capability information</span>
+<span class="sd">        :param **kwargs: extra initial arguments</span>
+<span class="sd">        :return the new unsaved capability instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">perm_id</span><span class="p">,</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_capability_kwargs</span><span class="p">(</span><span class="n">cap</span><span class="p">,</span> <span class="p">{</span><span class="o">**</span><span class="n">kwargs</span><span class="p">,</span> <span class="s2">&quot;Share&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="p">})</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Capability</span><span class="p">(</span><span class="n">permission_id</span><span class="o">=</span><span class="n">perm_id</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CapabilitySet.create_capabilities">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.capability_set.CapabilitySet.create_capabilities">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_capabilities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">caps</span><span class="p">:</span> <span class="n">CapabilitySet</span><span class="o">.</span><span class="n">Caps</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">CapabilitySet</span><span class="o">.</span><span class="n">Capability</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create multiple capabilities based on descriptors.</span>
+
+<span class="sd">        :param caps: capabilities&#39; informations</span>
+<span class="sd">        :param **kwargs: extra initial arguments</span>
+<span class="sd">        :return a list of unsaved capabilities instances.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">create_capability</span><span class="p">(</span><span class="n">cap</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">for</span> <span class="n">cap</span> <span class="ow">in</span> <span class="n">caps</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="CapabilitySet.derive_caps">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.capability_set.CapabilitySet.derive_caps">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">derive_caps</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">caps</span><span class="p">:</span> <span class="n">CapabilitySet</span><span class="o">.</span><span class="n">Caps</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">raises</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">defaults</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Capability</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Derive capabilities from this set.</span>
+
+<span class="sd">        When `caps` is provided, it will only derive allowed derivations for declared capabilities.</span>
+
+<span class="sd">        When `caps` is not provided, it derives all allowed capabilities of the set.</span>
+
+<span class="sd">        The created capabilities are not saved to the db.</span>
+
+<span class="sd">        :param source: capabilities to derive</span>
+<span class="sd">        :param caps: specify which capabilities to derive</span>
+<span class="sd">        :param raises: if True, raise exception when there are denied derivation.</span>
+<span class="sd">        :param defaults: initial arguments to pass to all generated capabilities.</span>
+<span class="sd">        :return the list of derived capabilities.</span>
+<span class="sd">        :yield PermissionDenied: when there are unauthorized derivation and :py:param:`raises` is True.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">caps</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;max_derive&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">defaults</span><span class="p">}</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">derive</span><span class="p">(</span><span class="o">**</span><span class="n">defaults</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_capabilities</span><span class="p">()</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">can_derive</span><span class="p">(</span><span class="n">defaults</span><span class="p">[</span><span class="s2">&quot;max_derive&quot;</span><span class="p">])]</span>
+
+        <span class="n">by_perm</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="o">.</span><span class="n">permission_id</span><span class="p">:</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_capabilities</span><span class="p">()}</span>
+        <span class="n">derived</span><span class="p">,</span> <span class="n">denied</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">cap</span> <span class="ow">in</span> <span class="n">caps</span><span class="p">:</span>
+            <span class="n">perm_id</span><span class="p">,</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_capability_kwargs</span><span class="p">(</span><span class="n">cap</span><span class="p">,</span> <span class="n">defaults</span><span class="p">)</span>
+            <span class="n">capability</span> <span class="o">=</span> <span class="n">by_perm</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">perm_id</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">capability</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">PermissionDenied</span><span class="p">(</span><span class="s2">&quot;Capability does not exist for this Share.&quot;</span><span class="p">)</span>
+
+                <span class="c1"># we always use Capability.derive in order to ensure custom</span>
+                <span class="c1"># implementations.</span>
+                <span class="n">obj</span> <span class="o">=</span> <span class="n">capability</span><span class="o">.</span><span class="n">derive</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="n">derived</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">PermissionDenied</span><span class="p">:</span>
+                <span class="n">denied</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cap</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">raises</span> <span class="ow">and</span> <span class="n">denied</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">PermissionDenied</span><span class="p">(</span>
+                <span class="n">__</span><span class="p">(</span><span class="s2">&quot;Some capabilities can not be derived: </span><span class="si">{denied}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">denied</span><span class="o">=</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">denied</span><span class="p">))</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">derived</span></div>
+
+
+<div class="viewcode-block" id="CapabilitySet.get_capability_kwargs">
+<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.capability_set.CapabilitySet.get_capability_kwargs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_capability_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cap</span><span class="p">:</span> <span class="n">CapabilitySet</span><span class="o">.</span><span class="n">Cap</span><span class="p">,</span> <span class="n">defaults</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        From provided ``cap`` description, return a tuple with permission id and :py:meth:`Capability.derive` arguments.</span>
+
+<span class="sd">        We return a tuple because permission id can not be provided</span>
+<span class="sd">        to the derive method.</span>
+
+<span class="sd">        :param cap: the capability descriptor;</span>
+<span class="sd">        :param **kwargs: extra arguments to pass down to the method;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cap</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="n">perm_id</span><span class="p">,</span> <span class="n">max_derive</span> <span class="o">=</span> <span class="n">cap</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cap</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">perm_id</span><span class="p">,</span> <span class="n">max_derive</span> <span class="o">=</span> <span class="n">cap</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid value for `cap`: </span><span class="si">{</span><span class="n">cap</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">perm_id</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;max_derive&quot;</span><span class="p">:</span> <span class="n">max_derive</span><span class="p">,</span> <span class="o">**</span><span class="n">defaults</span><span class="p">}</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Thomas.</p>
+  </div>
+
+  Built with <a haccess="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a haccess="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a haccess="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

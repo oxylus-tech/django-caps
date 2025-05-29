@@ -27,4 +27,5 @@ Here is what we provide:
 
 
 Among other things:
+
 - **Database id obfuscation**: object internal id are never exposed to the outside world. Instead uuid are used to reference them in API and urls. This mitigate attacks on predictive id.
