@@ -12,7 +12,7 @@ In short, why use capabilities?
 - *Reduced risk of privilege escalation*
 - *Avoid direct access to database objects*
 
-More in the guide, :ref:`Capability vs ACL permission systems`.
+Documentation: https://oxylus-tech.github.io/django-caps/
 
 
 Features
