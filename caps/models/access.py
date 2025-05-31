@@ -134,13 +134,9 @@ class Access(models.Model):
         verbose_name=_("Source Access"),
     )
     """Source access in accesses chain."""
-    emitter = models.ForeignKey(
-        Agent, models.CASCADE, verbose_name=_("Emitter"), related_name="emit_accesses", db_index=True
-    )
+    emitter = models.ForeignKey(Agent, models.CASCADE, verbose_name=_("Emitter"), related_name="+", db_index=True)
     """Agent receiving capability."""
-    receiver = models.ForeignKey(
-        Agent, models.CASCADE, verbose_name=_("Receiver"), related_name="accesses", db_index=True
-    )
+    receiver = models.ForeignKey(Agent, models.CASCADE, verbose_name=_("Receiver"), related_name="+", db_index=True)
     """Agent receiving capability."""
     expiration = models.DateTimeField(
         _("Expiration"),
