@@ -51,7 +51,7 @@ class ObjectSerializer(serializers.ModelSerializer):
     """
 
     uuid = serializers.SerializerMethodField()
-    owner = serializers.UUIDField(source="owner__uuid", read_only=True)
+    owner = serializers.UUIDField(source="owner__uuid", required=False)
     access = AccessSerializer(read_only=True)
     """ Access """
 
@@ -70,12 +70,23 @@ class ObjectSerializer(serializers.ModelSerializer):
     def validate(self, data):
         v_data = super().validate(data)
         if request := self.context.get("request"):
-            v_data["owner"] = request.agent
+            if not v_data.get("owner"):
+                v_data["owner"] = request.agent
         return v_data
+
+    def validate_owner(self, value):
+        if request := self.context.get("request"):
+            owner = next((a for a in request.agents if a.uuid == value), None)
+            if owner:
+                return owner
+        raise ValidationError("Invalid owner")
 
     class Meta:
         fields = ["access"]
-        read_only_fields = ["access", "uuid", "owner"]
+        read_only_fields = [
+            "access",
+            "uuid",
+        ]
 
 
 class ShareSerializer(serializers.Serializer):

@@ -18,6 +18,10 @@ class ObjectViewSet(mixins.SingleObjectMixin, viewsets.ModelViewSet):
     This is the base mixin handling permissions check for django-caps.
     """
 
+    perms_map = {
+        "share": ["%(app_label)s.change_%(model_name)s"],
+    }
+
     share_serializer_class = serializers.ShareSerializer
     """ This specifies serializer class used for the :py:meth:`share` action. """
 
@@ -57,8 +61,10 @@ class ObjectViewSet(mixins.SingleObjectMixin, viewsets.ModelViewSet):
             return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
 
         access = obj.share(ser.validated_data["receiver"], ser.validated_data["grants"])
+
+        # Get Access serializer from field `access`
         ser_cls = type(self.get_serializer_class()._declared_fields["access"])
-        return Response(ser_cls(access).data)
+        return Response(ser_cls(access).data, status=201)
 
 
 class AgentViewSet(viewsets.ModelViewSet):
@@ -110,4 +116,4 @@ class AccessViewSet(mx.RetrieveModelMixin, mx.DestroyModelMixin, mx.ListModelMix
         if not ser.is_valid():
             return Response(ser.errors, status=status.HTTP_400_BAD_REQUEST)
         shared = access.share(ser.validated_data["receiver"], ser.validated_data["grants"])
-        return Response(self.get_serializer_class()(shared).data)
+        return Response(self.get_serializer_class()(shared).data, status=201)

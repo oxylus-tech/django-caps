@@ -4,6 +4,7 @@ import unittest
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import Group, User, Permission
 from django.test import RequestFactory
+from rest_framework.test import APIRequestFactory, force_authenticate
 
 from caps.models import Agent
 from .app.models import ConcreteObject
@@ -17,6 +18,7 @@ assertCountEqual = test_case.assertCountEqual
 
 
 req_factory = RequestFactory()
+api_req_factory = APIRequestFactory()
 
 
 def init_request(req, agent, agents):
@@ -24,6 +26,16 @@ def init_request(req, agent, agents):
     setattr(req, "user", agent.user)
     setattr(req, "agent", agent)
     setattr(req, "agents", agents)
+    return req
+
+
+def init_api_request(req, agent, agents):
+    """Initialize request."""
+    setattr(req, "user", agent.user)
+    setattr(req, "agent", agent)
+    setattr(req, "agents", agents)
+    req.authenticators = None
+    force_authenticate(req, user=user)
     return req
 
 

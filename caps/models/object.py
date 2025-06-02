@@ -4,6 +4,7 @@ from typing import Iterable
 
 from django.db import models
 from django.db.models import Q, OuterRef, Prefetch, Subquery
+from django.core.exceptions import PermissionDenied
 from django.contrib.auth.models import Permission
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -172,7 +173,7 @@ class Object(models.Model, metaclass=ObjectBase):
     def share(self, receiver: Agent, grants: dict[str, int] | None = None, **kwargs) -> Access:
         """Share and save access to this object.
 
-        See :py:meth:`get_shared` for parameters.
+        See :py:meth:`get_share` for parameters.
         """
         obj = self.get_share(receiver, grants, **kwargs)
         obj.save()
@@ -185,7 +186,7 @@ class Object(models.Model, metaclass=ObjectBase):
         return obj
 
     def get_share(self, receiver: Agent, grants: dict[str, int] | None = None, **kwargs) -> Access:
-        """Share this object to this receiver.
+        """Share this object to this receiver, returning new unsaved :py:class:`~.access.Access`.
 
         :param receiver: share's receiver
         :param grants: allowed permissions (should be in :py:attr:`root_grants`)
@@ -195,6 +196,9 @@ class Object(models.Model, metaclass=ObjectBase):
             grants = {key: min(value, grants[key]) for key, value in self.root_grants.items() if key in grants}
         else:
             grants = dict(self.root_grants.items())
+
+        if not grants:
+            raise PermissionDenied("Share not allowed.")
         return self.Access(target=self, emitter=self.owner, receiver=receiver, grants=grants, **kwargs)
 
     def get_absolute_url(self) -> str:

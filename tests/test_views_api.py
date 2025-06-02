@@ -1,11 +1,12 @@
 import pytest
 
+from django.core.exceptions import PermissionDenied
 from rest_framework import status
 
 from caps.views import api
 from .app.models import Access, ConcreteObject
 from .app.serializers import ConcreteObjectSerializer
-from .conftest import req_factory, init_request
+from .conftest import api_req_factory, init_api_request
 from .test_views_mixins import BaseMixin
 
 
@@ -16,13 +17,17 @@ class ObjectViewSetMixin(api.ObjectViewSet, BaseMixin):
 
 @pytest.fixture
 def req(user_agent, user_agents):
-    req = req_factory.get("/test")
-    return init_request(req, user_agent, user_agents)
+    return init_api_request(api_req_factory.get("/test"), user_agent, user_agents)
 
 
 @pytest.fixture
-def viewset_mixin(req, user_agent):
-    return ObjectViewSetMixin(request=req, agent=user_agent)
+def post_req(user_agent, user_agents):
+    return init_api_request(api_req_factory.post("/test", {}), user_agent, user_agents)
+
+
+@pytest.fixture
+def viewset_mixin(req, user_agent, object):
+    return ObjectViewSetMixin(request=req, agent=user_agent, kwargs={"uuid": str(object.uuid)})
 
 
 @pytest.fixture
@@ -40,11 +45,30 @@ class TestObjectViewSet:
 
         assert ser.instance.owner == user_agent
 
-    def test_get_queryset(self):
-        raise NotImplementedError()
+    def test_get_access_queryset_with_action_share(self, viewset_mixin):
+        viewset_mixin.action = "share"
+        assert viewset_mixin.get_access_queryset() is None
 
-    def test_share(self):
-        raise NotImplementedError()
+    def test_share_valid(self, viewset_mixin, post_req, user_2_agent):
+        viewset_mixin.action = "share"
+        viewset_mixin.request = post_req
+        post_req.data = {"receiver": user_2_agent.uuid, "grants": {"caps_test.view_concreteobject": 1}}
+        resp = viewset_mixin.share(post_req)
+        assert resp.status_code == 201
+
+    def test_share_invalid_data(self, viewset_mixin, post_req):
+        viewset_mixin.action = "share"
+        viewset_mixin.request = post_req
+        post_req.data = {"grants": {"caps_test.view_concreteobject": 1}}
+        resp = viewset_mixin.share(post_req)
+        assert resp.status_code == 400
+
+    def test_share_invalid_grants(self, viewset_mixin, post_req, user_2_agent):
+        viewset_mixin.action = "share"
+        viewset_mixin.request = post_req
+        post_req.data = {"receiver": user_2_agent.uuid, "grants": {"auth.view_user": 1}}
+        with pytest.raises(PermissionDenied):
+            viewset_mixin.share(post_req)
 
 
 class TestAccessViewSet:

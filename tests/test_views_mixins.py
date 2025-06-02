@@ -57,13 +57,6 @@ class TestObjectMixin:
         object_mixin.all_agents = True
         assert object_mixin.get_agents() == user_agents
 
-    def test_get_queryset(self, object_mixin, user_agent, accesses):
-        raise NotImplementedError()
-
-    #    object_mixin.agents = user_agent
-    #    query = object_mixin.get_queryset()
-    #    assert all(o.access.agent == user_agent for o in query)
-
     def test_dispatch(self, object_mixin):
         class Base:
             def dispatch(self, *args, **kwargs):

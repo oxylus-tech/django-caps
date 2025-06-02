@@ -95,22 +95,22 @@ class TestAccess:
         assert obj.emitter == access.receiver
         assert obj.grants.keys() == access.grants.keys()
 
-    def test_get_shared_grants_with_defaults(self, access):
-        result = access.get_shared_grants()
+    def test_get_share_grants_with_defaults(self, access):
+        result = access.get_share_grants()
         assert all(v == access.grants[k] - 1 for k, v in result.items())
 
-    def test_get_shared_grants_with_grants(self, access):
+    def test_get_share_grants_with_grants(self, access):
         access.grants = {"a": 0, "b": 1}
         grants = {
             "a": 1,  # should not exists
             "b": 1,  # upper value
             "c": 4,  # not granted
         }
-        result = access.get_shared_grants(grants)
+        result = access.get_share_grants(grants)
         assert result == {"b": 0}
 
-    def test_get_shared_kwargs(self, access, group_agent):
-        assert access.get_shared_kwargs(group_agent, {"a": 123}) == {
+    def test_get_share_kwargs(self, access, group_agent):
+        assert access.get_share_kwargs(group_agent, {"a": 123}) == {
             "a": 123,
             "emitter_id": access.receiver_id,
             "receiver": group_agent,
@@ -118,14 +118,14 @@ class TestAccess:
             "target": access.target,
         }
 
-    def test_get_shared_kwargs_expired_raise_permission_denied(self, access, group_agent):
+    def test_get_share_kwargs_expired_raise_permission_denied(self, access, group_agent):
         access.expiration = tz.now() - timedelta(hours=1)
         with pytest.raises(PermissionDenied):
-            access.get_shared_kwargs(group_agent, {})
+            access.get_share_kwargs(group_agent, {})
 
-    def test_get_shared_kwargs_expiration_fixed(self, access, group_agent):
+    def test_get_share_kwargs_expiration_fixed(self, access, group_agent):
         access.expiration = tz.now() + timedelta(hours=1)
-        kw = access.get_shared_kwargs(group_agent, {"expiration": tz.now() + timedelta(hours=3)})
+        kw = access.get_share_kwargs(group_agent, {"expiration": tz.now() + timedelta(hours=3)})
         assert kw["expiration"] == access.expiration
 
     def test_get_absolute_url(self, access):

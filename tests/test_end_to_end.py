@@ -47,7 +47,7 @@ def test_api_create_access(client, client_2, user_2, group_agent):
         {"receiver": user_2.agents.all().first().uuid, "grants": {"caps_test.view_concreteobject": 0}},
         format="json",
     )
-    assert resp.status_code == 200
+    assert resp.status_code == 201
 
     access_uuid = resp.data["uuid"]
 

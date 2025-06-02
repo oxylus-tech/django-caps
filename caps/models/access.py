@@ -190,22 +190,22 @@ class Access(models.Model):
     def share(self, receiver: Agent, grants: dict[str, int] | None = None, **kwargs):
         """Create a new saved access shared from self.
 
-        See :py:meth:`get_shared` for arguments.
+        See :py:meth:`get_share` for arguments.
         """
-        obj = self.get_shared(receiver, grants, **kwargs)
+        obj = self.get_share(receiver, grants, **kwargs)
         obj.save()
         return obj
 
     async def ashare(self, receiver: Agent, grants: dict[str, int] | None = None, **kwargs):
         """Create a new saved access shared from self (async).
 
-        See :py:meth:`get_shared` for arguments.
+        See :py:meth:`get_share` for arguments.
         """
-        obj = self.get_shared(receiver, grants, **kwargs)
+        obj = self.get_share(receiver, grants, **kwargs)
         await obj.asave()
         return obj
 
-    def get_shared(self, receiver: Agent, grants: dict[str, int] | None = None, **kwargs):
+    def get_share(self, receiver: Agent, grants: dict[str, int] | None = None, **kwargs):
         """Return new access shared from self. The object is not saved.
 
         :param receiver: the receiver
@@ -213,13 +213,13 @@ class Access(models.Model):
         :param **kwargs: extra initial arguments
         :yield PermissionDenied: when access expired or no grant is shareable.
         """
-        grants = self.get_shared_grants(grants)
+        grants = self.get_share_grants(grants)
         if not grants:
             raise PermissionDenied("Share not allowed.")
-        kwargs = self.get_shared_kwargs(receiver, kwargs)
+        kwargs = self.get_share_kwargs(receiver, kwargs)
         return type(self)(grants=grants, **kwargs)
 
-    def get_shared_kwargs(self, receiver: Agent, kwargs):
+    def get_share_kwargs(self, receiver: Agent, kwargs):
         """Return initial argument for a derived access from self."""
         e_key, emitter = get_lazy_relation(self, "receiver", "emitter")
 
@@ -240,7 +240,7 @@ class Access(models.Model):
             "target": self.target,
         }
 
-    def get_shared_grants(self, grants: dict[str, int] | None = None, **kwargs) -> dict[str, int]:
+    def get_share_grants(self, grants: dict[str, int] | None = None, **kwargs) -> dict[str, int]:
         """Return :py:attr:`grants` for shared access."""
         if grants:
             return {
