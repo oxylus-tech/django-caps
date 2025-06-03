@@ -15,8 +15,8 @@ def forwards_func(apps, schema_editor):
     users = User.objects.using(db_alias).filter(agent__isnull=True)
     groups = Group.objects.using(db_alias).filter(agent__isnull=True)
 
-    Agent.objects.using(db_alias).create_for_users(users)
-    Agent.objects.using(db_alias).create_for_groups(groups)
+    agents = [Agent(user=user) for user in users] + [Agent(group=group) for group in groups]
+    Agent.objects.using(db_alias).bulk_create(agents)
 
 
 def backward_func(apps, schema_editor):

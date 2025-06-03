@@ -12,30 +12,6 @@ __all__ = ("AgentQuerySet", "Agent")
 
 
 class AgentQuerySet(models.QuerySet):
-    def create_for_users(self, users: models.QuerySet[User] | None) -> AgentQuerySet:
-        """Create Agent for all users that don't have one assigned yet.
-
-        :param users: if provided only for those users
-        :return: newly created agent (excluding existing ones)
-        """
-        if users is None:
-            users = User.objects.all()
-
-        db = set(users.filter(agent__is_default=True).values_list("id", flat=True))
-        return self.model.bulk_create(self.model(user=user, is_default=True) for user in users if user.id not in db)
-
-    def create_for_groups(self, groups: models.QuerySet[Group] | None) -> AgentQuerySet:
-        """Create Agent for all users that don't have one assigned yet.
-
-        :param users: if provided only for those users
-        :return: newly created agent (excluding existing ones)
-        """
-        if groups is None:
-            groups = Group.objects.all()
-
-        db = set(groups.filter(agent__isnull=False).values_list("id", flat=True))
-        return self.model.bulk_create(self.model(group=group) for group in groups if group.id not in db)
-
     def user(self, user: User, strict: bool = False) -> AgentQuerySet:
         """Filter by user or its groups.
 
