@@ -75,7 +75,7 @@ class OwnedSerializer(UUIDSerializer, serializers.ModelSerializer):
     """
 
     id = serializers.SerializerMethodField()
-    owner = serializers.UUIDField(source="owner__uuid", allow_null=True, required=False)
+    owner = serializers.SlugRelatedField(slug_field="uuid", allow_null=True, required=False)
     access = AccessSerializer(read_only=True)
     """ Access """
     path = serializers.CharField(required=False, allow_null=True)
