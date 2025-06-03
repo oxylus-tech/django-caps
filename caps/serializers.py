@@ -31,7 +31,7 @@ class AgentSerializer(UUIDSerializer, serializers.ModelSerializer):
 
     class Meta:
         model = models.Agent
-        fields = ["uuid", "user_id", "group_id"]
+        fields = ["uuid", "user", "group", "name"]
 
     def get_name(self, obj):
         if obj.user:

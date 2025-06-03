@@ -59,6 +59,11 @@ def user(db, user_group):
 
 
 @pytest.fixture
+def user_admin(db, user_group):
+    return User.objects.create_user(username="admin", password="none-3", is_superuser=True)
+
+
+@pytest.fixture
 def user_perms(user):
     ct = ContentType.objects.get_for_model(ConcreteOwned)
     perms = Permission.objects.filter(content_type=ct)

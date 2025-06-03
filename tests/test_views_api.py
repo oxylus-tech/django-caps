@@ -101,3 +101,36 @@ class TestAccessViewSet:
         access_viewset.request.data = {"receiver": group_agent.uuid, "grants": "list"}
         resp = access_viewset.share(access_viewset.request)
         assert resp.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.fixture
+def agent_viewset(req):
+    return api.AgentViewSet(request=req)
+
+
+class TestAgentViewSet:
+    def test_user_with_provided_id_is_request_user(self, agent_viewset, user, user_agents):
+        agent_viewset.request.GET = {"user": user.id}
+        resp = agent_viewset.user()
+        assert resp.status_code == 200
+
+        for vals in resp.data:
+            assert vals["user"] == user.id or any(g.id == vals["group"] for g in user.groups.all())
+
+    def test_user_with_provided_id_raises_permission_denied(self, agent_viewset, user_2):
+        agent_viewset.request.GET = {"user": user_2.id}
+        with pytest.raises(PermissionDenied):
+            agent_viewset.user()
+
+    def test_user_with_provided_id_has_perm(self, agent_viewset, user_admin, user):
+        agent_viewset.request.user = user_admin
+        agent_viewset.request.GET = {"user": user.id}
+        resp = agent_viewset.user()
+        assert resp.status_code == 200
+
+    def test_user_without_id(self, agent_viewset, user):
+        resp = agent_viewset.user()
+        assert resp.status_code == 200
+
+        for vals in resp.data:
+            assert vals["user"] == user.id or any(g.id == vals["group"] for g in user.groups.all())

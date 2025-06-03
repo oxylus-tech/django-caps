@@ -1,3 +1,4 @@
+from django.core.exceptions import PermissionDenied
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 
@@ -136,9 +137,19 @@ class AgentViewSet(UserAgentMixin, viewsets.ModelViewSet):
     filterset_fields = ("group", "user", "user__group")
     search_fields = ("group__name", "user__name")
 
-    @action(detail=True, methods=["GET"])
-    def user(self, pk=None):
-        """Return request agents for user."""
-        user = get_object_or_404(User.objects.all(), pk=pk)
-        agents = self.queryset.user(user)
-        return self.get_serializer_class()(instance=agents, many=True).data
+    @action(detail=False, methods=["GET"])
+    def user(self, *_):
+        """
+        Return request agents for user using ``GET['user']``.
+        When parameter is not provided, it uses current user.
+        """
+        if userId := self.request.GET.get("user"):
+            if not self.request.user.has_perm("caps.view_agent") and userId != self.request.user.id:
+                raise PermissionDenied("Not allowed")
+
+            user = get_object_or_404(User.objects.all(), pk=userId)
+            agents = self.queryset.user(user)
+        else:
+            agents = self.agents
+
+        return Response(self.get_serializer_class()(instance=agents, many=True).data)
