@@ -75,7 +75,9 @@ class OwnedSerializer(UUIDSerializer, serializers.ModelSerializer):
     """
 
     id = serializers.SerializerMethodField()
-    owner = serializers.SlugRelatedField(slug_field="uuid", allow_null=True, required=False)
+    owner = serializers.SlugRelatedField(
+        slug_field="uuid", allow_null=True, required=False, queryset=models.Agent.objects.all()
+    )
     access = AccessSerializer(read_only=True)
     """ Access """
     path = serializers.CharField(required=False, allow_null=True)
@@ -99,10 +101,9 @@ class OwnedSerializer(UUIDSerializer, serializers.ModelSerializer):
         if not value:
             if agent := self.context.get("agent"):
                 return agent
-        if agents := self.context.get("agents"):
-            agent = next((a for a in agents if a.uuid == value), None)
-            if agent:
-                return agent
+        elif agents := self.context.get("agents"):
+            if value in agents:
+                return value
         raise ValidationError("Invalid owner")
 
     class Meta:
