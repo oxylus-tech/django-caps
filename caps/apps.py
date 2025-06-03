@@ -11,17 +11,8 @@ class CapsConfig(AppConfig):
     name = "caps"
     label = "caps"
 
+    def ready(self):
+        """Enforce permissions validation at boot-up."""
+        from . import signals
 
-#     def ready(self):
-#         """ Enforce permissions validation at boot-up. """
-#         from .models import Owned
-#         self.check_root_access_grants(Owned)
-#
-#     def check_root_access_grants(self, model):
-#         try:
-#             model.check_root_access_grants()
-#         except ValueError as err:
-#             logger.warn(err)
-#
-#         for sub in model.__subclasses__():
-#             self.check_root_access_grants(sub)
+        signals.create_group_agent
