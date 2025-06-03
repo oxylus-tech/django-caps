@@ -35,7 +35,7 @@ class AgentSerializer(UUIDSerializer, serializers.ModelSerializer):
 
     def get_name(self, obj):
         if obj.user:
-            return obj.user.username
+            return obj.user.get_full_name() or obj.user.username
         if obj.group:
             return obj.group.name
         return _("Anonymous")

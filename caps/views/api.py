@@ -1,3 +1,6 @@
+from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
+
 from rest_framework import status, viewsets, mixins as mx
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -130,11 +133,12 @@ class AgentViewSet(UserAgentMixin, viewsets.ModelViewSet):
     queryset = models.Agent.objects.all()
     serializer_class = serializers.AgentSerializer
     permissions = [permissions.DjangoModelPermissions]
-
     filterset_fields = ("group", "user", "user__group")
     search_fields = ("group__name", "user__name")
 
-    @action(detail=False, methods=["GET"])
-    def user(self, **kw):
-        """Return request user's agents."""
-        return self.get_serializer_class()(instance=self.agents, many=True).data
+    @action(detail=True, methods=["GET"])
+    def user(self, pk=None):
+        """Return request agents for user."""
+        user = get_object_or_404(User.objects.all(), pk=pk)
+        agents = self.queryset.user(user)
+        return self.get_serializer_class()(instance=agents, many=True).data
