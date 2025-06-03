@@ -6,7 +6,7 @@ from . import models, views
 
 
 def get_object_paths(
-    obj_class: type[models.Object],
+    obj_class: type[models.Owned],
     url_paccessix: str | None = None,
     kwargs: dict[str, Any] | None = None,
     basename: str = "",
@@ -29,7 +29,7 @@ def get_object_paths(
     :param url_paccessix: url base path (default to model name);
     :param kwargs: ``as_view`` kwargs, by view kind (list, detail, etc.)
     :param basename: use this as url's basename (default to model name)
-    :param accesses: if True, generate path for Object's Access using default view (see :py:mod:`caps.views.common`)
+    :param accesses: if True, generate path for Owned's Access using default view (see :py:mod:`caps.views.common`)
     :param access_kwargs: ``kwargs`` argument passed down to :py:func:`get_access_class`.
 
     :return: a list of path
@@ -43,11 +43,11 @@ def get_object_paths(
         obj_class,
         basename,
         [
-            ("list", views.ObjectListView, url_paccessix),
-            ("detail", views.ObjectDetailView, f"{url_paccessix}/<uuid:uuid>"),
-            ("create", views.ObjectCreateView, f"{url_paccessix}/create"),
-            ("update", views.ObjectUpdateView, f"{url_paccessix}/<uuid:uuid>/update"),
-            ("delete", views.ObjectDeleteView, f"{url_paccessix}/<uuid:uuid>/delete"),
+            ("list", views.OwnedListView, url_paccessix),
+            ("detail", views.OwnedDetailView, f"{url_paccessix}/<uuid:uuid>"),
+            ("create", views.OwnedCreateView, f"{url_paccessix}/create"),
+            ("update", views.OwnedUpdateView, f"{url_paccessix}/<uuid:uuid>/update"),
+            ("delete", views.OwnedDeleteView, f"{url_paccessix}/<uuid:uuid>/delete"),
         ],
         kwargs,
     ) + get_access_paths(obj_class.Access, f"{url_paccessix}/access", kwargs=access_kwargs)

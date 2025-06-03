@@ -3,40 +3,40 @@ import pytest
 
 from django.utils import timezone as tz
 
-from .app.models import ConcreteObject, Access
+from .app.models import ConcreteOwned, Access
 from .conftest import assertCountEqual
 
 
-class TestObjectQuerySet:
+class TestOwnedQuerySet:
     def test_available_with_owner(self, user_agent, objects, user_2_object):
-        query = ConcreteObject.objects.available(user_agent)
+        query = ConcreteOwned.objects.available(user_agent)
         assertCountEqual(query, objects)
 
     def test_available_with_access(self, user_2_agent, objects):
         objects[0].share(user_2_agent)
-        query = ConcreteObject.objects.available(user_2_agent, Access.objects.all())
+        query = ConcreteOwned.objects.available(user_2_agent, Access.objects.all())
         assert list(query) == [objects[0]]
 
     def test_available_with_access_expired(self, user_2_agent, objects):
         objects[0].share(user_2_agent, expiration=tz.now() - timedelta(hours=1))
-        assert not ConcreteObject.objects.available(user_2_agent, Access.objects.all()).exists()
+        assert not ConcreteOwned.objects.available(user_2_agent, Access.objects.all()).exists()
 
     def test_access(self, agents, accesses):
         for agent in agents:
             query = Access.objects.receiver(agent)
             q_uuids = list(query.values_list("uuid", flat=True))
-            result = ConcreteObject.objects.access(query, strict=True)
+            result = ConcreteOwned.objects.access(query, strict=True)
             uuids = [r.access.uuid for r in result]
             assertCountEqual(uuids, q_uuids)
 
 
 @pytest.mark.django_db(transaction=True)
-class TestObject:
+class TestOwned:
     def test_check_root_grants(self):
-        ConcreteObject.check_root_grants()
+        ConcreteOwned.check_root_grants()
 
     def test_check_root_grants_raises_value_error(self):
-        class SubClass(ConcreteObject):
+        class SubClass(ConcreteOwned):
             root_grants = {"invalid-permission": 1}
 
             class Meta:

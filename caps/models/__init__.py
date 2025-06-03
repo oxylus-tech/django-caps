@@ -1,13 +1,13 @@
 from .agent import Agent, AgentQuerySet
-from .object import Object, ObjectQuerySet, ObjectBase
+from .owned import Owned, OwnedQuerySet, OwnedBase
 from .access import Access, AccessQuerySet
 
 __all__ = (
     "Agent",
     "AgentQuerySet",
-    "Object",
-    "ObjectQuerySet",
-    "ObjectBase",
+    "Owned",
+    "OwnedQuerySet",
+    "OwnedBase",
     "Access",
     "AccessQuerySet",
 )

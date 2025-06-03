@@ -7,7 +7,7 @@ from django.test import RequestFactory
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from caps.models import Agent
-from .app.models import ConcreteObject
+from .app.models import ConcreteOwned
 
 
 __all__ = ("assertCountEqual",)
@@ -21,19 +21,15 @@ req_factory = RequestFactory()
 api_req_factory = APIRequestFactory()
 
 
-def init_request(req, agent, agents):
+def init_request(req, user):
     """Initialize request."""
-    setattr(req, "user", agent.user)
-    setattr(req, "agent", agent)
-    setattr(req, "agents", agents)
+    setattr(req, "user", user)
     return req
 
 
-def init_api_request(req, agent, agents):
+def init_api_request(req, user):
     """Initialize request."""
-    setattr(req, "user", agent.user)
-    setattr(req, "agent", agent)
-    setattr(req, "agents", agents)
+    setattr(req, "user", user)
     req.authenticators = None
     force_authenticate(req, user=user)
     return req
@@ -64,7 +60,7 @@ def user(db, user_group):
 
 @pytest.fixture
 def user_perms(user):
-    ct = ContentType.objects.get_for_model(ConcreteObject)
+    ct = ContentType.objects.get_for_model(ConcreteOwned)
     perms = Permission.objects.filter(content_type=ct)
     user.user_permissions.set(perms)
     return perms
@@ -78,8 +74,15 @@ def user_2(db, user_group):
 
 
 @pytest.fixture
+def user_3(db, user_group):
+    user = User.objects.create_user(username="test_3", password="none-3")
+    user.groups.add(user_group)
+    return user
+
+
+@pytest.fixture
 def user_2_perms(user_2):
-    ct = ContentType.objects.get_for_model(ConcreteObject)
+    ct = ContentType.objects.get_for_model(ConcreteOwned)
     perms = Permission.objects.filter(content_type=ct, codename__contains="view")
     user_2.user_permissions.set(perms)
     return perms
@@ -92,12 +95,12 @@ def anon_agent(db, user):
 
 @pytest.fixture
 def user_agent(db, user):
-    return Agent.objects.create(user=user, is_default=True)
+    return Agent.objects.create(user=user)
 
 
 @pytest.fixture
 def user_2_agent(db, user_2):
-    return Agent.objects.create(user=user_2, is_default=True)
+    return Agent.objects.create(user=user_2)
 
 
 @pytest.fixture
@@ -126,8 +129,8 @@ def permissions(db):
     perms = Permission.objects.all().values_list("content_type__app_label", "codename")[0:3]
     perms = [".".join(p) for p in perms]
 
-    if perms[0] not in ConcreteObject.root_grants:
-        ConcreteObject.root_grants.update({p: 2 for p in perms})
+    if perms[0] not in ConcreteOwned.root_grants:
+        ConcreteOwned.root_grants.update({p: 2 for p in perms})
     return perms
 
 
@@ -141,22 +144,22 @@ def orphan_perm():
     return Permission.objects.all().last().codename
 
 
-# -- Objects
+# -- Owneds
 @pytest.fixture
 def object(user_agent, db):
-    return ConcreteObject.objects.create(name="test-object", owner=user_agent)
+    return ConcreteOwned.objects.create(name="test-object", owner=user_agent)
 
 
 @pytest.fixture
 def objects(user_agent, db):
-    objects = [ConcreteObject(name=f"object-{i}", owner=user_agent) for i in range(0, 3)]
-    ConcreteObject.objects.bulk_create(objects)
+    objects = [ConcreteOwned(name=f"object-{i}", owner=user_agent) for i in range(0, 3)]
+    ConcreteOwned.objects.bulk_create(objects)
     return objects
 
 
 @pytest.fixture
 def user_2_object(user_2_agent, db):
-    return ConcreteObject.objects.create(name="user-2-object", owner=user_2_agent)
+    return ConcreteOwned.objects.create(name="user-2-object", owner=user_2_agent)
 
 
 @pytest.fixture

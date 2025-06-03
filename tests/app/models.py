@@ -1,34 +1,34 @@
 from django.db import models
 
-from caps.models import Object
+from caps.models import Owned
 
-__all__ = ("ConcreteObject", "Access")
+__all__ = ("ConcreteOwned", "Access")
 
 
-class ConcreteObject(Object):
+class ConcreteOwned(Owned):
     """This class is used to test object agains't concrete class."""
 
     detail_url_name = "concrete-detail"
 
     root_grants = {
-        "caps_test.view_concreteobject": 4,
-        "caps_test.change_concreteobject": 2,
+        "caps_test.view_concreteowned": 4,
+        "caps_test.change_concreteowned": 2,
     }
 
     name = models.CharField(max_length=16)
 
 
-Access = ConcreteObject.Access
+Access = ConcreteOwned.Access
 
 
-# class AbstractObject(Object):
+# class AbstractOwned(Owned):
 #     name = models.CharField(max_length=16)
 #
 #     class Access(Access):
-#         target = models.ForeignKey(ConcreteObject, models.CASCADE, related_name="_abstract")
+#         target = models.ForeignKey(ConcreteOwned, models.CASCADE, related_name="_abstract")
 #
 #     class Meta:
 #         abstract = True
 #
 #
-# AbstractAccess = AbstractObject.Access
+# AbstractAccess = AbstractOwned.Access

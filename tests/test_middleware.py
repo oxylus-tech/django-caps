@@ -26,12 +26,8 @@ class TestAgentMiddleware:
 
     def test_get_agents(self, middleware, req, user_agents):
         agents = middleware.get_agents(req)
-        assert agents[0].is_default
+        assert agents[0].user_id == req.user.id
         assertCountEqual(agents, user_agents)
-
-    def test_get_agent_from_cookie(self, middleware, req, user_agents):
-        req.COOKIES = {middleware.agent_cookie_key: user_agents[-1].uuid}
-        assert middleware.get_agent(req, user_agents) == user_agents[-1]
 
     def test_get_agent_with_anonymous_user(self, middleware, req, anon_agent):
         req.user = AnonymousUser()
@@ -44,4 +40,4 @@ class TestAgentMiddleware:
     def test_get_agent_create_new_one(self, middleware, req):
         agent = middleware.get_agent(req, [])
         assert agent.user == req.user
-        assert agent.is_default
+        assert req.user.agent == agent

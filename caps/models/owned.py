@@ -14,11 +14,11 @@ from .agent import Agent
 from .access import Access, AccessQuerySet
 from .nested import NestedModelBase
 
-__all__ = ("ObjectBase", "ObjectQuerySet", "Object")
+__all__ = ("OwnedBase", "OwnedQuerySet", "Owned")
 
 
-class ObjectBase(NestedModelBase):
-    """Metaclass for Object model classes.
+class OwnedBase(NestedModelBase):
+    """Metaclass for Owned model classes.
 
     It subclass Access if no `Access` member is provided.
     """
@@ -28,7 +28,7 @@ class ObjectBase(NestedModelBase):
     @classmethod
     def create_nested_class(cls, new_class, name, attrs={}):
         """Provide `target` ForeignKey on nested Access model."""
-        return super(ObjectBase, cls).create_nested_class(
+        return super(OwnedBase, cls).create_nested_class(
             new_class,
             name,
             {
@@ -44,8 +44,8 @@ class ObjectBase(NestedModelBase):
         )
 
 
-class ObjectQuerySet(models.QuerySet):
-    """QuerySet for Objects."""
+class OwnedQuerySet(models.QuerySet):
+    """QuerySet for Owneds."""
 
     def available(self, agents: Agent | Iterable[Agent], accesses: AccessQuerySet | None = None):
         """
@@ -68,7 +68,7 @@ class ObjectQuerySet(models.QuerySet):
             q = Q(owner__in=agents) | Q(accesses__in=accesses)
         return self.access(accesses).filter(q)
 
-    def access(self, access: AccessQuerySet | Access, strict: bool = False) -> ObjectQuerySet:
+    def access(self, access: AccessQuerySet | Access, strict: bool = False) -> OwnedQuerySet:
         """Prefetch object with accesses from the provided queryset (as ``agent_accesses``).
 
         The items are annotated with ``access_uuid`` corresponding to the access.
@@ -89,7 +89,7 @@ class ObjectQuerySet(models.QuerySet):
         return self.filter(access_uuid__isnull=False) if strict else self
 
 
-class Object(models.Model, metaclass=ObjectBase):
+class Owned(models.Model, metaclass=OwnedBase):
     """An object accessible through Accesss.
 
     It can have a member `Access` (subclass of
@@ -102,8 +102,8 @@ class Object(models.Model, metaclass=ObjectBase):
 
     This provides:
 
-        - :py:class:`Access` concrete model accessible from the :py:class:`Object` concrete subclass;
-        - :py:class:`Capability` concrete model accessible from the :py:class:`Object` concrete subclass;
+        - :py:class:`Access` concrete model accessible from the :py:class:`Owned` concrete subclass;
+        - :py:class:`Capability` concrete model accessible from the :py:class:`Owned` concrete subclass;
     """
 
     root_grants = {}
@@ -120,10 +120,10 @@ class Object(models.Model, metaclass=ObjectBase):
 
     """
 
-    uuid = models.UUIDField(_("uuid"), default=uuid4)
+    uuid = models.UUIDField(_("Id"), default=uuid4)
     owner = models.ForeignKey(Agent, models.CASCADE, verbose_name=_("Owner"))
 
-    objects = ObjectQuerySet.as_manager()
+    objects = OwnedQuerySet.as_manager()
 
     detail_url_name = None
     """ Provide url name used for get_absolute_url. """
@@ -134,7 +134,7 @@ class Object(models.Model, metaclass=ObjectBase):
     @cached_property
     def access(self) -> Access:
         """Return Access to this object for receiver provided to
-        ObjectQuerySet's `access()` or `accesses()`."""
+        OwnedQuerySet's `access()` or `accesses()`."""
         access_set = getattr(self, "agent_accesses", None)
         return access_set and access_set[0] or None
 

@@ -1,12 +1,12 @@
 from caps import views
 
 from . import models
-from .serializers import ConcreteObjectSerializer
+from .serializers import ConcreteOwnedSerializer
 
 
-class ObjectViewSet(views.ObjectViewSet):
-    serializer_class = ConcreteObjectSerializer
-    queryset = models.ConcreteObject.objects.all()
+class OwnedViewSet(views.OwnedViewSet):
+    serializer_class = ConcreteOwnedSerializer
+    queryset = models.ConcreteOwned.objects.all()
 
 
 class AccessViewSet(views.AccessViewSet):

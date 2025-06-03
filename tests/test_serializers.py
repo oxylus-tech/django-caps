@@ -5,34 +5,36 @@ from rest_framework.serializers import ValidationError
 
 from caps import serializers
 from .conftest import api_req_factory, init_api_request
-from .app.models import ConcreteObject
+from .app.models import ConcreteOwned
 
 
-class ConcreteObjectSerializer(serializers.ObjectSerializer):
+class ConcreteOwnedSerializer(serializers.OwnedSerializer):
     class Meta:
         fields = "__all__"
-        model = ConcreteObject
+        model = ConcreteOwned
 
 
 @pytest.fixture
-def req(user_agent, user_agents):
-    return init_api_request(api_req_factory.post("/test", {}), user_agent, user_agents)
+def req(user):
+    return init_api_request(api_req_factory.post("/test", {}), user)
 
 
 @pytest.fixture
-def object_ser(req):
-    return ConcreteObjectSerializer(object, context={"request": req})
+def object_ser(user_agent, user_agents):
+    return ConcreteOwnedSerializer(object, context={"agent": user_agent, "agents": user_agents})
 
 
-class TestObjectSerializer:
+class TestOwnedSerializer:
     def test__init__(self, object):
-        ser = ConcreteObjectSerializer(object)
+        ser = ConcreteOwnedSerializer(object)
         assert "pk" not in ser.data
-        assert "id" not in ser.data
+        assert "uuid" not in ser.data
         assert "access" in ser.data
 
-    def test_deserialize(self, req, user_agent):
-        ser = ConcreteObjectSerializer(data={"name": "name", "owner": user_agent.uuid}, context={"request": req})
+    def test_deserialize(self, req, user_agent, user_agents):
+        ser = ConcreteOwnedSerializer(
+            data={"name": "name", "owner": user_agent.uuid}, context={"agent": user_agent, "agents": user_agents}
+        )
         assert ser.is_valid(raise_exception=True)
         # assert ser.validated_data ==
 

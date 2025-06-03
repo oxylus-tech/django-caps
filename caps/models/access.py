@@ -98,17 +98,17 @@ class AccessQuerySet(models.QuerySet):
 
 
 class Access(models.Model):
-    """Access are the entry point to access an :py:class:`Object`.
+    """Access are the entry point to access an :py:class:`Owned`.
 
     Access provides a set of capabilities for specific receiver.
     The concrete sub-model MUST provide the ``target`` foreign key to an
-    Object.
+    Owned.
 
     There are two kind of access:
 
     - root: the root access from which all other accesses to object
       are derived. Created from the :py:meth:`create` class method. It has no :py:attr:`origin`
-      and **there can be only one root access per :py:class:`Object` instance.
+      and **there can be only one root access per :py:class:`Owned` instance.
     - derived: access derived from root or another derived. Created
       from the :py:meth:`derive` method.
 
@@ -118,12 +118,12 @@ class Access(models.Model):
     ------------------
 
     This model is implemented as an abstract in order to have a access
-    specific to each model (see :py:class:`Object` abstract model). The
-    actual concrete class is created when :py:class:`Object` is subclassed
+    specific to each model (see :py:class:`Owned` abstract model). The
+    actual concrete class is created when :py:class:`Owned` is subclassed
     by a concrete model.
     """
 
-    uuid = models.UUIDField(_("UUID"), default=uuid.uuid4, db_index=True)
+    uuid = models.UUIDField(_("Id"), default=uuid.uuid4, db_index=True)
     """Public access id used in API."""
     origin = models.ForeignKey(
         "self",
@@ -131,7 +131,7 @@ class Access(models.Model):
         blank=True,
         null=True,
         related_name="derived",
-        verbose_name=_("Source Access"),
+        verbose_name=_("Origin"),
     )
     """Source access in accesses chain."""
     emitter = models.ForeignKey(Agent, models.CASCADE, verbose_name=_("Emitter"), related_name="+", db_index=True)
@@ -145,7 +145,7 @@ class Access(models.Model):
         help_text=_("Defines an expiration date after which the access is not longer valid."),
     )
     """Date of expiration."""
-    grants = models.JSONField(_("Granted capabilities"), blank=True)
+    grants = models.JSONField(_("Granted permissions"), blank=True)
     """ Allowed permissions as a dict of ``{"permission": allowed_reshare}`.
 
     The integer value of ``allowed_reshare`` determines the amount of reshare can be done.
@@ -164,7 +164,7 @@ class Access(models.Model):
 
     @classmethod
     def get_object_class(cls):
-        """Return related Object class."""
+        """Return related Owned class."""
         return cls.target.field.related_model
 
     def has_perm(self, user: User, permission: str) -> bool:
@@ -257,3 +257,6 @@ class Access(models.Model):
     def save(self, *a, **kw):
         self.is_valid(raises=True)
         return super().save(*a, **kw)
+
+    def __str__(self):
+        return f"{self.emitter} -> {self.receiver}, {self.target.uuid}"

@@ -32,27 +32,16 @@ class AgentMiddleware:
         return self.get_response(request)
 
     def get_agents(self, request: HttpRequest) -> AgentQuerySet:
-        """Return queryset for user's agents, ordered by ``-is_default``."""
-        return Agent.objects.user(request.user, strict=False).order_by("-is_default")
+        """Return queryset for user's agents, ordered by ``-user_id``."""
+        return Agent.objects.user(request.user, strict=False).order_by("-user_id")
 
     def get_agent(self, request: HttpRequest, agents: AgentQuerySet) -> Agent:
         """Return user's active agent."""
-        cookie = request.COOKIES.get(self.agent_cookie_key)
-        if cookie:
-            # we iterate over agents instead of fetching extra queryset
-            # this keeps cache for further operations.
-            agent = next((r for r in agents if r.uuid == cookie), None)
-            if agent:
-                return agent
-
         if request.user.is_anonymous:
             return next(iter(agents), None)
-
-        # agents are sorted such as default are first:
-        # predicates order ensure that we return first on is_default
-        # then only if is user
-        it = (r for r in agents if r.is_default or r.user_id == request.user.id)
-        if agent := next(it, None):
+        if agent := getattr(request.user, "agent", None):
             return agent
 
-        return Agent.objects.create(user=request.user, is_default=True)
+        agent = Agent.objects.create(user=request.user)
+        request.user.__dict__["agent"] = agent
+        return agent

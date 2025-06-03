@@ -1,0 +1,68 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-06-03 13:45+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: caps/models/access.py:126 caps/models/object.py:123
+msgid "Id"
+msgstr "Id"
+
+#: caps/models/access.py:134
+msgid "Origin"
+msgstr "Origine"
+
+#: caps/models/access.py:137
+msgid "Emitter"
+msgstr "Émetteur"
+
+#: caps/models/access.py:139
+msgid "Receiver"
+msgstr "Récepteur"
+
+#: caps/models/access.py:142
+msgid "Expiration"
+msgstr "Expiration"
+
+#: caps/models/access.py:145
+msgid "Defines an expiration date after which the access is not longer valid."
+msgstr ""
+"Définit une date d'expiration après laquelle l'accès n'est plus valide."
+
+#: caps/models/access.py:148
+msgid "Granted permissions"
+msgstr "Permissions accordées"
+
+#: caps/models/agent.py:62
+msgid "Access"
+msgstr "Accès"
+
+#: caps/models/agent.py:89
+msgid "Agent targets either a user or a group"
+msgstr "Un agent cible soit un utilisateur soit un groupe."
+
+#: caps/models/object.py:40
+msgid "Target"
+msgstr "Cible"
+
+#: caps/models/object.py:124
+msgid "Owner"
+msgstr "Propriétaire"
+
+#: caps/serializers.py:26
+msgid "Anonymous"
+msgstr "Anonyme"

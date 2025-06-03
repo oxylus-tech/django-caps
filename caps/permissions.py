@@ -4,7 +4,7 @@ from django.http import Http404
 from rest_framework import exceptions, permissions
 
 
-__all__ = ("DjangoModelPermissions", "ObjectPermissions")
+__all__ = ("DjangoModelPermissions", "OwnedPermissions")
 
 
 class DjangoModelPermissions(permissions.DjangoModelPermissions):
@@ -64,7 +64,7 @@ class DjangoModelPermissions(permissions.DjangoModelPermissions):
         return request.user.has_perms(perms)
 
 
-class ObjectPermissions(permissions.DjangoObjectPermissions, DjangoModelPermissions):
+class OwnedPermissions(permissions.DjangoObjectPermissions, DjangoModelPermissions):
     """
     This class provide permissions check over object using a permission map.
 

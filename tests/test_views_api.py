@@ -4,30 +4,30 @@ from django.core.exceptions import PermissionDenied
 from rest_framework import status
 
 from caps.views import api
-from .app.models import Access, ConcreteObject
-from .app.serializers import ConcreteObjectSerializer
+from .app.models import Access, ConcreteOwned
+from .app.serializers import ConcreteOwnedSerializer
 from .conftest import api_req_factory, init_api_request
 from .test_views_mixins import BaseMixin
 
 
-class ObjectViewSetMixin(api.ObjectViewSet, BaseMixin):
-    queryset = ConcreteObject.objects.all()
-    serializer_class = ConcreteObjectSerializer
+class OwnedViewSetMixin(api.OwnedViewSet, BaseMixin):
+    queryset = ConcreteOwned.objects.all()
+    serializer_class = ConcreteOwnedSerializer
 
 
 @pytest.fixture
-def req(user_agent, user_agents):
-    return init_api_request(api_req_factory.get("/test"), user_agent, user_agents)
+def req(user, user_agent, user_agents):
+    return init_api_request(api_req_factory.get("/test"), user)
 
 
 @pytest.fixture
-def post_req(user_agent, user_agents):
-    return init_api_request(api_req_factory.post("/test", {}), user_agent, user_agents)
+def post_req(user, user_agents):
+    return init_api_request(api_req_factory.post("/test", {}), user)
 
 
 @pytest.fixture
 def viewset_mixin(req, user_agent, object):
-    return ObjectViewSetMixin(request=req, agent=user_agent, kwargs={"uuid": str(object.uuid)})
+    return OwnedViewSetMixin(request=req, agent=user_agent, kwargs={"uuid": str(object.uuid)})
 
 
 @pytest.fixture
@@ -37,9 +37,11 @@ def access_viewset(req):
 
 
 @pytest.mark.django_db(transaction=True)
-class TestObjectViewSet:
-    def test_perform_create(self, viewset_mixin, req, user_agent):
-        ser = ConcreteObjectSerializer(data={"name": "Name"}, context={"request": req})
+class TestOwnedViewSet:
+    def test_perform_create(self, viewset_mixin, req, user_agent, user_agents):
+        ser = ConcreteOwnedSerializer(
+            data={"name": "Name"}, context={"request": req, "agent": user_agent, "agents": user_agents}
+        )
         ser.is_valid()
         viewset_mixin.perform_create(ser)
 
@@ -52,14 +54,14 @@ class TestObjectViewSet:
     def test_share_valid(self, viewset_mixin, post_req, user_2_agent):
         viewset_mixin.action = "share"
         viewset_mixin.request = post_req
-        post_req.data = {"receiver": user_2_agent.uuid, "grants": {"caps_test.view_concreteobject": 1}}
+        post_req.data = {"receiver": user_2_agent.uuid, "grants": {"caps_test.view_concreteowned": 1}}
         resp = viewset_mixin.share(post_req)
         assert resp.status_code == 201
 
     def test_share_invalid_data(self, viewset_mixin, post_req):
         viewset_mixin.action = "share"
         viewset_mixin.request = post_req
-        post_req.data = {"grants": {"caps_test.view_concreteobject": 1}}
+        post_req.data = {"grants": {"caps_test.view_concreteowned": 1}}
         resp = viewset_mixin.share(post_req)
         assert resp.status_code == 400
 

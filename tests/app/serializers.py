@@ -1,12 +1,12 @@
-from caps.serializers import ObjectSerializer
+from caps.serializers import OwnedSerializer
 
 from . import models
 
 
-__all__ = ("ConcreteObjectSerializer",)
+__all__ = ("ConcreteOwnedSerializer",)
 
 
-class ConcreteObjectSerializer(ObjectSerializer):
+class ConcreteOwnedSerializer(OwnedSerializer):
     class Meta:
-        model = models.ConcreteObject
+        model = models.ConcreteOwned
         fields = "__all__"

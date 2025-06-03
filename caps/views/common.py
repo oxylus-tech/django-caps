@@ -42,7 +42,7 @@ class AgentDeleteView(mixins.AgentMixin, generic.edit.DeleteView):
 class AccessDetailView(mixins.AccessMixin, generic.DetailView):
     def get_queryset(self):
         """Ensure capabilities are paccessetch at the same time than the access."""
-        return super().get_queryset().paccessetch_related("capabilities")
+        return super().get_queryset().prefetch_related("capabilities")
 
 
 class AccessListView(mixins.AccessMixin, generic.ListView):

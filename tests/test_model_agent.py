@@ -60,12 +60,3 @@ class TestAgent:
         agent = Agent(user=user, group=groups[0])
         with pytest.raises(ValidationError):
             agent.clean()
-
-    def test_clean_raises_on_is_default_not_allowed(self, groups):
-        agent = Agent(group=groups[0], is_default=True)
-        with pytest.raises(ValidationError):
-            agent.clean()
-
-    def test_clean_anonymous_is_default(self):
-        agent = Agent()
-        agent.clean()

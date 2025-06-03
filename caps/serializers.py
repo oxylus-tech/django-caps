@@ -2,29 +2,53 @@ from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError
 
+from django.utils.translation import gettext_lazy as _
+
 from . import models
 
 
-__all__ = ("AgentSerializer", "AccessSerializer", "ObjectSerializer", "ShareSerializer")
+__all__ = ("AgentSerializer", "AccessSerializer", "OwnedSerializer", "ShareSerializer")
 
 
-class AgentSerializer(serializers.ModelSerializer):
+class UUIDSerializer(serializers.Serializer):
+    """Serialize uuids as id."""
+
+    id = serializers.UUIDField(source="uuid", read_only=True)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if "pk" in self.fields:
+            del self.fields["pk"]
+        if "uuid" in self.fields:
+            del self.fields["uuid"]
+
+
+class AgentSerializer(UUIDSerializer, serializers.ModelSerializer):
     """Serializer for :py:class:`caps.models.agent.Agent`."""
+
+    name = serializers.SerializerMethodField()
+    """ Provided fields for utility """
 
     class Meta:
         model = models.Agent
-        fields = ["user_id", "group_id"]
+        fields = ["uuid", "user_id", "group_id"]
+
+    def get_name(self, obj):
+        if obj.user:
+            return obj.user.username
+        if obj.group:
+            return obj.group.name
+        return _("Anonymous")
 
 
-class AccessSerializer(serializers.Serializer):
+class AccessSerializer(UUIDSerializer, serializers.Serializer):
     """
     Serializer for :py:class:`caps.models.capability.Access`.
 
     Implemented as simple Serializer, since the corresponding models are generated based on
-    concrete :py:class:`.models.object.Object`.
+    concrete :py:class:`.models.object.Owned`.
     """
 
-    uuid = serializers.CharField(read_only=True)
     emitter = serializers.SerializerMethodField()
     receiver = serializers.SerializerMethodField()
     origin = serializers.SerializerMethodField()
@@ -45,38 +69,31 @@ class AccessSerializer(serializers.Serializer):
         return obj.origin and str(obj.origin.uuid) or None
 
 
-class ObjectSerializer(serializers.ModelSerializer):
+class OwnedSerializer(UUIDSerializer, serializers.ModelSerializer):
     """
-    Base serializer for Objects. It provides :py:attr:`uuid` field.
+    Base serializer for Owneds. It provides :py:attr:`uuid` field.
     """
 
-    uuid = serializers.SerializerMethodField()
+    id = serializers.SerializerMethodField()
     owner = serializers.UUIDField(source="owner__uuid", required=False)
     access = AccessSerializer(read_only=True)
     """ Access """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if "pk" in self.fields:
-            del self.fields["pk"]
-        if "id" in self.fields:
-            del self.fields["id"]
-
-    def get_uuid(self, obj):
+    def get_id(self, obj):
         if obj.access:
             return str(obj.access.uuid)
         return str(obj.uuid)
 
     def validate(self, data):
         v_data = super().validate(data)
-        if request := self.context.get("request"):
+        if agent := self.context.get("agent"):
             if not v_data.get("owner"):
-                v_data["owner"] = request.agent
+                v_data["owner"] = agent
         return v_data
 
     def validate_owner(self, value):
-        if request := self.context.get("request"):
-            owner = next((a for a in request.agents if a.uuid == value), None)
+        if agents := self.context.get("agents"):
+            owner = next((a for a in agents if a.uuid == value), None)
             if owner:
                 return owner
         raise ValidationError("Invalid owner")

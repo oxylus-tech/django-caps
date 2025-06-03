@@ -2,24 +2,24 @@ from django.views import generic
 
 from . import mixins
 
-__all__ = ("ObjectListView", "ObjectDetailView", "ObjectCreateView", "ObjectUpdateView", "ObjectDeleteView")
+__all__ = ("OwnedListView", "OwnedDetailView", "OwnedCreateView", "OwnedUpdateView", "OwnedDeleteView")
 
 
-class ObjectListView(mixins.ObjectMixin, generic.ListView):
+class OwnedListView(mixins.OwnedMixin, generic.ListView):
     pass
 
 
-class ObjectDetailView(mixins.SingleObjectMixin, mixins.ObjectPermissionMixin, generic.DetailView):
+class OwnedDetailView(mixins.SingleOwnedMixin, mixins.OwnedPermissionMixin, generic.DetailView):
     pass
 
 
-class ObjectCreateView(generic.edit.CreateView):
+class OwnedCreateView(mixins.UserAgentMixin, generic.edit.CreateView):
     pass
 
 
-class ObjectUpdateView(mixins.SingleObjectMixin, mixins.ObjectPermissionMixin, generic.edit.UpdateView):
+class OwnedUpdateView(mixins.SingleOwnedMixin, mixins.OwnedPermissionMixin, generic.edit.UpdateView):
     pass
 
 
-class ObjectDeleteView(mixins.SingleObjectMixin, mixins.ObjectPermissionMixin, generic.edit.DeleteView):
+class OwnedDeleteView(mixins.SingleOwnedMixin, mixins.OwnedPermissionMixin, generic.edit.DeleteView):
     pass

@@ -57,18 +57,14 @@ class Agent(models.Model):
     """
     An agent is the one executing an action. It can either be related to
     a specific user (anonymous included) or group.
-
-    A user can impersonate multiple agent.
     """
 
     uuid = models.UUIDField(_("Access"), default=uuid.uuid4)
     """Public access to agent."""
-    user = models.ForeignKey(User, models.CASCADE, null=True, blank=True, related_name="agents")
+    user = models.OneToOneField(User, models.CASCADE, null=True, blank=True)
     """Agent targets this user. Related name: 'agents'. """
-    group = models.ForeignKey(Group, models.CASCADE, null=True, blank=True, related_name="agents")
+    group = models.OneToOneField(Group, models.CASCADE, null=True, blank=True)
     """Agent targets this group. Related name: 'agents'. """
-    is_default = models.BooleanField(_("Default User Agent"), default=False, blank=True)
-    """If True, use this Agent as user's default."""
 
     objects = AgentQuerySet.as_manager()
 
@@ -91,6 +87,11 @@ class Agent(models.Model):
     def clean(self):
         if self.user and self.group:
             raise ValidationError(_("Agent targets either a user or a group"))
-        if self.is_default and not (self.user or self.is_anonymous):
-            raise ValidationError(_("Agent can be set as default only when targeting a user."))
         super().clean()
+
+    def __str__(self):
+        if self.user:
+            return f"User '{self.user.username}'"
+        if self.group:
+            return f"Group '{self.group.name}'"
+        return "Anonymous"
