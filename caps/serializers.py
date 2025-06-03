@@ -31,7 +31,7 @@ class AgentSerializer(UUIDSerializer, serializers.ModelSerializer):
 
     class Meta:
         model = models.Agent
-        fields = ["uuid", "user", "group", "name"]
+        fields = ["id", "user", "group", "name"]
 
     def get_name(self, obj):
         if obj.user:
@@ -56,7 +56,7 @@ class AccessSerializer(UUIDSerializer, serializers.Serializer):
     grants = serializers.JSONField()
 
     class Meta:
-        fields = ["uuid", "origin", "emitter", "receiver", "expiration", "grants"]
+        fields = ["id", "origin", "emitter", "receiver", "expiration", "grants"]
         read_only_fields = fields
 
     def get_emitter(self, obj):
