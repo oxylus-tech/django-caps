@@ -96,7 +96,7 @@ class OwnedSerializer(UUIDSerializer, serializers.ModelSerializer):
         return v_data
 
     def validate_owner(self, value):
-        if value is None:
+        if not value:
             if agent := self.context.get("agent"):
                 return agent
         if agents := self.context.get("agents"):
