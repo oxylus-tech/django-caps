@@ -75,9 +75,10 @@ class OwnedSerializer(UUIDSerializer, serializers.ModelSerializer):
     """
 
     id = serializers.SerializerMethodField()
-    owner = serializers.UUIDField(source="owner__uuid", required=False)
+    owner = serializers.UUIDField(source="owner__uuid", allow_null=True, required=False)
     access = AccessSerializer(read_only=True)
     """ Access """
+    path = serializers.CharField(required=False, allow_null=True)
 
     def get_id(self, obj):
         if obj.access:
@@ -89,6 +90,9 @@ class OwnedSerializer(UUIDSerializer, serializers.ModelSerializer):
         if agent := self.context.get("agent"):
             if not v_data.get("owner"):
                 v_data["owner"] = agent
+        if "path" in v_data:
+            del v_data["path"]
+
         return v_data
 
     def validate_owner(self, value):
