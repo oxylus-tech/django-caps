@@ -96,10 +96,13 @@ class OwnedSerializer(UUIDSerializer, serializers.ModelSerializer):
         return v_data
 
     def validate_owner(self, value):
+        if value is None:
+            if agent := self.context.get("agent"):
+                return agent
         if agents := self.context.get("agents"):
-            owner = next((a for a in agents if a.uuid == value), None)
-            if owner:
-                return owner
+            agent = next((a for a in agents if a.uuid == value), None)
+            if agent:
+                return agent
         raise ValidationError("Invalid owner")
 
     class Meta:
