@@ -134,6 +134,8 @@ class AgentViewSet(UserAgentMixin, viewsets.ModelViewSet):
     queryset = models.Agent.objects.all()
     serializer_class = serializers.AgentSerializer
     permissions = [permissions.DjangoModelPermissions]
+    lookup_field = "uuid"
+    lookup_url_kwarg = "uuid"
     filterset_fields = ("group", "user")
     search_fields = ("group__name", "user__name")
 
