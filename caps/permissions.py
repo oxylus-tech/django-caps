@@ -1,3 +1,12 @@
+"""
+This module provides Django Rest Framework permissions that run checks based on
+the capability system.
+
+Two implementations are provided: :py:class:`DjangoModelPermissions` and
+:py:class:`OwnedPermissions`. The first one is the base improved class,
+second is used to provide object permission checks.
+"""
+
 from collections import namedtuple
 
 from django.http import Http404
@@ -9,14 +18,19 @@ __all__ = ("DjangoModelPermissions", "OwnedPermissions")
 
 class DjangoModelPermissions(permissions.DjangoModelPermissions):
     """
-    Provide DjangoModelPermissions with "view" permission for GET request.
+    This base class improve base DRF's ``DjangoModelPermissions`` class.
 
-    It also supports providing ``perms_map`` on the view: permissions will be looked up in view' perms_map if
-    present before looking up on self. If ``view.action`` is provided,
+    It provides extra features:
 
-    View action will be searched before using request's method.
+        - GET request also has permission check (model's ``view`` permission);
+        - Maps view's ``action`` to permissions;
+        - Permissions map can be provided by the view (as attribute on the view);
 
-    This is an adapted version of Django Rest Framework's class.
+    When the view has ``perms_map`` attribute, it will look up there for a permission
+    at first place, defaulting to self's one.
+
+    View action will be searched before using request's method. This allows viewsets
+    to specify different permissions based on the current action.
     """
 
     perms_map = {
@@ -35,21 +49,18 @@ class DjangoModelPermissions(permissions.DjangoModelPermissions):
 
         action = getattr(view, "action", None)
         view_map = getattr(view, "perms_map", None)
-        perms = view_map and self._get_permissions(view_map, action, method)
-        if not perms:
-            perms = self._get_permissions(self.perms_map, action, method)
+
+        # action is selected before methods
+        candidates = ((view_map, action), (self.perms_map, action), (view_map, method), (self.perms_map, method))
+        for map, lookup in candidates:
+            if perms_ := (map and lookup and map.get(lookup)):
+                perms = perms_
+                break
 
         if not perms:
             raise exceptions.MethodNotAllowed(method)
 
         return [perm % kwargs for perm in perms]
-
-    def _get_permissions(self, perms_map, action, method) -> None | list[str]:
-        """Using provided permission map, action and method return permissions if any."""
-        if perms := (action and perms_map.get(action)):
-            return perms
-        if perms := perms_map.get(method):
-            return perms
 
     def has_permission(self, request, view):
         if not request.user or (not request.user.is_authenticated and self.authenticated_users_only):
@@ -66,11 +77,12 @@ class DjangoModelPermissions(permissions.DjangoModelPermissions):
 
 class OwnedPermissions(permissions.DjangoObjectPermissions, DjangoModelPermissions):
     """
-    This class provide permissions check over object using a permission map.
+    This class provides object permissions check for :py:class:`~.models.owned.Owned`.
 
-    The mapped permissions can either a request method or a viewset action (in case this is used with viewsets).
+    For more information about usage, see :py:class:`DjangoModelPermissions`.
     """
 
+    # FIXME: still in use or remove?
     Request = namedtuple("RequestInfo", ["method", "user"])
     """ Fake request providing what is required to get permissions. """
 
@@ -88,7 +100,7 @@ class OwnedPermissions(permissions.DjangoObjectPermissions, DjangoModelPermissio
     # request object with the viewset's action if required.
 
     def has_object_permission(self, request, view, obj):
-        # authentication checks have already executed via has_permission
+        # authentication checks have already been executed via has_permission
         queryset = self._queryset(view)
         model_cls = queryset.model
         user = request.user

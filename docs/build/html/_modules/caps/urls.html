@@ -6,8 +6,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>caps.urls &mdash; Django-Caps 1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" haccess="../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" haccess="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
 
 
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
@@ -16,8 +16,8 @@
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
-    <link rel="index" title="Index" haccess="../../genindex.html" />
-    <link rel="search" title="Search" haccess="../../search.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
 </head>
 
 <body class="wy-body-for-nav">
@@ -28,7 +28,7 @@
 
 
 
-          <a haccess="../../index.html" class="icon icon-home">
+          <a href="../../index.html" class="icon icon-home">
             Django-Caps
           </a>
 <div role="search">
@@ -40,9 +40,9 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="Share internal" haccess="../../guide.html">Guide</a></li>
-<li class="toctree-l1"><a class="Share internal" haccess="../../api.html">API</a></li>
-<li class="toctree-l1"><a class="Share internal" haccess="../../project.html">Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guide.html">Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project.html">Project</a></li>
 </ul>
 
         </div>
@@ -51,15 +51,15 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a haccess="../../index.html">Django-Caps</a>
+          <a href="../../index.html">Django-Caps</a>
       </nav>
 
       <div class="wy-nav-content">
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a haccess="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a haccess="../index.html">Module code</a></li>
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
       <li class="breadcrumb-item active">caps.urls</li>
       <li class="wy-breadcrumbs-aside">
       </li>
@@ -78,17 +78,17 @@
 
 
 <div class="viewcode-block" id="get_object_paths">
-<a class="viewcode-back" haccess="../../api/70_urls.html#caps.urls.get_object_paths">[docs]</a>
+<a class="viewcode-back" href="../../api/71_urls.html#caps.urls.get_object_paths">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_object_paths</span><span class="p">(</span>
-    <span class="n">obj_class</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">models</span><span class="o">.</span><span class="n">Object</span><span class="p">],</span>
+    <span class="n">obj_class</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">models</span><span class="o">.</span><span class="n">Owned</span><span class="p">],</span>
     <span class="n">url_paccessix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">basename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="n">Shares</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">accesses</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">access_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">path</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Return Django paths for the provided object class, including to edit Share (:py:func:`get_Share_path`).</span>
+<span class="sd">    Return Django paths for the provided object class, including to edit access (:py:func:`get_access_path`).</span>
 
 <span class="sd">    .. code-block:: python</span>
 
@@ -103,8 +103,8 @@
 <span class="sd">    :param url_paccessix: url base path (default to model name);</span>
 <span class="sd">    :param kwargs: ``as_view`` kwargs, by view kind (list, detail, etc.)</span>
 <span class="sd">    :param basename: use this as url&#39;s basename (default to model name)</span>
-<span class="sd">    :param Shares: if True, generate path for Object&#39;s Share using default view (see :py:mod:`caps.views.common`)</span>
-<span class="sd">    :param access_kwargs: ``kwargs`` argument passed down to :py:func:`get_Share_class`.</span>
+<span class="sd">    :param accesses: if True, generate path for Owned&#39;s Access using default view (see :py:mod:`caps.views.common`)</span>
+<span class="sd">    :param access_kwargs: ``kwargs`` argument passed down to :py:func:`get_access_class`.</span>
 
 <span class="sd">    :return: a list of path</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -117,47 +117,47 @@
         <span class="n">obj_class</span><span class="p">,</span>
         <span class="n">basename</span><span class="p">,</span>
         <span class="p">[</span>
-            <span class="p">(</span><span class="s2">&quot;list&quot;</span><span class="p">,</span> <span class="n">views</span><span class="o">.</span><span class="n">ObjectListView</span><span class="p">,</span> <span class="n">url_paccessix</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">&quot;detail&quot;</span><span class="p">,</span> <span class="n">views</span><span class="o">.</span><span class="n">ObjectDetailView</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url_paccessix</span><span class="si">}</span><span class="s2">/&lt;uuid:uuid&gt;&quot;</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">&quot;create&quot;</span><span class="p">,</span> <span class="n">views</span><span class="o">.</span><span class="n">ObjectCreateView</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url_paccessix</span><span class="si">}</span><span class="s2">/create&quot;</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">&quot;update&quot;</span><span class="p">,</span> <span class="n">views</span><span class="o">.</span><span class="n">ObjectUpdateView</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url_paccessix</span><span class="si">}</span><span class="s2">/&lt;uuid:uuid&gt;/update&quot;</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">&quot;delete&quot;</span><span class="p">,</span> <span class="n">views</span><span class="o">.</span><span class="n">ObjectDeleteView</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url_paccessix</span><span class="si">}</span><span class="s2">/&lt;uuid:uuid&gt;/delete&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;list&quot;</span><span class="p">,</span> <span class="n">views</span><span class="o">.</span><span class="n">OwnedListView</span><span class="p">,</span> <span class="n">url_paccessix</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;detail&quot;</span><span class="p">,</span> <span class="n">views</span><span class="o">.</span><span class="n">OwnedDetailView</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url_paccessix</span><span class="si">}</span><span class="s2">/&lt;uuid:uuid&gt;&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;create&quot;</span><span class="p">,</span> <span class="n">views</span><span class="o">.</span><span class="n">OwnedCreateView</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url_paccessix</span><span class="si">}</span><span class="s2">/create&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;update&quot;</span><span class="p">,</span> <span class="n">views</span><span class="o">.</span><span class="n">OwnedUpdateView</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url_paccessix</span><span class="si">}</span><span class="s2">/&lt;uuid:uuid&gt;/update&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;delete&quot;</span><span class="p">,</span> <span class="n">views</span><span class="o">.</span><span class="n">OwnedDeleteView</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url_paccessix</span><span class="si">}</span><span class="s2">/&lt;uuid:uuid&gt;/delete&quot;</span><span class="p">),</span>
         <span class="p">],</span>
         <span class="n">kwargs</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">+</span> <span class="n">get_Share_paths</span><span class="p">(</span><span class="n">obj_class</span><span class="o">.</span><span class="n">Share</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url_paccessix</span><span class="si">}</span><span class="s2">/Share&quot;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="n">access_kwargs</span><span class="p">)</span></div>
+    <span class="p">)</span> <span class="o">+</span> <span class="n">get_access_paths</span><span class="p">(</span><span class="n">obj_class</span><span class="o">.</span><span class="n">Access</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url_paccessix</span><span class="si">}</span><span class="s2">/access&quot;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="n">access_kwargs</span><span class="p">)</span></div>
 
 
 
-<div class="viewcode-block" id="get_Share_paths">
-<a class="viewcode-back" haccess="../../api/70_urls.html#caps.urls.get_Share_paths">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">get_Share_paths</span><span class="p">(</span>
-    <span class="n">access_class</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">models</span><span class="o">.</span><span class="n">Share</span><span class="p">],</span>
-    <span class="n">url_paccessix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Share&quot;</span><span class="p">,</span>
+<div class="viewcode-block" id="get_access_paths">
+<a class="viewcode-back" href="../../api/71_urls.html#caps.urls.get_access_paths">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_access_paths</span><span class="p">(</span>
+    <span class="n">access_class</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">models</span><span class="o">.</span><span class="n">Access</span><span class="p">],</span>
+    <span class="n">url_paccessix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;access&quot;</span><span class="p">,</span>
     <span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">basename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">path</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Return Django paths for the provided Share class.</span>
+<span class="sd">    Return Django paths for the provided access class.</span>
 
 <span class="sd">    Created path for views: ``list``, ``detail``, ``delete``.</span>
 
-<span class="sd">    The path will have names such as (for a model named ``contact``): ``contact-Share-list``.</span>
+<span class="sd">    The path will have names such as (for a model named ``contact``): ``contact-access-list``.</span>
 
-<span class="sd">    :param access_class: Share class</span>
+<span class="sd">    :param access_class: Access class</span>
 <span class="sd">    :param kwargs: ``as_view`` extra arguments by view type</span>
-<span class="sd">    :param basename: use this a base name for url, instead of ``{object_model_name}-Share``.</span>
+<span class="sd">    :param basename: use this a base name for url, instead of ``{object_model_name}-access``.</span>
 <span class="sd">    :returns: list of path</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">basename</span><span class="p">:</span>
         <span class="n">obj_class</span> <span class="o">=</span> <span class="n">access_class</span><span class="o">.</span><span class="n">get_object_class</span><span class="p">()</span>
-        <span class="n">basename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">obj_class</span><span class="o">.</span><span class="n">_meta</span><span class="o">.</span><span class="n">model_name</span><span class="si">}</span><span class="s2">-Share&quot;</span>
+        <span class="n">basename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">obj_class</span><span class="o">.</span><span class="n">_meta</span><span class="o">.</span><span class="n">model_name</span><span class="si">}</span><span class="s2">-access&quot;</span>
     <span class="k">return</span> <span class="n">_get_paths</span><span class="p">(</span>
         <span class="n">access_class</span><span class="p">,</span>
         <span class="n">basename</span><span class="p">,</span>
         <span class="p">[</span>
-            <span class="p">(</span><span class="s2">&quot;list&quot;</span><span class="p">,</span> <span class="n">views</span><span class="o">.</span><span class="n">ShareListView</span><span class="p">,</span> <span class="n">url_paccessix</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">&quot;detail&quot;</span><span class="p">,</span> <span class="n">views</span><span class="o">.</span><span class="n">ShareDetailView</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url_paccessix</span><span class="si">}</span><span class="s2">/&lt;uuid:uuid&gt;&quot;</span><span class="p">),</span>
-            <span class="p">(</span><span class="s2">&quot;delete&quot;</span><span class="p">,</span> <span class="n">views</span><span class="o">.</span><span class="n">ShareDeleteView</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url_paccessix</span><span class="si">}</span><span class="s2">/&lt;uuid:uuid&gt;/delete&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;list&quot;</span><span class="p">,</span> <span class="n">views</span><span class="o">.</span><span class="n">AccessListView</span><span class="p">,</span> <span class="n">url_paccessix</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;detail&quot;</span><span class="p">,</span> <span class="n">views</span><span class="o">.</span><span class="n">AccessDetailView</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url_paccessix</span><span class="si">}</span><span class="s2">/&lt;uuid:uuid&gt;&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;delete&quot;</span><span class="p">,</span> <span class="n">views</span><span class="o">.</span><span class="n">AccessDeleteView</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url_paccessix</span><span class="si">}</span><span class="s2">/&lt;uuid:uuid&gt;/delete&quot;</span><span class="p">),</span>
         <span class="p">],</span>
         <span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span></div>
@@ -182,9 +182,9 @@
     <p>&#169; Copyright 2025, Thomas.</p>
   </div>
 
-  Built with <a haccess="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a haccess="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a haccess="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
 
 
 </footer>

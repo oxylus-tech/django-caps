@@ -48,17 +48,17 @@
 <li class="toctree-l2"><a class="reference internal" href="10_models.html">caps.models</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">caps.views</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#module-caps.views.generics">caps.views.generics</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#caps.views.generics.ObjectCreateView"><code class="docutils literal notranslate"><span class="pre">ObjectCreateView</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#caps.views.generics.ObjectDeleteView"><code class="docutils literal notranslate"><span class="pre">ObjectDeleteView</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#caps.views.generics.ObjectDetailView"><code class="docutils literal notranslate"><span class="pre">ObjectDetailView</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#caps.views.generics.ObjectListView"><code class="docutils literal notranslate"><span class="pre">ObjectListView</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#caps.views.generics.ObjectUpdateView"><code class="docutils literal notranslate"><span class="pre">ObjectUpdateView</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#caps.views.generics.OwnedCreateView"><code class="docutils literal notranslate"><span class="pre">OwnedCreateView</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#caps.views.generics.OwnedDeleteView"><code class="docutils literal notranslate"><span class="pre">OwnedDeleteView</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#caps.views.generics.OwnedDetailView"><code class="docutils literal notranslate"><span class="pre">OwnedDetailView</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#caps.views.generics.OwnedListView"><code class="docutils literal notranslate"><span class="pre">OwnedListView</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#caps.views.generics.OwnedUpdateView"><code class="docutils literal notranslate"><span class="pre">OwnedUpdateView</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-caps.views.api">caps.views.api</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#caps.views.api.AccessViewSet"><code class="docutils literal notranslate"><span class="pre">AccessViewSet</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#caps.views.api.AgentViewSet"><code class="docutils literal notranslate"><span class="pre">AgentViewSet</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#caps.views.api.ObjectViewSet"><code class="docutils literal notranslate"><span class="pre">ObjectViewSet</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#caps.views.api.OwnedViewSet"><code class="docutils literal notranslate"><span class="pre">OwnedViewSet</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-caps.views.common">caps.views.common</a><ul>
@@ -76,9 +76,9 @@
 <li class="toctree-l4"><a class="reference internal" href="#caps.views.mixins.AccessMixin"><code class="docutils literal notranslate"><span class="pre">AccessMixin</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#caps.views.mixins.AgentMixin"><code class="docutils literal notranslate"><span class="pre">AgentMixin</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#caps.views.mixins.ByUUIDMixin"><code class="docutils literal notranslate"><span class="pre">ByUUIDMixin</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#caps.views.mixins.ObjectMixin"><code class="docutils literal notranslate"><span class="pre">ObjectMixin</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#caps.views.mixins.ObjectPermissionMixin"><code class="docutils literal notranslate"><span class="pre">ObjectPermissionMixin</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#caps.views.mixins.SingleObjectMixin"><code class="docutils literal notranslate"><span class="pre">SingleObjectMixin</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#caps.views.mixins.OwnedMixin"><code class="docutils literal notranslate"><span class="pre">OwnedMixin</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#caps.views.mixins.OwnedPermissionMixin"><code class="docutils literal notranslate"><span class="pre">OwnedPermissionMixin</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#caps.views.mixins.SingleOwnedMixin"><code class="docutils literal notranslate"><span class="pre">SingleOwnedMixin</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -125,33 +125,33 @@
 <section id="module-caps.views.generics">
 <span id="caps-views-generics"></span><h2>caps.views.generics<a class="headerlink" href="#module-caps.views.generics" title="Link to this heading"></a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="caps.views.generics.ObjectCreateView">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ObjectCreateView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/generics.html#ObjectCreateView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.generics.ObjectCreateView" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">CreateView</span></code></p>
+<dt class="sig sig-object py" id="caps.views.generics.OwnedCreateView">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">OwnedCreateView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/generics.html#OwnedCreateView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.generics.OwnedCreateView" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">UserAgentMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">CreateView</span></code></p>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="caps.views.generics.ObjectDeleteView">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ObjectDeleteView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/generics.html#ObjectDeleteView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.generics.ObjectDeleteView" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#caps.views.mixins.SingleObjectMixin" title="caps.views.mixins.SingleObjectMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleObjectMixin</span></code></a>, <a class="reference internal" href="#caps.views.mixins.ObjectPermissionMixin" title="caps.views.mixins.ObjectPermissionMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectPermissionMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DeleteView</span></code></p>
+<dt class="sig sig-object py" id="caps.views.generics.OwnedDeleteView">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">OwnedDeleteView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/generics.html#OwnedDeleteView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.generics.OwnedDeleteView" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#caps.views.mixins.SingleOwnedMixin" title="caps.views.mixins.SingleOwnedMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleOwnedMixin</span></code></a>, <a class="reference internal" href="#caps.views.mixins.OwnedPermissionMixin" title="caps.views.mixins.OwnedPermissionMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">OwnedPermissionMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DeleteView</span></code></p>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="caps.views.generics.ObjectDetailView">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ObjectDetailView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/generics.html#ObjectDetailView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.generics.ObjectDetailView" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#caps.views.mixins.SingleObjectMixin" title="caps.views.mixins.SingleObjectMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleObjectMixin</span></code></a>, <a class="reference internal" href="#caps.views.mixins.ObjectPermissionMixin" title="caps.views.mixins.ObjectPermissionMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectPermissionMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DetailView</span></code></p>
+<dt class="sig sig-object py" id="caps.views.generics.OwnedDetailView">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">OwnedDetailView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/generics.html#OwnedDetailView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.generics.OwnedDetailView" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#caps.views.mixins.SingleOwnedMixin" title="caps.views.mixins.SingleOwnedMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleOwnedMixin</span></code></a>, <a class="reference internal" href="#caps.views.mixins.OwnedPermissionMixin" title="caps.views.mixins.OwnedPermissionMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">OwnedPermissionMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DetailView</span></code></p>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="caps.views.generics.ObjectListView">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ObjectListView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/generics.html#ObjectListView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.generics.ObjectListView" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#caps.views.mixins.ObjectMixin" title="caps.views.mixins.ObjectMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ListView</span></code></p>
+<dt class="sig sig-object py" id="caps.views.generics.OwnedListView">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">OwnedListView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/generics.html#OwnedListView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.generics.OwnedListView" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#caps.views.mixins.OwnedMixin" title="caps.views.mixins.OwnedMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">OwnedMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ListView</span></code></p>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="caps.views.generics.ObjectUpdateView">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ObjectUpdateView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/generics.html#ObjectUpdateView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.generics.ObjectUpdateView" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#caps.views.mixins.SingleObjectMixin" title="caps.views.mixins.SingleObjectMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleObjectMixin</span></code></a>, <a class="reference internal" href="#caps.views.mixins.ObjectPermissionMixin" title="caps.views.mixins.ObjectPermissionMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectPermissionMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">UpdateView</span></code></p>
+<dt class="sig sig-object py" id="caps.views.generics.OwnedUpdateView">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">OwnedUpdateView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/generics.html#OwnedUpdateView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.generics.OwnedUpdateView" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#caps.views.mixins.SingleOwnedMixin" title="caps.views.mixins.SingleOwnedMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleOwnedMixin</span></code></a>, <a class="reference internal" href="#caps.views.mixins.OwnedPermissionMixin" title="caps.views.mixins.OwnedPermissionMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">OwnedPermissionMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">UpdateView</span></code></p>
 </dd></dl>
 
 </section>
@@ -160,7 +160,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="caps.views.api.AccessViewSet">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AccessViewSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/api.html#AccessViewSet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.api.AccessViewSet" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">RetrieveModelMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DestroyModelMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ListModelMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">GenericViewSet</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">UserAgentMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">RetrieveModelMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DestroyModelMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ListModelMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">GenericViewSet</span></code></p>
 <p>This viewset provides API to <a class="reference internal" href="10_models.html#caps.models.access.Access" title="caps.models.access.Access"><code class="xref py py-class docutils literal notranslate"><span class="pre">Access</span></code></a>.</p>
 <p>It ensures that:</p>
 <blockquote>
@@ -170,7 +170,7 @@
 <li><p>Access can only be shared, listed, retrieved, and destroyed.</p></li>
 </ul>
 </div></blockquote>
-<p>Note: no model nor queryset is provided by default, as Access is an abstract class and is dependent of the concrete Object sub-model.</p>
+<p>Note: no model nor queryset is provided by default, as Access is an abstract class and is dependent of the concrete Owned sub-model.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caps.views.api.AccessViewSet.filterset_fields">
 <span class="sig-name descname"><span class="pre">filterset_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('receiver__uuid',</span> <span class="pre">'emitter__uuid',</span> <span class="pre">'origin__uuid',</span> <span class="pre">'target__uuid')</span></em><a class="headerlink" href="#caps.views.api.AccessViewSet.filterset_fields" title="Link to this definition"></a></dt>
@@ -209,7 +209,7 @@ querysets depending on the incoming request.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="caps.views.api.AccessViewSet.share">
 <span class="sig-name descname"><span class="pre">share</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uuid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/api.html#AccessViewSet.share"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.api.AccessViewSet.share" title="Link to this definition"></a></dt>
-<dd><p>Share object access to someone. See <a class="reference internal" href="#caps.views.api.ObjectViewSet.share" title="caps.views.api.ObjectViewSet.share"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ObjectViewSet.share()</span></code></a> for more info.</p>
+<dd><p>Share object access to someone. See <a class="reference internal" href="#caps.views.api.OwnedViewSet.share" title="caps.views.api.OwnedViewSet.share"><code class="xref py py-meth docutils literal notranslate"><span class="pre">OwnedViewSet.share()</span></code></a> for more info.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -224,11 +224,22 @@ querysets depending on the incoming request.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="caps.views.api.AgentViewSet">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AgentViewSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/api.html#AgentViewSet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.api.AgentViewSet" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelViewSet</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">UserAgentMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelViewSet</span></code></p>
 <p>Viewset provides API for <a class="reference internal" href="10_models.html#caps.models.agent.Agent" title="caps.models.agent.Agent"><code class="xref py py-class docutils literal notranslate"><span class="pre">Agent</span></code></a>.</p>
+<p>Provides an extra API endpoint <code class="docutils literal notranslate"><span class="pre">user</span></code> returning user’s agents (<a class="reference internal" href="#caps.views.api.AgentViewSet.user" title="caps.views.api.AgentViewSet.user"><code class="xref py py-meth docutils literal notranslate"><span class="pre">user()</span></code></a>).</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caps.views.api.AgentViewSet.filterset_fields">
-<span class="sig-name descname"><span class="pre">filterset_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('group',</span> <span class="pre">'user',</span> <span class="pre">'user__group')</span></em><a class="headerlink" href="#caps.views.api.AgentViewSet.filterset_fields" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">filterset_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('group',</span> <span class="pre">'user')</span></em><a class="headerlink" href="#caps.views.api.AgentViewSet.filterset_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.views.api.AgentViewSet.lookup_field">
+<span class="sig-name descname"><span class="pre">lookup_field</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'uuid'</span></em><a class="headerlink" href="#caps.views.api.AgentViewSet.lookup_field" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.views.api.AgentViewSet.lookup_url_kwarg">
+<span class="sig-name descname"><span class="pre">lookup_url_kwarg</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'uuid'</span></em><a class="headerlink" href="#caps.views.api.AgentViewSet.lookup_url_kwarg" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -247,44 +258,69 @@ querysets depending on the incoming request.</p>
 <span class="sig-name descname"><span class="pre">queryset</span></span><a class="headerlink" href="#caps.views.api.AgentViewSet.queryset" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.views.api.AgentViewSet.search_fields">
+<span class="sig-name descname"><span class="pre">search_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('group__name',</span> <span class="pre">'user__name')</span></em><a class="headerlink" href="#caps.views.api.AgentViewSet.search_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.views.api.AgentViewSet.serializer_class">
+<span class="sig-name descname"><span class="pre">serializer_class</span></span><a class="headerlink" href="#caps.views.api.AgentViewSet.serializer_class" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="30_serializers.html#caps.serializers.AgentSerializer" title="caps.serializers.AgentSerializer"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentSerializer</span></code></a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.views.api.AgentViewSet.user">
+<span class="sig-name descname"><span class="pre">user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">_</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/api.html#AgentViewSet.user"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.api.AgentViewSet.user" title="Link to this definition"></a></dt>
+<dd><p>Return request agents for user using <code class="docutils literal notranslate"><span class="pre">GET['user']</span></code>.
+When parameter is not provided, it uses current user.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="caps.views.api.ObjectViewSet">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ObjectViewSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/api.html#ObjectViewSet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.api.ObjectViewSet" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#caps.views.mixins.SingleObjectMixin" title="caps.views.mixins.SingleObjectMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleObjectMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelViewSet</span></code></p>
-<p>This is the base mixin handling permissions check for django-caps.</p>
+<dt class="sig sig-object py" id="caps.views.api.OwnedViewSet">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">OwnedViewSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/api.html#OwnedViewSet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.api.OwnedViewSet" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">UserAgentMixin</span></code>, <a class="reference internal" href="#caps.views.mixins.SingleOwnedMixin" title="caps.views.mixins.SingleOwnedMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleOwnedMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelViewSet</span></code></p>
+<p>This is the base viewset class for Owned models, running object permission checks.</p>
+<p>It also provides the <a class="reference internal" href="#caps.views.api.OwnedViewSet.share" title="caps.views.api.OwnedViewSet.share"><code class="xref py py-meth docutils literal notranslate"><span class="pre">share()</span></code></a> that allows a user to share an access to
+the object.</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="caps.views.api.ObjectViewSet.get_access_queryset">
-<span class="sig-name descname"><span class="pre">get_access_queryset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/api.html#ObjectViewSet.get_access_queryset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.api.ObjectViewSet.get_access_queryset" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="caps.views.api.OwnedViewSet.get_access_queryset">
+<span class="sig-name descname"><span class="pre">get_access_queryset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/api.html#OwnedViewSet.get_access_queryset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.api.OwnedViewSet.get_access_queryset" title="Link to this definition"></a></dt>
 <dd><p>When <code class="docutils literal notranslate"><span class="pre">uuid</span></code> GET argument is provided, filter accesses on it.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="caps.views.api.ObjectViewSet.get_queryset">
-<span class="sig-name descname"><span class="pre">get_queryset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/api.html#ObjectViewSet.get_queryset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.api.ObjectViewSet.get_queryset" title="Link to this definition"></a></dt>
-<dd><p>Get Object queryset based get_access_queryset.</p>
+<dt class="sig sig-object py" id="caps.views.api.OwnedViewSet.get_queryset">
+<span class="sig-name descname"><span class="pre">get_queryset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/api.html#OwnedViewSet.get_queryset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.api.OwnedViewSet.get_queryset" title="Link to this definition"></a></dt>
+<dd><p>Get Owned queryset based get_access_queryset.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="caps.views.api.ObjectViewSet.lookup_field">
-<span class="sig-name descname"><span class="pre">lookup_field</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'uuid'</span></em><a class="headerlink" href="#caps.views.api.ObjectViewSet.lookup_field" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="caps.views.api.OwnedViewSet.lookup_field">
+<span class="sig-name descname"><span class="pre">lookup_field</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'uuid'</span></em><a class="headerlink" href="#caps.views.api.OwnedViewSet.lookup_field" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="caps.views.api.ObjectViewSet.lookup_url_kwarg">
-<span class="sig-name descname"><span class="pre">lookup_url_kwarg</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'uuid'</span></em><a class="headerlink" href="#caps.views.api.ObjectViewSet.lookup_url_kwarg" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="caps.views.api.OwnedViewSet.lookup_url_kwarg">
+<span class="sig-name descname"><span class="pre">lookup_url_kwarg</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'uuid'</span></em><a class="headerlink" href="#caps.views.api.OwnedViewSet.lookup_url_kwarg" title="Link to this definition"></a></dt>
 <dd><p>URL’s kwargs argument used to retrieve access uuid.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="caps.views.api.ObjectViewSet.permission_classes">
-<span class="sig-name descname"><span class="pre">permission_classes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;class</span> <span class="pre">'caps.permissions.ObjectPermissions'&gt;]</span></em><a class="headerlink" href="#caps.views.api.ObjectViewSet.permission_classes" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="caps.views.api.OwnedViewSet.permission_classes">
+<span class="sig-name descname"><span class="pre">permission_classes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;class</span> <span class="pre">'caps.permissions.OwnedPermissions'&gt;]</span></em><a class="headerlink" href="#caps.views.api.OwnedViewSet.permission_classes" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.views.api.OwnedViewSet.perms_map">
+<span class="sig-name descname"><span class="pre">perms_map</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'share':</span> <span class="pre">['%(app_label)s.change_%(model_name)s']}</span></em><a class="headerlink" href="#caps.views.api.OwnedViewSet.perms_map" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="caps.views.api.ObjectViewSet.share">
-<span class="sig-name descname"><span class="pre">share</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uuid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/api.html#ObjectViewSet.share"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.api.ObjectViewSet.share" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="caps.views.api.OwnedViewSet.share">
+<span class="sig-name descname"><span class="pre">share</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uuid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/api.html#OwnedViewSet.share"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.api.OwnedViewSet.share" title="Link to this definition"></a></dt>
 <dd><p>Share object, returning the newly created Access.</p>
 <p>Example of request’s POST data in YAML (see <a class="reference internal" href="10_models.html#caps.models.access.Access.share" title="caps.models.access.Access.share"><code class="xref py py-meth docutils literal notranslate"><span class="pre">share()</span></code></a> and <a class="reference internal" href="30_serializers.html#caps.serializers.ShareSerializer" title="caps.serializers.ShareSerializer"><code class="xref py py-class docutils literal notranslate"><span class="pre">ShareSerializer</span></code></a>):</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">receiver</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;agent-uuid&quot;</span>
@@ -297,9 +333,9 @@ querysets depending on the incoming request.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="caps.views.api.ObjectViewSet.share_serializer_class">
-<span class="sig-name descname"><span class="pre">share_serializer_class</span></span><a class="headerlink" href="#caps.views.api.ObjectViewSet.share_serializer_class" title="Link to this definition"></a></dt>
-<dd><p>This specifies serializer class used for the <a class="reference internal" href="#caps.views.api.ObjectViewSet.share" title="caps.views.api.ObjectViewSet.share"><code class="xref py py-meth docutils literal notranslate"><span class="pre">share()</span></code></a> action.</p>
+<dt class="sig sig-object py" id="caps.views.api.OwnedViewSet.share_serializer_class">
+<span class="sig-name descname"><span class="pre">share_serializer_class</span></span><a class="headerlink" href="#caps.views.api.OwnedViewSet.share_serializer_class" title="Link to this definition"></a></dt>
+<dd><p>The serializer class used for the <a class="reference internal" href="#caps.views.api.OwnedViewSet.share" title="caps.views.api.OwnedViewSet.share"><code class="xref py py-meth docutils literal notranslate"><span class="pre">share()</span></code></a> action.</p>
 <p>alias of <a class="reference internal" href="30_serializers.html#caps.serializers.ShareSerializer" title="caps.serializers.ShareSerializer"><code class="xref py py-class docutils literal notranslate"><span class="pre">ShareSerializer</span></code></a></p>
 </dd></dl>
 
@@ -404,7 +440,7 @@ querysets depending on the incoming request.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="caps.views.mixins.AccessMixin">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AccessMixin</span></span><a class="reference internal" href="../_modules/caps/views/mixins.html#AccessMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.mixins.AccessMixin" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#caps.views.mixins.ByUUIDMixin" title="caps.views.mixins.ByUUIDMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">ByUUIDMixin</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#caps.views.mixins.ByUUIDMixin" title="caps.views.mixins.ByUUIDMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">ByUUIDMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">UserAgentMixin</span></code></p>
 <p>Mixin used by Access views and viewsets.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="caps.views.mixins.AccessMixin.get_queryset">
@@ -416,7 +452,7 @@ querysets depending on the incoming request.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="caps.views.mixins.AgentMixin">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AgentMixin</span></span><a class="reference internal" href="../_modules/caps/views/mixins.html#AgentMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.mixins.AgentMixin" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#caps.views.mixins.ByUUIDMixin" title="caps.views.mixins.ByUUIDMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">ByUUIDMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">PermissionRequiredMixin</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#caps.views.mixins.ByUUIDMixin" title="caps.views.mixins.ByUUIDMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">ByUUIDMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">UserAgentMixin</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">PermissionRequiredMixin</span></code></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caps.views.mixins.AgentMixin.model">
 <span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#caps.views.mixins.AgentMixin.model" title="Link to this definition"></a></dt>
@@ -444,52 +480,26 @@ querysets depending on the incoming request.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="caps.views.mixins.ObjectMixin">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ObjectMixin</span></span><a class="reference internal" href="../_modules/caps/views/mixins.html#ObjectMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.mixins.ObjectMixin" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Base mixin providing functionalities to work with <a class="reference internal" href="10_models.html#caps.models.object.Object" title="caps.models.object.Object"><code class="xref py py-class docutils literal notranslate"><span class="pre">Object</span></code></a> model.</p>
+<dt class="sig sig-object py" id="caps.views.mixins.OwnedMixin">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">OwnedMixin</span></span><a class="reference internal" href="../_modules/caps/views/mixins.html#OwnedMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.mixins.OwnedMixin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">UserAgentMixin</span></code></p>
+<p>Base mixin providing functionalities to work with <code class="xref py py-class docutils literal notranslate"><span class="pre">Owned</span></code> model.</p>
 <p>It provides:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>assign self’s <a class="reference internal" href="#caps.views.mixins.ObjectMixin.agent" title="caps.views.mixins.ObjectMixin.agent"><code class="xref py py-attr docutils literal notranslate"><span class="pre">agent</span></code></a> and <a class="reference internal" href="#caps.views.mixins.ObjectMixin.agents" title="caps.views.mixins.ObjectMixin.agents"><code class="xref py py-attr docutils literal notranslate"><span class="pre">agents</span></code></a></p></li>
+<li><p>assign self’s <code class="xref py py-attr docutils literal notranslate"><span class="pre">agent</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">agents</span></code></p></li>
 <li><p>queryset to available <a class="reference internal" href="10_models.html#caps.models.access.Access" title="caps.models.access.Access"><code class="xref py py-class docutils literal notranslate"><span class="pre">Access</span></code></a>.</p></li>
 </ul>
 </div></blockquote>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="caps.views.mixins.ObjectMixin.access_class">
-<span class="sig-name descname"><span class="pre">access_class</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#caps.views.mixins.ObjectMixin.access_class" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="caps.views.mixins.OwnedMixin.access_class">
+<span class="sig-name descname"><span class="pre">access_class</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#caps.views.mixins.OwnedMixin.access_class" title="Link to this definition"></a></dt>
 <dd><p>Access class (defaults to model’s Access).</p>
 </dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="caps.views.mixins.ObjectMixin.agent">
-<span class="sig-name descname"><span class="pre">agent</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="10_models.html#caps.models.agent.Agent" title="caps.models.agent.Agent"><code class="xref py py-class docutils literal notranslate"><span class="pre">Agent</span></code></a> <span class="pre">|</span> <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#caps.views.mixins.ObjectMixin.agent" title="Link to this definition"></a></dt>
-<dd><p>Current request’s agent.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="caps.views.mixins.ObjectMixin.agents">
-<span class="sig-name descname"><span class="pre">agents</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="10_models.html#caps.models.agent.Agent" title="caps.models.agent.Agent"><code class="xref py py-class docutils literal notranslate"><span class="pre">Agent</span></code></a> <span class="pre">|</span> <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code><span class="pre">[</span><a class="reference internal" href="10_models.html#caps.models.agent.Agent" title="caps.models.agent.Agent"><code class="xref py py-class docutils literal notranslate"><span class="pre">Agent</span></code></a><span class="pre">]</span> <span class="pre">|</span> <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#caps.views.mixins.ObjectMixin.agents" title="Link to this definition"></a></dt>
-<dd><p>Receiver(s) used to fetch access. It is different from <a class="reference internal" href="#caps.views.mixins.ObjectMixin.agent" title="caps.views.mixins.ObjectMixin.agent"><code class="xref py py-attr docutils literal notranslate"><span class="pre">agent</span></code></a> as the latest is used to create accesses.</p>
-<p>This value is set in <a class="reference internal" href="#caps.views.mixins.ObjectMixin.dispatch" title="caps.views.mixins.ObjectMixin.dispatch"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dispatch()</span></code></a> using <a class="reference internal" href="#caps.views.mixins.ObjectMixin.get_agents" title="caps.views.mixins.ObjectMixin.get_agents"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_agents()</span></code></a>. It will be either all request’s user’s
-agents (if <a class="reference internal" href="#caps.views.mixins.ObjectMixin.all_agents" title="caps.views.mixins.ObjectMixin.all_agents"><code class="xref py py-attr docutils literal notranslate"><span class="pre">all_agents</span></code></a>) or only the active one.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="caps.views.mixins.ObjectMixin.all_agents">
-<span class="sig-name descname"><span class="pre">all_agents</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#caps.views.mixins.ObjectMixin.all_agents" title="Link to this definition"></a></dt>
-<dd><p>When this parameter is <code class="docutils literal notranslate"><span class="pre">True</span></code>, it filter object’s access using
-all user’s assigned agents instead of only the current one. See <a class="reference internal" href="#caps.views.mixins.ObjectMixin.agents" title="caps.views.mixins.ObjectMixin.agents"><code class="xref py py-attr docutils literal notranslate"><span class="pre">agents</span></code></a> for more information.</p>
-</dd></dl>
-
 <dl class="py method">
-<dt class="sig sig-object py" id="caps.views.mixins.ObjectMixin.dispatch">
-<span class="sig-name descname"><span class="pre">dispatch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/mixins.html#ObjectMixin.dispatch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.mixins.ObjectMixin.dispatch" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="caps.views.mixins.ObjectMixin.get_access_queryset">
-<span class="sig-name descname"><span class="pre">get_access_queryset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/mixins.html#ObjectMixin.get_access_queryset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.mixins.ObjectMixin.get_access_queryset" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="caps.views.mixins.OwnedMixin.get_access_queryset">
+<span class="sig-name descname"><span class="pre">get_access_queryset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/mixins.html#OwnedMixin.get_access_queryset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.mixins.OwnedMixin.get_access_queryset" title="Link to this definition"></a></dt>
 <dd><p>Return queryset for accesses.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
@@ -499,73 +509,62 @@ all user’s assigned agents instead of only the current one. See <a class="refe
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="caps.views.mixins.ObjectMixin.get_agents">
-<span class="sig-name descname"><span class="pre">get_agents</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/mixins.html#ObjectMixin.get_agents"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.mixins.ObjectMixin.get_agents" title="Link to this definition"></a></dt>
-<dd><p>Return value to use for <a class="reference internal" href="#caps.views.mixins.ObjectMixin.agents" title="caps.views.mixins.ObjectMixin.agents"><code class="xref py py-attr docutils literal notranslate"><span class="pre">agents</span></code></a>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="10_models.html#caps.models.agent.Agent" title="caps.models.agent.Agent"><code class="xref py py-class docutils literal notranslate"><span class="pre">Agent</span></code></a> | <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<a class="reference internal" href="10_models.html#caps.models.agent.Agent" title="caps.models.agent.Agent"><code class="xref py py-class docutils literal notranslate"><span class="pre">Agent</span></code></a>]</span></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="caps.views.mixins.ObjectMixin.get_queryset">
-<span class="sig-name descname"><span class="pre">get_queryset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/mixins.html#ObjectMixin.get_queryset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.mixins.ObjectMixin.get_queryset" title="Link to this definition"></a></dt>
-<dd><p>Get Object queryset based get_access_queryset.</p>
+<dt class="sig sig-object py" id="caps.views.mixins.OwnedMixin.get_queryset">
+<span class="sig-name descname"><span class="pre">get_queryset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/mixins.html#OwnedMixin.get_queryset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.mixins.OwnedMixin.get_queryset" title="Link to this definition"></a></dt>
+<dd><p>Get Owned queryset based get_access_queryset.</p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="caps.views.mixins.ObjectPermissionMixin">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ObjectPermissionMixin</span></span><a class="reference internal" href="../_modules/caps/views/mixins.html#ObjectPermissionMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.mixins.ObjectPermissionMixin" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#caps.views.mixins.ObjectMixin" title="caps.views.mixins.ObjectMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectMixin</span></code></a></p>
+<dt class="sig sig-object py" id="caps.views.mixins.OwnedPermissionMixin">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">OwnedPermissionMixin</span></span><a class="reference internal" href="../_modules/caps/views/mixins.html#OwnedPermissionMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.mixins.OwnedPermissionMixin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#caps.views.mixins.OwnedMixin" title="caps.views.mixins.OwnedMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">OwnedMixin</span></code></a></p>
 <p>This mixin checks for object permission when <code class="docutils literal notranslate"><span class="pre">get_object()</span></code> is called. It raises a
 <code class="docutils literal notranslate"><span class="pre">PermissionDenied</span></code> or <code class="docutils literal notranslate"><span class="pre">Http404</span></code> if user does not have access to the object.</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="caps.views.mixins.ObjectPermissionMixin.check_object_permissions">
-<span class="sig-name descname"><span class="pre">check_object_permissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/mixins.html#ObjectPermissionMixin.check_object_permissions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.mixins.ObjectPermissionMixin.check_object_permissions" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="caps.views.mixins.OwnedPermissionMixin.check_object_permissions">
+<span class="sig-name descname"><span class="pre">check_object_permissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/mixins.html#OwnedPermissionMixin.check_object_permissions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.mixins.OwnedPermissionMixin.check_object_permissions" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="caps.views.mixins.ObjectPermissionMixin.get_object">
-<span class="sig-name descname"><span class="pre">get_object</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/mixins.html#ObjectPermissionMixin.get_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.mixins.ObjectPermissionMixin.get_object" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="caps.views.mixins.OwnedPermissionMixin.get_object">
+<span class="sig-name descname"><span class="pre">get_object</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/mixins.html#OwnedPermissionMixin.get_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.mixins.OwnedPermissionMixin.get_object" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="caps.views.mixins.ObjectPermissionMixin.get_permissions">
-<span class="sig-name descname"><span class="pre">get_permissions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/mixins.html#ObjectPermissionMixin.get_permissions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.mixins.ObjectPermissionMixin.get_permissions" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="caps.views.mixins.OwnedPermissionMixin.get_permissions">
+<span class="sig-name descname"><span class="pre">get_permissions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/mixins.html#OwnedPermissionMixin.get_permissions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.mixins.OwnedPermissionMixin.get_permissions" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="caps.views.mixins.ObjectPermissionMixin.permissions">
-<span class="sig-name descname"><span class="pre">permissions</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;class</span> <span class="pre">'caps.permissions.ObjectPermissions'&gt;]</span></em><a class="headerlink" href="#caps.views.mixins.ObjectPermissionMixin.permissions" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="caps.views.mixins.OwnedPermissionMixin.permissions">
+<span class="sig-name descname"><span class="pre">permissions</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;class</span> <span class="pre">'caps.permissions.OwnedPermissions'&gt;]</span></em><a class="headerlink" href="#caps.views.mixins.OwnedPermissionMixin.permissions" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="caps.views.mixins.SingleObjectMixin">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SingleObjectMixin</span></span><a class="reference internal" href="../_modules/caps/views/mixins.html#SingleObjectMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.mixins.SingleObjectMixin" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#caps.views.mixins.ObjectMixin" title="caps.views.mixins.ObjectMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectMixin</span></code></a></p>
-<p>Detail mixin used to retrieve Object detail.</p>
+<dt class="sig sig-object py" id="caps.views.mixins.SingleOwnedMixin">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SingleOwnedMixin</span></span><a class="reference internal" href="../_modules/caps/views/mixins.html#SingleOwnedMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.mixins.SingleOwnedMixin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#caps.views.mixins.OwnedMixin" title="caps.views.mixins.OwnedMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">OwnedMixin</span></code></a></p>
+<p>Detail mixin used to retrieve Owned detail.</p>
 <p>It requires subclass to have  a <code class="docutils literal notranslate"><span class="pre">check_object_permissions</span></code> method (
-eg by a child of <a class="reference internal" href="#caps.views.mixins.ObjectPermissionMixin" title="caps.views.mixins.ObjectPermissionMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectPermissionMixin</span></code></a> or DRF APIView).</p>
+eg by a child of <a class="reference internal" href="#caps.views.mixins.OwnedPermissionMixin" title="caps.views.mixins.OwnedPermissionMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">OwnedPermissionMixin</span></code></a> or DRF APIView).</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="caps.views.mixins.SingleObjectMixin.get_access_queryset">
-<span class="sig-name descname"><span class="pre">get_access_queryset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/mixins.html#SingleObjectMixin.get_access_queryset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.mixins.SingleObjectMixin.get_access_queryset" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="caps.views.mixins.SingleOwnedMixin.get_access_queryset">
+<span class="sig-name descname"><span class="pre">get_access_queryset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/mixins.html#SingleOwnedMixin.get_access_queryset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.mixins.SingleOwnedMixin.get_access_queryset" title="Link to this definition"></a></dt>
 <dd><p>When <code class="docutils literal notranslate"><span class="pre">uuid</span></code> GET argument is provided, filter accesses on it.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="caps.views.mixins.SingleObjectMixin.get_object">
-<span class="sig-name descname"><span class="pre">get_object</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/mixins.html#SingleObjectMixin.get_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.mixins.SingleObjectMixin.get_object" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="caps.views.mixins.SingleOwnedMixin.get_object">
+<span class="sig-name descname"><span class="pre">get_object</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/views/mixins.html#SingleOwnedMixin.get_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.views.mixins.SingleOwnedMixin.get_object" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="caps.views.mixins.SingleObjectMixin.lookup_url_kwarg">
-<span class="sig-name descname"><span class="pre">lookup_url_kwarg</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'uuid'</span></em><a class="headerlink" href="#caps.views.mixins.SingleObjectMixin.lookup_url_kwarg" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="caps.views.mixins.SingleOwnedMixin.lookup_url_kwarg">
+<span class="sig-name descname"><span class="pre">lookup_url_kwarg</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'uuid'</span></em><a class="headerlink" href="#caps.views.mixins.SingleOwnedMixin.lookup_url_kwarg" title="Link to this definition"></a></dt>
 <dd><p>URL’s kwargs argument used to retrieve access uuid.</p>
 </dd></dl>
 

@@ -5,7 +5,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "django-caps"
-description = "Capability based permissions for Django."
+description = "Capability based object permissions for Django."
 version = "0.0.1"
 authors = ["Thomas Baquet <thomas oxylus app>"]
 readme = "README.rst"
@@ -32,6 +32,7 @@ classifiers = [
 python = "^3.13"
 Django = "^5"
 djangorestframework = "^3"
+django-filter = "^25.2"
 
 
 [tool.poetry.group.dev.dependencies]

@@ -42,10 +42,10 @@ class TestOwnedSerializer:
         assert object_ser.validate({"name": "name"})["owner"] == user_agent
 
     def test_validate_owner_with_request_agent(self, object_ser, user_agent):
-        assert object_ser.validate_owner(user_agent.uuid) == user_agent
+        assert object_ser.validate_owner(user_agent) == user_agent
 
     def test_validate_owner_with_other_request_agent(self, object_ser, group_agent):
-        assert object_ser.validate_owner(group_agent.uuid) == group_agent
+        assert object_ser.validate_owner(group_agent) == group_agent
 
     def test_validate_owner_raises_invalid_owner(self, object_ser, user_2_agent):
         with pytest.raises(ValidationError):

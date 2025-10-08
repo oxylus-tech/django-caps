@@ -27,7 +27,10 @@ class UserAgentMixin(mixins.UserAgentMixin):
 
 class OwnedViewSet(UserAgentMixin, mixins.SingleOwnedMixin, viewsets.ModelViewSet):
     """
-    This is the base mixin handling permissions check for django-caps.
+    This is the base viewset class for Owned models, running object permission checks.
+
+    It also provides the :py:meth:`share` that allows a user to share an access to
+    the object.
     """
 
     perms_map = {
@@ -35,7 +38,7 @@ class OwnedViewSet(UserAgentMixin, mixins.SingleOwnedMixin, viewsets.ModelViewSe
     }
 
     share_serializer_class = serializers.ShareSerializer
-    """ This specifies serializer class used for the :py:meth:`share` action. """
+    """ The serializer class used for the :py:meth:`share` action. """
 
     permission_classes = [permissions.OwnedPermissions]
     lookup_field = "uuid"
@@ -127,7 +130,7 @@ class AccessViewSet(
 class AgentViewSet(UserAgentMixin, viewsets.ModelViewSet):
     """Viewset provides API for :py:class:`~caps.models.agent.Agent`.
 
-    Provides an extra API endpoint ``user`` returning user's agents.
+    Provides an extra API endpoint ``user`` returning user's agents (:py:meth:`user`).
     """
 
     model = models.Agent

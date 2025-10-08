@@ -1,4 +1,4 @@
-.. _quickstart
+.. _quickstart:
 
 Quickstart
 ==========
@@ -42,14 +42,14 @@ Create an object to be accessed:
     from django.db import models
     from django.utils.translation import gettext_lazy as _
 
-    from caps.models import Object
+    from caps.models import Owned
 
     __all__ = ("Post",)
 
 
     # Create our example model. A Access and Capability model will be
     # generated and accessible from Post (Post.Access, Post.Capability)
-    class Post(Object):
+    class Post(Owned):
         title = models.CharField(_("Title"), max_length=64)
         content = models.TextField(_("Content"))
         created_at = models.DateTimeField(_("Date of creation"), auto_now_add=True)
@@ -75,12 +75,12 @@ Using views provided by caps, example of ``urls.py`` file:
     from . import models
 
     urlpatterns = [
-        path("/post/", views.ObjectListView.as_view(model=models.Post), name="post-list"),
-        path("/post/<uuid:uuid>/", views.ObjectDetailView.as_view(model=models.Post), name="post-detail"),
-        path("/post/create/", views.ObjectCreateView.as_view(model=models.Post), name="post-create"),
+        path("/post/", views.OwnedOwnedistView.as_view(model=models.Post), name="post-list"),
+        path("/post/<uuid:uuid>/", views.OwnedOwnedetailView.as_view(model=models.Post), name="post-detail"),
+        path("/post/create/", views.OwnedOwnedreateView.as_view(model=models.Post), name="post-create"),
         path(
             "/post/update/<uuid:uuid>",
-            views.ObjectUpdateView.as_view(model=models.Post),
+            views.OwnedUpdateView.as_view(model=models.Post),
             name="post-update",
         ),
     ]
@@ -105,7 +105,7 @@ You can have custom views as:
     __all__ = ("PostDetailView",)
 
 
-    class PostDetailView(views.ObjectDetailView):
+    class PostDetailView(views.OwnedDetailView):
         model = models.Post
 
         # do something here...
@@ -118,8 +118,8 @@ Although we provide basic views for django-caps' models, we don't provide templa
 
 We have views for the following models:
 
-- :py:class:`~caps.models.agent.Agent`: :py:class:`~caps.views.common.AgentListView`, :py:class:`~caps.views.common.AgentDetailView`, :py:class:`~caps.views.common.AgentCreateView`, :py:class:`~caps.views.common.AgentUpdateView`, :py:class:`~caps.views.common.AgentDeleteView`; -
-- :py:class:`~caps.models.object.Object`: :py:class:`~caps.views.generics.ObjectListView`, :py:class:`~caps.views.generics.ObjectDetailView`, :py:class:`~caps.views.generics.ObjectCreateView`, :py:class:`~caps.views.generics.ObjectUpdateView`, :py:class:`~caps.views.generics.ObjectDeleteView`;
+- :py:class:`~caps.models.agent.Agent`: :py:class:`~caps.views.common.AgentListView`, :py:class:`~caps.views.common.AgentDetailView`, :py:class:`~caps.views.common.AgentCreateView`, :py:class:`~caps.views.common.AgentUpdateView`, :py:class:`~caps.views.common.AgentDeleteView`;
+- :py:class:`~caps.models.owned.Owned`: :py:class:`~caps.views.generics.OwnedListView`, :py:class:`~caps.views.generics.OwnedDetailView`, :py:class:`~caps.views.generics.OwnedCreateView`, :py:class:`~caps.views.generics.OwnedUpdateView`, :py:class:`~caps.views.generics.OwnedDeleteView`;
 
 - :py:class:`~caps.models.access.Access`: :py:class:`~caps.views.common.AccessListView`, :py:class:`~caps.views.common.AccessDetailView`, :py:class:`~caps.views.common.AccessDeleteView`;
 
@@ -140,7 +140,7 @@ This is simple too, in ``viewsets.py``:
 
     # Example of viewset using DRF.
     # assuming you have implemented serializer for Post
-    class PostViewSet(viewsets.ObjectViewSet):
+    class PostViewSet(viewsets.OwnedViewSet):
         model = models.Post
         queryset = models.Post.objects.all()
         serializer_class = serializers.PostSerializer
@@ -154,16 +154,16 @@ Serializers:
 .. code-block:: python
 
     from rest_framework import serializers
-    from caps.serializers import ObjectSerializer
+    from caps.serializers import OwnedSerializer
 
     from . import models
 
     __all__ = ('PostSerializer',)
 
-    class PostSerializer(ObjectSerializer, serializers.ModelSerializer):
+    class PostSerializer(OwnedSerializer, serializers.ModelSerializer):
         class Meta:
             model = models.Post
-            fields = ObjectSerializer.fields + ('title', 'content', 'created_at')
+            fields = OwnedSerializer.fields + ('title', 'content', 'created_at')
 
 You'll have to manually add routes and urls for this part:
 

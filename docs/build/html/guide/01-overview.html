@@ -52,7 +52,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#usage-example">Usage Example</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#granting-access-from-an-object">Granting Access from an Object</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#granting-access-from-an-owned">Granting Access from an Owned</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#resharing-an-access">Resharing an Access</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#permission-check">Permission Check</a></li>
 </ul>
@@ -94,12 +94,12 @@
   <section id="overview">
 <h1>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h1>
 <p>The system is designed to support fine-grained, shareable permissions across users, groups, and anonymous agents, while maintaining clear constraints on how far permissions can be redistributed.</p>
-<p>Each <a class="reference internal" href="../api/10_models.html#caps.models.object.Object" title="caps.models.object.Object"><code class="xref py py-class docutils literal notranslate"><span class="pre">caps.models.object.Object</span></code></a> declares its own permission policy via a class-level <a class="reference internal" href="../api/10_models.html#caps.models.object.Object.root_grants" title="caps.models.object.Object.root_grants"><code class="xref py py-attr docutils literal notranslate"><span class="pre">caps.models.object.Object.root_grants</span></code></a> definition, while access instances are represented by Access entries, which may themselves be shared according to configurable depth constraints.</p>
+<p>Each <a class="reference internal" href="../api/10_models.html#caps.models.owned.Owned" title="caps.models.owned.Owned"><code class="xref py py-class docutils literal notranslate"><span class="pre">caps.models.owned.Owned</span></code></a> declares its own permission policy via a class-level <a class="reference internal" href="../api/10_models.html#caps.models.owned.Owned.root_grants" title="caps.models.owned.Owned.root_grants"><code class="xref py py-attr docutils literal notranslate"><span class="pre">caps.models.owned.Owned.root_grants</span></code></a> definition, while access instances are represented by Access entries, which may themselves be shared according to configurable depth constraints.</p>
 <p>The <a class="reference internal" href="../api/10_models.html#caps.models.access.Access" title="caps.models.access.Access"><code class="xref py py-class docutils literal notranslate"><span class="pre">caps.models.access.Access</span></code></a> defines what actions an agent can perform on a given object, and whether those permissions can be further shared. The <a class="reference internal" href="../api/10_models.html#caps.models.agent.Agent" title="caps.models.agent.Agent"><code class="xref py py-class docutils literal notranslate"><span class="pre">caps.models.agent.Agent</span></code></a> model provides a unified interface for addressing users, groups, and public (unauthenticated) access.</p>
 <figure class="align-default" id="id1">
 <img alt="../_images/caps-models.drawio.png" src="../_images/caps-models.drawio.png" />
 <figcaption>
-<p><span class="caption-text">Every Object has an owner and can provide Access to other Agents. They are addressed by their uuid (for the owner) or by the access’ uuid (for the receivers). The access provide permissions whose codename corresponds to Django’s auth Permission.</span><a class="headerlink" href="#id1" title="Link to this image"></a></p>
+<p><span class="caption-text">Every Owned has an owner and can provide Access to other Agents. They are addressed by their uuid (for the owner) or by the access’ uuid (for the receivers). The access provide permissions whose codename corresponds to Django’s auth Permission.</span><a class="headerlink" href="#id1" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <p>Django-Caps provides views that will use the provided scheme in order to grant user access or actions.</p>
@@ -112,14 +112,14 @@
 <h2>Core Models<a class="headerlink" href="#core-models" title="Link to this heading"></a></h2>
 <p>The system is composed of three core models:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">caps.models.object.Object</span></code>
+<li><p><code class="docutils literal notranslate"><span class="pre">caps.models.owned.Owned</span></code>
 Represents the resource being protected. Each object has a globally unique <code class="docutils literal notranslate"><span class="pre">uuid</span></code> and defines its available permissions through a class-level <code class="docutils literal notranslate"><span class="pre">root_grants</span></code> dictionary. This dictionary specifies which permissions are grantable and how many levels deep each one can be reshared.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">caps.models.agent.Agent</span></code>
 A unified abstraction of a permission recipient. An <code class="docutils literal notranslate"><span class="pre">Agent</span></code> may represent a specific user, a group of users, or an anonymous entity. This model decouples access logic from Django’s built-in user and group models, enabling flexible and consistent permission targeting.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">caps.models.access.Access</span></code>
-Encapsulates a delegated permission. Each <code class="docutils literal notranslate"><span class="pre">Access</span></code> instance links a target <code class="docutils literal notranslate"><span class="pre">Object</span></code> to a receiving <code class="docutils literal notranslate"><span class="pre">Agent</span></code> and contains a <code class="docutils literal notranslate"><span class="pre">grants</span></code> dictionary, where each key is a permission codename (e.g., <code class="docutils literal notranslate"><span class="pre">&quot;app.view_object&quot;</span></code>) and each value is a reshare depth. This depth determines how many times the permission can be reshared down the access chain.</p></li>
+Encapsulates a delegated permission. Each <code class="docutils literal notranslate"><span class="pre">Access</span></code> instance links a target <code class="docutils literal notranslate"><span class="pre">Owned</span></code> to a receiving <code class="docutils literal notranslate"><span class="pre">Agent</span></code> and contains a <code class="docutils literal notranslate"><span class="pre">grants</span></code> dictionary, where each key is a permission codename (e.g., <code class="docutils literal notranslate"><span class="pre">&quot;app.view_object&quot;</span></code>) and each value is a reshare depth. This depth determines how many times the permission can be reshared down the access chain.</p></li>
 </ul>
-<p><a class="reference internal" href="../api/10_models.html#caps.models.object.Object" title="caps.models.object.Object"><code class="xref py py-class docutils literal notranslate"><span class="pre">Object</span></code></a> and <a class="reference internal" href="../api/10_models.html#caps.models.access.Access" title="caps.models.access.Access"><code class="xref py py-class docutils literal notranslate"><span class="pre">Access</span></code></a> models are <code class="docutils literal notranslate"><span class="pre">abstract</span></code>. When Object is subclassed in a concrete model,
+<p><a class="reference internal" href="../api/10_models.html#caps.models.owned.Owned" title="caps.models.owned.Owned"><code class="xref py py-class docutils literal notranslate"><span class="pre">Owned</span></code></a> and <a class="reference internal" href="../api/10_models.html#caps.models.access.Access" title="caps.models.access.Access"><code class="xref py py-class docutils literal notranslate"><span class="pre">Access</span></code></a> models are <code class="docutils literal notranslate"><span class="pre">abstract</span></code>. When Owned is subclassed in a concrete model,
 a concrete Access is generated (accessible from subclass scope). This ensure that:</p>
 <ul class="simple">
 <li><p>The Access models are associated to one object type, allowing reverse relations to be accessible (comparing to a solution involving ContentType framework). This also allows to joins table on SQL requests (thus prefetch values among other things);</p></li>
@@ -129,7 +129,7 @@ a concrete Access is generated (accessible from subclass scope). This ensure tha
 <h3>Create and update Access<a class="headerlink" href="#create-and-update-access" title="Link to this heading"></a></h3>
 <p>There are only two ways for user (through views or API) to create a Access:</p>
 <ul class="simple">
-<li><p>By creating a <code class="xref py py-class docutils literal notranslate"><span class="pre">Object</span></code>: the related view will ensure the root access is created.</p></li>
+<li><p>By creating a <code class="xref py py-class docutils literal notranslate"><span class="pre">Owned</span></code>: the related view will ensure the root access is created.</p></li>
 <li><p>By derivating an already existing access;</p></li>
 </ul>
 <p>It is assumed that once a Access is created it can not be updated (nor its capabilities). This is in order to ensure the integrity of the whole chain of accesses. This is a current trade-off in Django-Caps that might change in the future even though it isn’t planned.</p>
@@ -145,9 +145,9 @@ a concrete Access is generated (accessible from subclass scope). This ensure tha
 <h2>Usage Example<a class="headerlink" href="#usage-example" title="Link to this heading"></a></h2>
 <p>This section illustrates how to use the permission model to delegate access and verify permissions.</p>
 <p>We use the <code class="docutils literal notranslate"><span class="pre">Post</span></code> model described in <span class="xref std std-ref">quickstart</span> (read it  for more usage examples and setup).</p>
-<section id="granting-access-from-an-object">
-<h3>Granting Access from an Object<a class="headerlink" href="#granting-access-from-an-object" title="Link to this heading"></a></h3>
-<p>An object owner can share the object with another agent using the <code class="docutils literal notranslate"><span class="pre">post.share(...)</span></code> method (<a class="reference internal" href="../api/10_models.html#caps.models.object.Object.share" title="caps.models.object.Object.share"><code class="xref py py-meth docutils literal notranslate"><span class="pre">caps.models.object.Object.share()</span></code></a>). This method creates a new <code class="docutils literal notranslate"><span class="pre">Access</span></code> instance and assigns permissions according to the object’s <code class="docutils literal notranslate"><span class="pre">root_grants</span></code>.</p>
+<section id="granting-access-from-an-owned">
+<h3>Granting Access from an Owned<a class="headerlink" href="#granting-access-from-an-owned" title="Link to this heading"></a></h3>
+<p>An object owner can share the object with another agent using the <code class="docutils literal notranslate"><span class="pre">post.share(...)</span></code> method (<a class="reference internal" href="../api/10_models.html#caps.models.owned.Owned.share" title="caps.models.owned.Owned.share"><code class="xref py py-meth docutils literal notranslate"><span class="pre">caps.models.owned.Owned.share()</span></code></a>). This method creates a new <code class="docutils literal notranslate"><span class="pre">Access</span></code> instance and assigns permissions according to the object’s <code class="docutils literal notranslate"><span class="pre">root_grants</span></code>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Assuming post is an instance of Post owned by the user</span>
 <span class="c1"># and agent_b is an instance of Agent representing the receiver</span>
 

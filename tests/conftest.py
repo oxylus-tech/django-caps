@@ -100,17 +100,17 @@ def anon_agent(db, user):
 
 @pytest.fixture
 def user_agent(db, user):
-    return Agent.objects.create(user=user)
+    return user.agent
 
 
 @pytest.fixture
 def user_2_agent(db, user_2):
-    return Agent.objects.create(user=user_2)
+    return user_2.agent
 
 
 @pytest.fixture
 def group_agent(db, user_group):
-    return Agent.objects.create(group=user_group)
+    return user_group.agent
 
 
 @pytest.fixture
@@ -125,7 +125,7 @@ def user_2_agents(db, user_2_agent, group_agent):
 
 @pytest.fixture
 def agents(db, user_2_agents, group):
-    return user_2_agents + [Agent.objects.create(group=group)]
+    return user_2_agents + [group.agent]
 
 
 # -- Capabilities

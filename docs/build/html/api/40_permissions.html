@@ -50,14 +50,15 @@
 <li class="toctree-l2"><a class="reference internal" href="30_serializers.html">caps.serializers</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">caps.permissions</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#caps.permissions.DjangoModelPermissions"><code class="docutils literal notranslate"><span class="pre">DjangoModelPermissions</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#caps.permissions.DjangoModelPermissions.get_required_permissions"><code class="docutils literal notranslate"><span class="pre">DjangoModelPermissions.get_required_permissions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#caps.permissions.DjangoModelPermissions.has_permission"><code class="docutils literal notranslate"><span class="pre">DjangoModelPermissions.has_permission()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#caps.permissions.DjangoModelPermissions.perms_map"><code class="docutils literal notranslate"><span class="pre">DjangoModelPermissions.perms_map</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#caps.permissions.ObjectPermissions"><code class="docutils literal notranslate"><span class="pre">ObjectPermissions</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#caps.permissions.ObjectPermissions.Request"><code class="docutils literal notranslate"><span class="pre">ObjectPermissions.Request</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#caps.permissions.ObjectPermissions.has_object_permission"><code class="docutils literal notranslate"><span class="pre">ObjectPermissions.has_object_permission()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#caps.permissions.ObjectPermissions.has_permission"><code class="docutils literal notranslate"><span class="pre">ObjectPermissions.has_permission()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#caps.permissions.ObjectPermissions.perms_map"><code class="docutils literal notranslate"><span class="pre">ObjectPermissions.perms_map</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#caps.permissions.OwnedPermissions"><code class="docutils literal notranslate"><span class="pre">OwnedPermissions</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#caps.permissions.OwnedPermissions.Request"><code class="docutils literal notranslate"><span class="pre">OwnedPermissions.Request</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#caps.permissions.OwnedPermissions.has_object_permission"><code class="docutils literal notranslate"><span class="pre">OwnedPermissions.has_object_permission()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#caps.permissions.OwnedPermissions.perms_map"><code class="docutils literal notranslate"><span class="pre">OwnedPermissions.perms_map</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -99,11 +100,47 @@
 
   <section id="module-caps.permissions">
 <span id="caps-permissions"></span><h1>caps.permissions<a class="headerlink" href="#module-caps.permissions" title="Link to this heading"></a></h1>
+<p>This module provides Django Rest Framework permissions that run checks based on
+the capability system.</p>
+<p>Two implementations are provided: <a class="reference internal" href="#caps.permissions.DjangoModelPermissions" title="caps.permissions.DjangoModelPermissions"><code class="xref py py-class docutils literal notranslate"><span class="pre">DjangoModelPermissions</span></code></a> and
+<a class="reference internal" href="#caps.permissions.OwnedPermissions" title="caps.permissions.OwnedPermissions"><code class="xref py py-class docutils literal notranslate"><span class="pre">OwnedPermissions</span></code></a>. The first one is the base improved class,
+second is used to provide object permission checks.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="caps.permissions.DjangoModelPermissions">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DjangoModelPermissions</span></span><a class="reference internal" href="../_modules/caps/permissions.html#DjangoModelPermissions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.permissions.DjangoModelPermissions" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">DjangoModelPermissions</span></code></p>
-<p>Subclass DRF DjangoModelPermissions in order to add “view” permission on GET request.</p>
+<p>This base class improve base DRF’s <code class="docutils literal notranslate"><span class="pre">DjangoModelPermissions</span></code> class.</p>
+<p>It provides extra features:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>GET request also has permission check (model’s <code class="docutils literal notranslate"><span class="pre">view</span></code> permission);</p></li>
+<li><p>Maps view’s <code class="docutils literal notranslate"><span class="pre">action</span></code> to permissions;</p></li>
+<li><p>Permissions map can be provided by the view (as attribute on the view);</p></li>
+</ul>
+</div></blockquote>
+<p>When the view has <code class="docutils literal notranslate"><span class="pre">perms_map</span></code> attribute, it will look up there for a permission
+at first place, defaulting to self’s one.</p>
+<p>View action will be searched before using request’s method. This allows viewsets
+to specify different permissions based on the current action.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.permissions.DjangoModelPermissions.get_required_permissions">
+<span class="sig-name descname"><span class="pre">get_required_permissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">view</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_cls</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/permissions.html#DjangoModelPermissions.get_required_permissions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.permissions.DjangoModelPermissions.get_required_permissions" title="Link to this definition"></a></dt>
+<dd><p>Given a view, model and HTTP method, return the list of permission codes that the user is required to have.</p>
+<p>Lookup for them based on viewset action if any, then on method.
+Lookup for view’s <code class="docutils literal notranslate"><span class="pre">perms_map</span></code> before self’s one if any.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.permissions.DjangoModelPermissions.has_permission">
+<span class="sig-name descname"><span class="pre">has_permission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/permissions.html#DjangoModelPermissions.has_permission"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.permissions.DjangoModelPermissions.has_permission" title="Link to this definition"></a></dt>
+<dd><p>Return <cite>True</cite> if permission is granted, <cite>False</cite> otherwise.</p>
+</dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caps.permissions.DjangoModelPermissions.perms_map">
 <span class="sig-name descname"><span class="pre">perms_map</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'DELETE':</span> <span class="pre">['%(app_label)s.delete_%(model_name)s'],</span> <span class="pre">'GET':</span> <span class="pre">['%(app_label)s.view_%(model_name)s'],</span> <span class="pre">'HEAD':</span> <span class="pre">[],</span> <span class="pre">'OPTIONS':</span> <span class="pre">[],</span> <span class="pre">'PATCH':</span> <span class="pre">['%(app_label)s.change_%(model_name)s'],</span> <span class="pre">'POST':</span> <span class="pre">['%(app_label)s.add_%(model_name)s'],</span> <span class="pre">'PUT':</span> <span class="pre">['%(app_label)s.change_%(model_name)s']}</span></em><a class="headerlink" href="#caps.permissions.DjangoModelPermissions.perms_map" title="Link to this definition"></a></dt>
@@ -112,33 +149,27 @@
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="caps.permissions.ObjectPermissions">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ObjectPermissions</span></span><a class="reference internal" href="../_modules/caps/permissions.html#ObjectPermissions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.permissions.ObjectPermissions" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="caps.permissions.OwnedPermissions">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">OwnedPermissions</span></span><a class="reference internal" href="../_modules/caps/permissions.html#OwnedPermissions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.permissions.OwnedPermissions" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">DjangoObjectPermissions</span></code>, <a class="reference internal" href="#caps.permissions.DjangoModelPermissions" title="caps.permissions.DjangoModelPermissions"><code class="xref py py-class docutils literal notranslate"><span class="pre">DjangoModelPermissions</span></code></a></p>
-<p>This class provide permissions check over object using a permission map.</p>
-<p>The mapped permissions can either a request method or a viewset action (in case this is used with viewsets).</p>
+<p>This class provides object permissions check for <a class="reference internal" href="10_models.html#caps.models.owned.Owned" title="caps.models.owned.Owned"><code class="xref py py-class docutils literal notranslate"><span class="pre">Owned</span></code></a>.</p>
+<p>For more information about usage, see <a class="reference internal" href="#caps.permissions.DjangoModelPermissions" title="caps.permissions.DjangoModelPermissions"><code class="xref py py-class docutils literal notranslate"><span class="pre">DjangoModelPermissions</span></code></a>.</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="caps.permissions.ObjectPermissions.Request">
-<span class="sig-name descname"><span class="pre">Request</span></span><a class="headerlink" href="#caps.permissions.ObjectPermissions.Request" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="caps.permissions.OwnedPermissions.Request">
+<span class="sig-name descname"><span class="pre">Request</span></span><a class="headerlink" href="#caps.permissions.OwnedPermissions.Request" title="Link to this definition"></a></dt>
 <dd><p>Fake request providing what is required to get permissions.</p>
 <p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">RequestInfo</span></code></p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="caps.permissions.ObjectPermissions.has_object_permission">
-<span class="sig-name descname"><span class="pre">has_object_permission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/permissions.html#ObjectPermissions.has_object_permission"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.permissions.ObjectPermissions.has_object_permission" title="Link to this definition"></a></dt>
-<dd><p>Return <cite>True</cite> if permission is granted, <cite>False</cite> otherwise.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="caps.permissions.ObjectPermissions.has_permission">
-<span class="sig-name descname"><span class="pre">has_permission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/permissions.html#ObjectPermissions.has_permission"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.permissions.ObjectPermissions.has_permission" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="caps.permissions.OwnedPermissions.has_object_permission">
+<span class="sig-name descname"><span class="pre">has_object_permission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/permissions.html#OwnedPermissions.has_object_permission"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.permissions.OwnedPermissions.has_object_permission" title="Link to this definition"></a></dt>
 <dd><p>Return <cite>True</cite> if permission is granted, <cite>False</cite> otherwise.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="caps.permissions.ObjectPermissions.perms_map">
-<span class="sig-name descname"><span class="pre">perms_map</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'DELETE':</span> <span class="pre">['%(app_label)s.delete_%(model_name)s'],</span> <span class="pre">'GET':</span> <span class="pre">['%(app_label)s.view_%(model_name)s'],</span> <span class="pre">'HEAD':</span> <span class="pre">[],</span> <span class="pre">'OPTIONS':</span> <span class="pre">[],</span> <span class="pre">'PATCH':</span> <span class="pre">['%(app_label)s.change_%(model_name)s'],</span> <span class="pre">'POST':</span> <span class="pre">['%(app_label)s.add_%(model_name)s'],</span> <span class="pre">'PUT':</span> <span class="pre">['%(app_label)s.change_%(model_name)s'],</span> <span class="pre">'create':</span> <span class="pre">['%(app_label)s.add_%(model_name)s'],</span> <span class="pre">'destroy':</span> <span class="pre">['%(app_label)s.delete_%(model_name)s'],</span> <span class="pre">'list':</span> <span class="pre">['%(app_label)s.view_%(model_name)s'],</span> <span class="pre">'partial_update':</span> <span class="pre">['%(app_label)s.change_%(model_name)s'],</span> <span class="pre">'retrieve':</span> <span class="pre">['%(app_label)s.view_%(model_name)s'],</span> <span class="pre">'update':</span> <span class="pre">['%(app_label)s.change_%(model_name)s']}</span></em><a class="headerlink" href="#caps.permissions.ObjectPermissions.perms_map" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="caps.permissions.OwnedPermissions.perms_map">
+<span class="sig-name descname"><span class="pre">perms_map</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'DELETE':</span> <span class="pre">['%(app_label)s.delete_%(model_name)s'],</span> <span class="pre">'GET':</span> <span class="pre">['%(app_label)s.view_%(model_name)s'],</span> <span class="pre">'HEAD':</span> <span class="pre">[],</span> <span class="pre">'OPTIONS':</span> <span class="pre">[],</span> <span class="pre">'PATCH':</span> <span class="pre">['%(app_label)s.change_%(model_name)s'],</span> <span class="pre">'POST':</span> <span class="pre">['%(app_label)s.add_%(model_name)s'],</span> <span class="pre">'PUT':</span> <span class="pre">['%(app_label)s.change_%(model_name)s'],</span> <span class="pre">'create':</span> <span class="pre">['%(app_label)s.add_%(model_name)s'],</span> <span class="pre">'destroy':</span> <span class="pre">['%(app_label)s.delete_%(model_name)s'],</span> <span class="pre">'list':</span> <span class="pre">['%(app_label)s.view_%(model_name)s'],</span> <span class="pre">'partial_update':</span> <span class="pre">['%(app_label)s.change_%(model_name)s'],</span> <span class="pre">'retrieve':</span> <span class="pre">['%(app_label)s.view_%(model_name)s'],</span> <span class="pre">'update':</span> <span class="pre">['%(app_label)s.change_%(model_name)s']}</span></em><a class="headerlink" href="#caps.permissions.OwnedPermissions.perms_map" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>

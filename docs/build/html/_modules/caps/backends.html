@@ -81,15 +81,26 @@
 <a class="viewcode-back" href="../../api/60_backends.html#caps.backends.PermissionsBackend">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">PermissionsBackend</span><span class="p">(</span><span class="n">BaseBackend</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Provide permission backend using capabilities system.</span>
+<span class="sd">    Provide object permission backend using the capabilities system.</span>
 
-<span class="sd">    It will only test permissions on Object and Access subclass.</span>
+<span class="sd">    The check is only run on :py:class:`~.models.owned.Owned` and</span>
+<span class="sd">    :py:class:`~/models.access.Access` instances.</span>
+
+<span class="sd">    You can add it to the ``AUTHENTICATION_BACKENDS`` setting, as:</span>
+
+<span class="sd">    ..code-block:: python</span>
+
+<span class="sd">        AUTHENTICATION_BACKENDS = [</span>
+<span class="sd">            &quot;django.contrib.auth.backends.ModelBackend&quot;,</span>
+<span class="sd">            &quot;caps.backends.PermissionsBackend&quot;,</span>
+<span class="sd">        ]</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="PermissionsBackend.has_perm">
 <a class="viewcode-back" href="../../api/60_backends.html#caps.backends.PermissionsBackend.has_perm">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">has_perm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">perm</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Object</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">Access</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Owned</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">Access</span><span class="p">)):</span>
             <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">has_perm</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">perm</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">False</span></div>
 
@@ -97,7 +108,7 @@
 <div class="viewcode-block" id="PermissionsBackend.get_all_permissions">
 <a class="viewcode-back" href="../../api/60_backends.html#caps.backends.PermissionsBackend.get_all_permissions">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_all_permissions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Object</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">Access</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Owned</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">Access</span><span class="p">)):</span>
             <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">get_all_permissions</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">set</span><span class="p">()</span></div>
 </div>

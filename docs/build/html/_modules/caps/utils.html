@@ -6,8 +6,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>caps.utils &mdash; Django-Caps 1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" haccess="../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" haccess="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
 
 
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
@@ -16,8 +16,8 @@
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
-    <link rel="index" title="Index" haccess="../../genindex.html" />
-    <link rel="search" title="Search" haccess="../../search.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
 </head>
 
 <body class="wy-body-for-nav">
@@ -28,7 +28,7 @@
 
 
 
-          <a haccess="../../index.html" class="icon icon-home">
+          <a href="../../index.html" class="icon icon-home">
             Django-Caps
           </a>
 <div role="search">
@@ -40,9 +40,9 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="Share internal" haccess="../../guide.html">Guide</a></li>
-<li class="toctree-l1"><a class="Share internal" haccess="../../api.html">API</a></li>
-<li class="toctree-l1"><a class="Share internal" haccess="../../project.html">Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guide.html">Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../project.html">Project</a></li>
 </ul>
 
         </div>
@@ -51,15 +51,15 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a haccess="../../index.html">Django-Caps</a>
+          <a href="../../index.html">Django-Caps</a>
       </nav>
 
       <div class="wy-nav-content">
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a haccess="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a haccess="../index.html">Module code</a></li>
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
       <li class="breadcrumb-item active">caps.utils</li>
       <li class="wy-breadcrumbs-aside">
       </li>
@@ -74,7 +74,7 @@
 
 
 <div class="viewcode-block" id="get_lazy_relation">
-<a class="viewcode-back" haccess="../../api/80_utils.html#caps.utils.get_lazy_relation">[docs]</a>
+<a class="viewcode-back" href="../../api/80_utils.html#caps.utils.get_lazy_relation">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_lazy_relation</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">out_field</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    For the provided model instance, return an attribute name and value for field.</span>
@@ -83,7 +83,7 @@
 
 <span class="sd">    .. code-block:: python</span>
 
-<span class="sd">        access = Share.objects.all().first()</span>
+<span class="sd">        access = Access.objects.all().first()</span>
 
 <span class="sd">        # relation has not been fetched</span>
 <span class="sd">        k, v = get_lazy_relation(access, &#39;origin&#39;)</span>
@@ -92,11 +92,11 @@
 <span class="sd">        # fetch from db:</span>
 <span class="sd">        access.origin</span>
 <span class="sd">        k, v = get_lazy_relation(access, &#39;origin&#39;)</span>
-<span class="sd">        assert k == &#39;origin&#39; and isinstance(v, Share)</span>
+<span class="sd">        assert k == &#39;origin&#39; and isinstance(v, Access)</span>
 
 <span class="sd">        # map a name:</span>
 <span class="sd">        k, v = get_lazy_relation(access, &#39;origin&#39;, &#39;dest&#39;)</span>
-<span class="sd">        assert k == &#39;dest&#39; and isinstance(v, Share)</span>
+<span class="sd">        assert k == &#39;dest&#39; and isinstance(v, Access)</span>
 
 <span class="sd">    :param obj: object to get value on</span>
 <span class="sd">    :param field: object&#39;s field to lookup</span>
@@ -122,9 +122,9 @@
     <p>&#169; Copyright 2025, Thomas.</p>
   </div>
 
-  Built with <a haccess="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a haccess="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a haccess="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
 
 
 </footer>

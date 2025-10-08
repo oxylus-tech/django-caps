@@ -74,40 +74,40 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">mixins</span>
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;ObjectListView&quot;</span><span class="p">,</span> <span class="s2">&quot;ObjectDetailView&quot;</span><span class="p">,</span> <span class="s2">&quot;ObjectCreateView&quot;</span><span class="p">,</span> <span class="s2">&quot;ObjectUpdateView&quot;</span><span class="p">,</span> <span class="s2">&quot;ObjectDeleteView&quot;</span><span class="p">)</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;OwnedListView&quot;</span><span class="p">,</span> <span class="s2">&quot;OwnedDetailView&quot;</span><span class="p">,</span> <span class="s2">&quot;OwnedCreateView&quot;</span><span class="p">,</span> <span class="s2">&quot;OwnedUpdateView&quot;</span><span class="p">,</span> <span class="s2">&quot;OwnedDeleteView&quot;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="ObjectListView">
-<a class="viewcode-back" href="../../../api/20_views.html#caps.views.generics.ObjectListView">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">ObjectListView</span><span class="p">(</span><span class="n">mixins</span><span class="o">.</span><span class="n">ObjectMixin</span><span class="p">,</span> <span class="n">generic</span><span class="o">.</span><span class="n">ListView</span><span class="p">):</span>
+<div class="viewcode-block" id="OwnedListView">
+<a class="viewcode-back" href="../../../api/20_views.html#caps.views.generics.OwnedListView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OwnedListView</span><span class="p">(</span><span class="n">mixins</span><span class="o">.</span><span class="n">OwnedMixin</span><span class="p">,</span> <span class="n">generic</span><span class="o">.</span><span class="n">ListView</span><span class="p">):</span>
     <span class="k">pass</span></div>
 
 
 
-<div class="viewcode-block" id="ObjectDetailView">
-<a class="viewcode-back" href="../../../api/20_views.html#caps.views.generics.ObjectDetailView">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">ObjectDetailView</span><span class="p">(</span><span class="n">mixins</span><span class="o">.</span><span class="n">SingleObjectMixin</span><span class="p">,</span> <span class="n">mixins</span><span class="o">.</span><span class="n">ObjectPermissionMixin</span><span class="p">,</span> <span class="n">generic</span><span class="o">.</span><span class="n">DetailView</span><span class="p">):</span>
+<div class="viewcode-block" id="OwnedDetailView">
+<a class="viewcode-back" href="../../../api/20_views.html#caps.views.generics.OwnedDetailView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OwnedDetailView</span><span class="p">(</span><span class="n">mixins</span><span class="o">.</span><span class="n">SingleOwnedMixin</span><span class="p">,</span> <span class="n">mixins</span><span class="o">.</span><span class="n">OwnedPermissionMixin</span><span class="p">,</span> <span class="n">generic</span><span class="o">.</span><span class="n">DetailView</span><span class="p">):</span>
     <span class="k">pass</span></div>
 
 
 
-<div class="viewcode-block" id="ObjectCreateView">
-<a class="viewcode-back" href="../../../api/20_views.html#caps.views.generics.ObjectCreateView">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">ObjectCreateView</span><span class="p">(</span><span class="n">generic</span><span class="o">.</span><span class="n">edit</span><span class="o">.</span><span class="n">CreateView</span><span class="p">):</span>
+<div class="viewcode-block" id="OwnedCreateView">
+<a class="viewcode-back" href="../../../api/20_views.html#caps.views.generics.OwnedCreateView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OwnedCreateView</span><span class="p">(</span><span class="n">mixins</span><span class="o">.</span><span class="n">UserAgentMixin</span><span class="p">,</span> <span class="n">generic</span><span class="o">.</span><span class="n">edit</span><span class="o">.</span><span class="n">CreateView</span><span class="p">):</span>
     <span class="k">pass</span></div>
 
 
 
-<div class="viewcode-block" id="ObjectUpdateView">
-<a class="viewcode-back" href="../../../api/20_views.html#caps.views.generics.ObjectUpdateView">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">ObjectUpdateView</span><span class="p">(</span><span class="n">mixins</span><span class="o">.</span><span class="n">SingleObjectMixin</span><span class="p">,</span> <span class="n">mixins</span><span class="o">.</span><span class="n">ObjectPermissionMixin</span><span class="p">,</span> <span class="n">generic</span><span class="o">.</span><span class="n">edit</span><span class="o">.</span><span class="n">UpdateView</span><span class="p">):</span>
+<div class="viewcode-block" id="OwnedUpdateView">
+<a class="viewcode-back" href="../../../api/20_views.html#caps.views.generics.OwnedUpdateView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OwnedUpdateView</span><span class="p">(</span><span class="n">mixins</span><span class="o">.</span><span class="n">SingleOwnedMixin</span><span class="p">,</span> <span class="n">mixins</span><span class="o">.</span><span class="n">OwnedPermissionMixin</span><span class="p">,</span> <span class="n">generic</span><span class="o">.</span><span class="n">edit</span><span class="o">.</span><span class="n">UpdateView</span><span class="p">):</span>
     <span class="k">pass</span></div>
 
 
 
-<div class="viewcode-block" id="ObjectDeleteView">
-<a class="viewcode-back" href="../../../api/20_views.html#caps.views.generics.ObjectDeleteView">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">ObjectDeleteView</span><span class="p">(</span><span class="n">mixins</span><span class="o">.</span><span class="n">SingleObjectMixin</span><span class="p">,</span> <span class="n">mixins</span><span class="o">.</span><span class="n">ObjectPermissionMixin</span><span class="p">,</span> <span class="n">generic</span><span class="o">.</span><span class="n">edit</span><span class="o">.</span><span class="n">DeleteView</span><span class="p">):</span>
+<div class="viewcode-block" id="OwnedDeleteView">
+<a class="viewcode-back" href="../../../api/20_views.html#caps.views.generics.OwnedDeleteView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OwnedDeleteView</span><span class="p">(</span><span class="n">mixins</span><span class="o">.</span><span class="n">SingleOwnedMixin</span><span class="p">,</span> <span class="n">mixins</span><span class="o">.</span><span class="n">OwnedPermissionMixin</span><span class="p">,</span> <span class="n">generic</span><span class="o">.</span><span class="n">edit</span><span class="o">.</span><span class="n">DeleteView</span><span class="p">):</span>
     <span class="k">pass</span></div>
 
 </pre></div>

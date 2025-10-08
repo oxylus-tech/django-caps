@@ -6,8 +6,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>caps.models.agent &mdash; Django-Caps 1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" haccess="../../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" haccess="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
 
 
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
@@ -16,8 +16,8 @@
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
-    <link rel="index" title="Index" haccess="../../../genindex.html" />
-    <link rel="search" title="Search" haccess="../../../search.html" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
 </head>
 
 <body class="wy-body-for-nav">
@@ -28,7 +28,7 @@
 
 
 
-          <a haccess="../../../index.html" class="icon icon-home">
+          <a href="../../../index.html" class="icon icon-home">
             Django-Caps
           </a>
 <div role="search">
@@ -40,9 +40,9 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="Share internal" haccess="../../../guide.html">Guide</a></li>
-<li class="toctree-l1"><a class="Share internal" haccess="../../../api.html">API</a></li>
-<li class="toctree-l1"><a class="Share internal" haccess="../../../project.html">Project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../guide.html">Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../project.html">Project</a></li>
 </ul>
 
         </div>
@@ -51,15 +51,15 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a haccess="../../../index.html">Django-Caps</a>
+          <a href="../../../index.html">Django-Caps</a>
       </nav>
 
       <div class="wy-nav-content">
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a haccess="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a haccess="../../index.html">Module code</a></li>
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
       <li class="breadcrumb-item active">caps.models.agent</li>
       <li class="wy-breadcrumbs-aside">
       </li>
@@ -84,10 +84,10 @@
 
 
 <div class="viewcode-block" id="AgentQuerySet">
-<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.agent.AgentQuerySet">[docs]</a>
+<a class="viewcode-back" href="../../../api/10_models.html#caps.models.agent.AgentQuerySet">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AgentQuerySet</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">QuerySet</span><span class="p">):</span>
 <div class="viewcode-block" id="AgentQuerySet.user">
-<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.agent.AgentQuerySet.user">[docs]</a>
+<a class="viewcode-back" href="../../../api/10_models.html#caps.models.agent.AgentQuerySet.user">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span> <span class="n">User</span><span class="p">,</span> <span class="n">strict</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AgentQuerySet</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Filter by user or its groups.</span>
 
@@ -102,7 +102,7 @@
 
 
 <div class="viewcode-block" id="AgentQuerySet.group">
-<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.agent.AgentQuerySet.group">[docs]</a>
+<a class="viewcode-back" href="../../../api/10_models.html#caps.models.agent.AgentQuerySet.group">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="n">Group</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AgentQuerySet</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Filter by group.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span></div>
@@ -111,23 +111,19 @@
 
 
 <div class="viewcode-block" id="Agent">
-<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.agent.Agent">[docs]</a>
+<a class="viewcode-back" href="../../../api/10_models.html#caps.models.agent.Agent">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Agent</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    An agent is the one executing an action. It can either be related to</span>
 <span class="sd">    a specific user (anonymous included) or group.</span>
-
-<span class="sd">    A user can impersonate multiple agent.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">uuid</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">UUIDField</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Share&quot;</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">)</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Public Share to agent.&quot;&quot;&quot;</span>
-    <span class="n">user</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;User&quot;</span><span class="p">))</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Agent targets this user.&quot;&quot;&quot;</span>
-    <span class="n">group</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Group</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Group&quot;</span><span class="p">))</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Agent targets this group.&quot;&quot;&quot;</span>
-    <span class="n">is_default</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Default User Agent&quot;</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;If True, use this Agent as user&#39;s default.&quot;&quot;&quot;</span>
+    <span class="n">uuid</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">UUIDField</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Access&quot;</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Public access to agent.&quot;&quot;&quot;</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">OneToOneField</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Agent targets this user. Related name: &#39;agents&#39;. &quot;&quot;&quot;</span>
+    <span class="n">group</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">OneToOneField</span><span class="p">(</span><span class="n">Group</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Agent targets this group. Related name: &#39;agents&#39;. &quot;&quot;&quot;</span>
 
     <span class="n">objects</span> <span class="o">=</span> <span class="n">AgentQuerySet</span><span class="o">.</span><span class="n">as_manager</span><span class="p">()</span>
 
@@ -136,15 +132,34 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return True when Agent targets anonymous users.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span>
 
+<div class="viewcode-block" id="Agent.is_agent">
+<a class="viewcode-back" href="../../../api/10_models.html#caps.models.agent.Agent.is_agent">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_agent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span> <span class="n">User</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return True if user can act as this agent.</span>
+
+<span class="sd">        This methods also check based on user&#39;s group and anonymity.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">is_anonymous</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_anonymous</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_id</span> <span class="o">==</span> <span class="n">user</span><span class="o">.</span><span class="n">pk</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span>
+            <span class="n">gid</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">group_id</span> <span class="k">for</span> <span class="n">gid</span> <span class="ow">in</span> <span class="n">user</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s2">&quot;pk&quot;</span><span class="p">,</span> <span class="n">flat</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="Agent.clean">
-<a class="viewcode-back" haccess="../../../api/10_models.html#caps.models.agent.Agent.clean">[docs]</a>
+<a class="viewcode-back" href="../../../api/10_models.html#caps.models.agent.Agent.clean">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Agent targets either a user or a group&quot;</span><span class="p">))</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_default</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_anonymous</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Agent can be set as default only when targeting a user.&quot;</span><span class="p">))</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">clean</span><span class="p">()</span></div>
-</div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;User &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Group &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;Anonymous&quot;</span></div>
 
 </pre></div>
 
@@ -158,9 +173,9 @@
     <p>&#169; Copyright 2025, Thomas.</p>
   </div>
 
-  Built with <a haccess="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a haccess="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a haccess="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
 
 
 </footer>

@@ -57,13 +57,16 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#caps.serializers.AgentSerializer"><code class="docutils literal notranslate"><span class="pre">AgentSerializer</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#caps.serializers.AgentSerializer.Meta"><code class="docutils literal notranslate"><span class="pre">AgentSerializer.Meta</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#caps.serializers.AgentSerializer.get_name"><code class="docutils literal notranslate"><span class="pre">AgentSerializer.get_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#caps.serializers.AgentSerializer.name"><code class="docutils literal notranslate"><span class="pre">AgentSerializer.name</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#caps.serializers.ObjectSerializer"><code class="docutils literal notranslate"><span class="pre">ObjectSerializer</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#caps.serializers.ObjectSerializer.Meta"><code class="docutils literal notranslate"><span class="pre">ObjectSerializer.Meta</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#caps.serializers.ObjectSerializer.access"><code class="docutils literal notranslate"><span class="pre">ObjectSerializer.access</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#caps.serializers.ObjectSerializer.get_uuid"><code class="docutils literal notranslate"><span class="pre">ObjectSerializer.get_uuid()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#caps.serializers.ObjectSerializer.validate"><code class="docutils literal notranslate"><span class="pre">ObjectSerializer.validate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#caps.serializers.OwnedSerializer"><code class="docutils literal notranslate"><span class="pre">OwnedSerializer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#caps.serializers.OwnedSerializer.Meta"><code class="docutils literal notranslate"><span class="pre">OwnedSerializer.Meta</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#caps.serializers.OwnedSerializer.access"><code class="docutils literal notranslate"><span class="pre">OwnedSerializer.access</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#caps.serializers.OwnedSerializer.get_id"><code class="docutils literal notranslate"><span class="pre">OwnedSerializer.get_id()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#caps.serializers.OwnedSerializer.validate"><code class="docutils literal notranslate"><span class="pre">OwnedSerializer.validate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#caps.serializers.OwnedSerializer.validate_owner"><code class="docutils literal notranslate"><span class="pre">OwnedSerializer.validate_owner()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#caps.serializers.ShareSerializer"><code class="docutils literal notranslate"><span class="pre">ShareSerializer</span></code></a><ul>
@@ -110,25 +113,28 @@
 
   <section id="module-caps.serializers">
 <span id="caps-serializers"></span><h1>caps.serializers<a class="headerlink" href="#module-caps.serializers" title="Link to this heading"></a></h1>
+<p>This module provides serializer (and base serializers) for Django-Caps’ models.</p>
+<p>** Note: we never expose internal db id to the external world as they are predictable
+for an attacker. Instead we refer to them using their UUID. **</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="caps.serializers.AccessSerializer">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AccessSerializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/serializers.html#AccessSerializer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.serializers.AccessSerializer" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Serializer</span></code></p>
-<p>Serializer for <code class="xref py py-class docutils literal notranslate"><span class="pre">caps.models.capability.Access</span></code>.</p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">UUIDSerializer</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Serializer</span></code></p>
+<p>Serializer for <code class="xref py py-class docutils literal notranslate"><span class="pre">Access</span></code>.</p>
 <p>Implemented as simple Serializer, since the corresponding models are generated based on
-concrete <a class="reference internal" href="10_models.html#caps.models.object.Object" title="caps.models.object.Object"><code class="xref py py-class docutils literal notranslate"><span class="pre">models.object.Object</span></code></a>.</p>
+concrete <code class="xref py py-class docutils literal notranslate"><span class="pre">models.object.Owned</span></code>.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="caps.serializers.AccessSerializer.Meta">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Meta</span></span><a class="reference internal" href="../_modules/caps/serializers.html#AccessSerializer.Meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.serializers.AccessSerializer.Meta" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caps.serializers.AccessSerializer.Meta.fields">
-<span class="sig-name descname"><span class="pre">fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['uuid',</span> <span class="pre">'origin',</span> <span class="pre">'emitter',</span> <span class="pre">'receiver',</span> <span class="pre">'expiration',</span> <span class="pre">'grants']</span></em><a class="headerlink" href="#caps.serializers.AccessSerializer.Meta.fields" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['id',</span> <span class="pre">'origin',</span> <span class="pre">'emitter',</span> <span class="pre">'receiver',</span> <span class="pre">'expiration',</span> <span class="pre">'grants']</span></em><a class="headerlink" href="#caps.serializers.AccessSerializer.Meta.fields" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caps.serializers.AccessSerializer.Meta.read_only_fields">
-<span class="sig-name descname"><span class="pre">read_only_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['uuid',</span> <span class="pre">'origin',</span> <span class="pre">'emitter',</span> <span class="pre">'receiver',</span> <span class="pre">'expiration',</span> <span class="pre">'grants']</span></em><a class="headerlink" href="#caps.serializers.AccessSerializer.Meta.read_only_fields" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">read_only_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['id',</span> <span class="pre">'origin',</span> <span class="pre">'emitter',</span> <span class="pre">'receiver',</span> <span class="pre">'expiration',</span> <span class="pre">'grants']</span></em><a class="headerlink" href="#caps.serializers.AccessSerializer.Meta.read_only_fields" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -153,15 +159,15 @@ concrete <a class="reference internal" href="10_models.html#caps.models.object.O
 <dl class="py class">
 <dt class="sig sig-object py" id="caps.serializers.AgentSerializer">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AgentSerializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/serializers.html#AgentSerializer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.serializers.AgentSerializer" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelSerializer</span></code></p>
-<p>Serializer for <a class="reference internal" href="10_models.html#caps.models.agent.Agent" title="caps.models.agent.Agent"><code class="xref py py-class docutils literal notranslate"><span class="pre">caps.models.agent.Agent</span></code></a>.</p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">UUIDSerializer</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelSerializer</span></code></p>
+<p>Serializer for <a class="reference internal" href="10_models.html#caps.models.agent.Agent" title="caps.models.agent.Agent"><code class="xref py py-class docutils literal notranslate"><span class="pre">Agent</span></code></a>.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="caps.serializers.AgentSerializer.Meta">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Meta</span></span><a class="reference internal" href="../_modules/caps/serializers.html#AgentSerializer.Meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.serializers.AgentSerializer.Meta" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caps.serializers.AgentSerializer.Meta.fields">
-<span class="sig-name descname"><span class="pre">fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['user_id',</span> <span class="pre">'group_id']</span></em><a class="headerlink" href="#caps.serializers.AgentSerializer.Meta.fields" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['id',</span> <span class="pre">'user',</span> <span class="pre">'group',</span> <span class="pre">'name']</span></em><a class="headerlink" href="#caps.serializers.AgentSerializer.Meta.fields" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -172,44 +178,72 @@ concrete <a class="reference internal" href="10_models.html#caps.models.object.O
 
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.serializers.AgentSerializer.get_name">
+<span class="sig-name descname"><span class="pre">get_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/serializers.html#AgentSerializer.get_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.serializers.AgentSerializer.get_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.serializers.AgentSerializer.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#caps.serializers.AgentSerializer.name" title="Link to this definition"></a></dt>
+<dd><p>Provided fields for utility</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="caps.serializers.ObjectSerializer">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ObjectSerializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/serializers.html#ObjectSerializer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.serializers.ObjectSerializer" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelSerializer</span></code></p>
-<p>Base serializer for Objects. It provides <code class="xref py py-attr docutils literal notranslate"><span class="pre">uuid</span></code> field.</p>
+<dt class="sig sig-object py" id="caps.serializers.OwnedSerializer">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">OwnedSerializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/serializers.html#OwnedSerializer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.serializers.OwnedSerializer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">UUIDSerializer</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelSerializer</span></code></p>
+<p>Base serializer for <a class="reference internal" href="10_models.html#caps.models.owned.Owned" title="caps.models.owned.Owned"><code class="xref py py-class docutils literal notranslate"><span class="pre">Owned</span></code></a>.</p>
+<p>When the owned object has <code class="docutils literal notranslate"><span class="pre">access</span></code> set, it will use the access’ uuid
+as id. This happens for example when it is fetched from database using
+the <a class="reference internal" href="10_models.html#caps.models.owned.OwnedQuerySet.access" title="caps.models.owned.OwnedQuerySet.access"><code class="xref py py-meth docutils literal notranslate"><span class="pre">access()</span></code></a> method.</p>
+<p>It is highly recommanded to set the user’s <code class="docutils literal notranslate"><span class="pre">agent</span></code> and <code class="docutils literal notranslate"><span class="pre">agents</span></code>
+in the serializer context (implemented API view already does it for you). This
+allows validation of the owner.</p>
 <dl class="py class">
-<dt class="sig sig-object py" id="caps.serializers.ObjectSerializer.Meta">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Meta</span></span><a class="reference internal" href="../_modules/caps/serializers.html#ObjectSerializer.Meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.serializers.ObjectSerializer.Meta" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="caps.serializers.OwnedSerializer.Meta">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Meta</span></span><a class="reference internal" href="../_modules/caps/serializers.html#OwnedSerializer.Meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.serializers.OwnedSerializer.Meta" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="caps.serializers.ObjectSerializer.Meta.fields">
-<span class="sig-name descname"><span class="pre">fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['access']</span></em><a class="headerlink" href="#caps.serializers.ObjectSerializer.Meta.fields" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="caps.serializers.OwnedSerializer.Meta.fields">
+<span class="sig-name descname"><span class="pre">fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['access']</span></em><a class="headerlink" href="#caps.serializers.OwnedSerializer.Meta.fields" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="caps.serializers.ObjectSerializer.Meta.read_only_fields">
-<span class="sig-name descname"><span class="pre">read_only_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['access',</span> <span class="pre">'uuid',</span> <span class="pre">'owner']</span></em><a class="headerlink" href="#caps.serializers.ObjectSerializer.Meta.read_only_fields" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="caps.serializers.OwnedSerializer.Meta.read_only_fields">
+<span class="sig-name descname"><span class="pre">read_only_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['access',</span> <span class="pre">'uuid']</span></em><a class="headerlink" href="#caps.serializers.OwnedSerializer.Meta.read_only_fields" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="caps.serializers.ObjectSerializer.access">
-<span class="sig-name descname"><span class="pre">access</span></span><a class="headerlink" href="#caps.serializers.ObjectSerializer.access" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="caps.serializers.OwnedSerializer.access">
+<span class="sig-name descname"><span class="pre">access</span></span><a class="headerlink" href="#caps.serializers.OwnedSerializer.access" title="Link to this definition"></a></dt>
 <dd><p>Access</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="caps.serializers.ObjectSerializer.get_uuid">
-<span class="sig-name descname"><span class="pre">get_uuid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/serializers.html#ObjectSerializer.get_uuid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.serializers.ObjectSerializer.get_uuid" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="caps.serializers.OwnedSerializer.get_id">
+<span class="sig-name descname"><span class="pre">get_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/serializers.html#OwnedSerializer.get_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.serializers.OwnedSerializer.get_id" title="Link to this definition"></a></dt>
+<dd><p>Get uuid from <code class="docutils literal notranslate"><span class="pre">obj.access</span></code> if present.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="caps.serializers.OwnedSerializer.validate">
+<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/serializers.html#OwnedSerializer.validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.serializers.OwnedSerializer.validate" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="caps.serializers.ObjectSerializer.validate">
-<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/serializers.html#ObjectSerializer.validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.serializers.ObjectSerializer.validate" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="caps.serializers.OwnedSerializer.validate_owner">
+<span class="sig-name descname"><span class="pre">validate_owner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/serializers.html#OwnedSerializer.validate_owner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.serializers.OwnedSerializer.validate_owner" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<a class="reference internal" href="10_models.html#caps.models.agent.Agent" title="caps.models.agent.Agent"><em>Agent</em></a>)</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 

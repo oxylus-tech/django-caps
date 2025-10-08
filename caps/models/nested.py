@@ -42,9 +42,9 @@ class NestedModelBase(nested.NestedBase, models.base.ModelBase):
     def set_meta(cls, attrs: dict[str, Any], set: dict[str, Any] = {}, defaults: dict[str, Any] = {}) -> type:
         """Get or create new meta class assigning to it the provided attributes.
 
-        :param attrs: attribute to look into
-        :param set: attributes to set to the class
-        :param defaults: attributes to set to the class if not present
+        :param attrs: attribute to look into.
+        :param set: attributes to set to the class.
+        :param defaults: attributes to set to the class if not present.
         :return the Meta class.
         """
         meta = attrs.get("Meta") or type("Meta", tuple(), {})

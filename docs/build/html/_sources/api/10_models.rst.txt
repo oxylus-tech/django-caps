@@ -11,10 +11,10 @@ caps.models.access
 
 .. automodule:: caps.models.access
 
-caps.models.object
+caps.models.owned
 ------------------
 
-.. automodule:: caps.models.object
+.. automodule:: caps.models.owned
 
 caps.models.nested
 ------------------

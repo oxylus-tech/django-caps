@@ -23,10 +23,6 @@ __all__ = (
 class AccessQuerySet(models.QuerySet):
     """QuerySet for Access classes."""
 
-    class Meta:
-        abstract = True
-        unique_together = (("receiver", "target", "emitter"),)
-
     def available(self, agent: Agent | Iterable[Agent] | None = None) -> AccessQuerySet:
         """Return available accesses based on expiration and eventual user."""
         if agent is not None:
@@ -108,7 +104,7 @@ class Access(models.Model):
 
     - root: the root access from which all other accesses to object
       are derived. Created from the :py:meth:`create` class method. It has no :py:attr:`origin`
-      and **there can be only one root access per :py:class:`Owned` instance.
+      and **there can be only one root access per :py:class:`Owned` instance**.
     - derived: access derived from root or another derived. Created
       from the :py:meth:`derive` method.
 
@@ -146,7 +142,7 @@ class Access(models.Model):
     )
     """Date of expiration."""
     grants = models.JSONField(_("Granted permissions"), blank=True)
-    """ Allowed permissions as a dict of ``{"permission": allowed_reshare}`.
+    """ Allowed permissions as a dict of ``{"permission": allowed_reshare}``.
 
     The integer value of ``allowed_reshare`` determines the amount of reshare can be done.
     """

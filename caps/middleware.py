@@ -9,14 +9,24 @@ class AgentMiddleware:
     """
     This middleware adds user's agents to the request object, as:
 
-        - `agent`: the current agent user is acting as;
-        - `agents`: the agents user can impersonate.
+        - ``agent``: the current agent user is acting as;
+        - ``agents``: the agents user can impersonate.
 
-    It creates user's default agent if there are none already present.
+    It creates user's default agent if none is already present.
+
+    You can add it to the ``MIDDLEWARE`` setting, after ``AuthenticationMiddleware``:
+
+    ..code-block:: python
+
+        MIDDLEWARE = [
+            # ...
+            "django.contrib.auth.middleware.AuthenticationMiddleware",
+            # ...
+            "django.middleware.clickjacking.XFrameOptionsMiddleware",
+            "caps.middleware.AgentMiddleware",
+        ]
+
     """
-
-    """Fetch request user's active agent, and assign it to
-    ``request.agent``."""
 
     agent_class = Agent
     """Agent model class to use."""
@@ -43,5 +53,6 @@ class AgentMiddleware:
             return agent
 
         agent = Agent.objects.create(user=request.user)
+        # assign agent to request's user as it ain't already present
         request.user.__dict__["agent"] = agent
         return agent

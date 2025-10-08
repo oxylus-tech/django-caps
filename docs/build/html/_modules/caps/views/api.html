@@ -70,7 +70,11 @@
            <div itemprop="articleBody">
 
   <h1>Source code for caps.views.api</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">status</span><span class="p">,</span> <span class="n">viewsets</span><span class="p">,</span> <span class="n">mixins</span> <span class="k">as</span> <span class="n">mx</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.core.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">PermissionDenied</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.shortcuts</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_object_or_404</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">status</span><span class="p">,</span> <span class="n">viewsets</span><span class="p">,</span> <span class="n">mixins</span> <span class="k">as</span> <span class="n">mx</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.decorators</span><span class="w"> </span><span class="kn">import</span> <span class="n">action</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.response</span><span class="w"> </span><span class="kn">import</span> <span class="n">Response</span>
 
@@ -79,28 +83,43 @@
 
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="s2">&quot;ObjectViewSet&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;OwnedViewSet&quot;</span><span class="p">,</span>
     <span class="s2">&quot;AgentViewSet&quot;</span><span class="p">,</span>
     <span class="s2">&quot;AccessViewSet&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 
 
-<div class="viewcode-block" id="ObjectViewSet">
-<a class="viewcode-back" href="../../../api/20_views.html#caps.views.api.ObjectViewSet">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">ObjectViewSet</span><span class="p">(</span><span class="n">mixins</span><span class="o">.</span><span class="n">SingleObjectMixin</span><span class="p">,</span> <span class="n">viewsets</span><span class="o">.</span><span class="n">ModelViewSet</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">UserAgentMixin</span><span class="p">(</span><span class="n">mixins</span><span class="o">.</span><span class="n">UserAgentMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add ``agent`` and ``agents`` to serializers&#39; contexts.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_serializer_context</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_serializer_context</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">context</span><span class="p">,</span> <span class="s2">&quot;agent&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent</span><span class="p">,</span> <span class="s2">&quot;agents&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">agents</span><span class="p">}</span>
+
+
+<div class="viewcode-block" id="OwnedViewSet">
+<a class="viewcode-back" href="../../../api/20_views.html#caps.views.api.OwnedViewSet">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OwnedViewSet</span><span class="p">(</span><span class="n">UserAgentMixin</span><span class="p">,</span> <span class="n">mixins</span><span class="o">.</span><span class="n">SingleOwnedMixin</span><span class="p">,</span> <span class="n">viewsets</span><span class="o">.</span><span class="n">ModelViewSet</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This is the base mixin handling permissions check for django-caps.</span>
+<span class="sd">    This is the base viewset class for Owned models, running object permission checks.</span>
+
+<span class="sd">    It also provides the :py:meth:`share` that allows a user to share an access to</span>
+<span class="sd">    the object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">share_serializer_class</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">ShareSerializer</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; This specifies serializer class used for the :py:meth:`share` action. &quot;&quot;&quot;</span>
+    <span class="n">perms_map</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;share&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">%(app_label)s</span><span class="s2">.change_</span><span class="si">%(model_name)s</span><span class="s2">&quot;</span><span class="p">],</span>
+    <span class="p">}</span>
 
-    <span class="n">permission_classes</span> <span class="o">=</span> <span class="p">[</span><span class="n">permissions</span><span class="o">.</span><span class="n">ObjectPermissions</span><span class="p">]</span>
+    <span class="n">share_serializer_class</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">ShareSerializer</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; The serializer class used for the :py:meth:`share` action. &quot;&quot;&quot;</span>
+
+    <span class="n">permission_classes</span> <span class="o">=</span> <span class="p">[</span><span class="n">permissions</span><span class="o">.</span><span class="n">OwnedPermissions</span><span class="p">]</span>
     <span class="n">lookup_field</span> <span class="o">=</span> <span class="s2">&quot;uuid&quot;</span>
     <span class="n">lookup_url_kwarg</span> <span class="o">=</span> <span class="s2">&quot;uuid&quot;</span>
 
-<div class="viewcode-block" id="ObjectViewSet.get_access_queryset">
-<a class="viewcode-back" href="../../../api/20_views.html#caps.views.api.ObjectViewSet.get_access_queryset">[docs]</a>
+<div class="viewcode-block" id="OwnedViewSet.get_access_queryset">
+<a class="viewcode-back" href="../../../api/20_views.html#caps.views.api.OwnedViewSet.get_access_queryset">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_access_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># disable access fetch</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">action</span> <span class="o">==</span> <span class="s2">&quot;share&quot;</span><span class="p">:</span>
@@ -108,16 +127,16 @@
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_access_queryset</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="ObjectViewSet.get_queryset">
-<a class="viewcode-back" href="../../../api/20_views.html#caps.views.api.ObjectViewSet.get_queryset">[docs]</a>
+<div class="viewcode-block" id="OwnedViewSet.get_queryset">
+<a class="viewcode-back" href="../../../api/20_views.html#caps.views.api.OwnedViewSet.get_queryset">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">action</span> <span class="o">==</span> <span class="s2">&quot;share&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_queryset</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">owner__in</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">agents</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_queryset</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">owner__in</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">agents</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_queryset</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="ObjectViewSet.share">
-<a class="viewcode-back" href="../../../api/20_views.html#caps.views.api.ObjectViewSet.share">[docs]</a>
+<div class="viewcode-block" id="OwnedViewSet.share">
+<a class="viewcode-back" href="../../../api/20_views.html#caps.views.api.OwnedViewSet.share">[docs]</a>
     <span class="nd">@action</span><span class="p">(</span><span class="n">detail</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;post&quot;</span><span class="p">])</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">share</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">uuid</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Share object, returning the newly created Access.</span>
@@ -139,27 +158,19 @@
             <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">ser</span><span class="o">.</span><span class="n">errors</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span><span class="p">)</span>
 
         <span class="n">access</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">share</span><span class="p">(</span><span class="n">ser</span><span class="o">.</span><span class="n">validated_data</span><span class="p">[</span><span class="s2">&quot;receiver&quot;</span><span class="p">],</span> <span class="n">ser</span><span class="o">.</span><span class="n">validated_data</span><span class="p">[</span><span class="s2">&quot;grants&quot;</span><span class="p">])</span>
+
+        <span class="c1"># Get Access serializer from field `access`</span>
         <span class="n">ser_cls</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_serializer_class</span><span class="p">()</span><span class="o">.</span><span class="n">_declared_fields</span><span class="p">[</span><span class="s2">&quot;access&quot;</span><span class="p">])</span>
-        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">ser_cls</span><span class="p">(</span><span class="n">access</span><span class="p">)</span><span class="o">.</span><span class="n">data</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">ser_cls</span><span class="p">(</span><span class="n">access</span><span class="p">)</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="mi">201</span><span class="p">)</span></div>
 </div>
-
-
-
-<div class="viewcode-block" id="AgentViewSet">
-<a class="viewcode-back" href="../../../api/20_views.html#caps.views.api.AgentViewSet">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">AgentViewSet</span><span class="p">(</span><span class="n">viewsets</span><span class="o">.</span><span class="n">ModelViewSet</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Viewset provides API for :py:class:`~caps.models.agent.Agent`.&quot;&quot;&quot;</span>
-
-    <span class="n">model</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Agent</span>
-    <span class="n">queryset</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Agent</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
-    <span class="n">permissions</span> <span class="o">=</span> <span class="p">[</span><span class="n">permissions</span><span class="o">.</span><span class="n">DjangoModelPermissions</span><span class="p">]</span>
-    <span class="n">filterset_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;group&quot;</span><span class="p">,</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;user__group&quot;</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="AccessViewSet">
 <a class="viewcode-back" href="../../../api/20_views.html#caps.views.api.AccessViewSet">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">AccessViewSet</span><span class="p">(</span><span class="n">mx</span><span class="o">.</span><span class="n">RetrieveModelMixin</span><span class="p">,</span> <span class="n">mx</span><span class="o">.</span><span class="n">DestroyModelMixin</span><span class="p">,</span> <span class="n">mx</span><span class="o">.</span><span class="n">ListModelMixin</span><span class="p">,</span> <span class="n">viewsets</span><span class="o">.</span><span class="n">GenericViewSet</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AccessViewSet</span><span class="p">(</span>
+    <span class="n">UserAgentMixin</span><span class="p">,</span> <span class="n">mx</span><span class="o">.</span><span class="n">RetrieveModelMixin</span><span class="p">,</span> <span class="n">mx</span><span class="o">.</span><span class="n">DestroyModelMixin</span><span class="p">,</span> <span class="n">mx</span><span class="o">.</span><span class="n">ListModelMixin</span><span class="p">,</span> <span class="n">viewsets</span><span class="o">.</span><span class="n">GenericViewSet</span>
+<span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This viewset provides API to :py:class:`~caps.models.access.Access`.</span>
 
@@ -169,7 +180,7 @@
 <span class="sd">        - Access can&#39;t be updated</span>
 <span class="sd">        - Access can only be shared, listed, retrieved, and destroyed.</span>
 
-<span class="sd">    Note: no model nor queryset is provided by default, as Access is an abstract class and is dependent of the concrete Object sub-model.</span>
+<span class="sd">    Note: no model nor queryset is provided by default, as Access is an abstract class and is dependent of the concrete Owned sub-model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">lookup_field</span> <span class="o">=</span> <span class="s2">&quot;uuid&quot;</span>
@@ -190,21 +201,60 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">query</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_queryset</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">action</span> <span class="o">==</span> <span class="s2">&quot;share&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="n">receiver</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">agents</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="n">agent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">agents</span><span class="p">)</span></div>
+            <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="n">receiver</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">agents</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="n">agent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">agents</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="AccessViewSet.share">
 <a class="viewcode-back" href="../../../api/20_views.html#caps.views.api.AccessViewSet.share">[docs]</a>
     <span class="nd">@action</span><span class="p">(</span><span class="n">detail</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;post&quot;</span><span class="p">])</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">share</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">uuid</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Share object access to someone. See :py:meth:`ObjectViewSet.share` for more info.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Share object access to someone. See :py:meth:`OwnedViewSet.share` for more info.&quot;&quot;&quot;</span>
         <span class="n">access</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_object</span><span class="p">()</span>
         <span class="n">ser</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">share_serializer_class</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">ser</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
             <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">ser</span><span class="o">.</span><span class="n">errors</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span><span class="p">)</span>
         <span class="n">shared</span> <span class="o">=</span> <span class="n">access</span><span class="o">.</span><span class="n">share</span><span class="p">(</span><span class="n">ser</span><span class="o">.</span><span class="n">validated_data</span><span class="p">[</span><span class="s2">&quot;receiver&quot;</span><span class="p">],</span> <span class="n">ser</span><span class="o">.</span><span class="n">validated_data</span><span class="p">[</span><span class="s2">&quot;grants&quot;</span><span class="p">])</span>
-        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_serializer_class</span><span class="p">()(</span><span class="n">shared</span><span class="p">)</span><span class="o">.</span><span class="n">data</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_serializer_class</span><span class="p">()(</span><span class="n">shared</span><span class="p">)</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="mi">201</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="AgentViewSet">
+<a class="viewcode-back" href="../../../api/20_views.html#caps.views.api.AgentViewSet">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AgentViewSet</span><span class="p">(</span><span class="n">UserAgentMixin</span><span class="p">,</span> <span class="n">viewsets</span><span class="o">.</span><span class="n">ModelViewSet</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Viewset provides API for :py:class:`~caps.models.agent.Agent`.</span>
+
+<span class="sd">    Provides an extra API endpoint ``user`` returning user&#39;s agents (:py:meth:`user`).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">model</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Agent</span>
+    <span class="n">queryset</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Agent</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="n">serializer_class</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">AgentSerializer</span>
+    <span class="n">permissions</span> <span class="o">=</span> <span class="p">[</span><span class="n">permissions</span><span class="o">.</span><span class="n">DjangoModelPermissions</span><span class="p">]</span>
+    <span class="n">lookup_field</span> <span class="o">=</span> <span class="s2">&quot;uuid&quot;</span>
+    <span class="n">lookup_url_kwarg</span> <span class="o">=</span> <span class="s2">&quot;uuid&quot;</span>
+    <span class="n">filterset_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;group&quot;</span><span class="p">,</span> <span class="s2">&quot;user&quot;</span><span class="p">)</span>
+    <span class="n">search_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;group__name&quot;</span><span class="p">,</span> <span class="s2">&quot;user__name&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="AgentViewSet.user">
+<a class="viewcode-back" href="../../../api/20_views.html#caps.views.api.AgentViewSet.user">[docs]</a>
+    <span class="nd">@action</span><span class="p">(</span><span class="n">detail</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;GET&quot;</span><span class="p">])</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return request agents for user using ``GET[&#39;user&#39;]``.</span>
+<span class="sd">        When parameter is not provided, it uses current user.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">userId</span> <span class="o">:=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;user&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">has_perm</span><span class="p">(</span><span class="s2">&quot;caps.view_agent&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">userId</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">PermissionDenied</span><span class="p">(</span><span class="s2">&quot;Not allowed&quot;</span><span class="p">)</span>
+
+            <span class="n">user</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span> <span class="n">pk</span><span class="o">=</span><span class="n">userId</span><span class="p">)</span>
+            <span class="n">agents</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">queryset</span><span class="o">.</span><span class="n">user</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">agents</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">agents</span>
+
+        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_serializer_class</span><span class="p">()(</span><span class="n">instance</span><span class="o">=</span><span class="n">agents</span><span class="p">,</span> <span class="n">many</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">data</span><span class="p">)</span></div>
 </div>
 
 </pre></div>

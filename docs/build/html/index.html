@@ -73,16 +73,17 @@
 
   <section id="django-caps">
 <h1>Django-Caps<a class="headerlink" href="#django-caps" title="Link to this heading"></a></h1>
-<p>Django-Caps provides capability based object permission system for Django applications.
-This project is inspired by <a class="reference external" href="https://capnproto.org">Capn’Proto documentation</a> (<a class="reference external" href="http://www.erights.org/elib/capability/ode/ode.pdf">interesting paper</a>).</p>
-<p>A capability is a permission provided for a specific object. It can be <em>derived</em> (shared) a limited amount of time. Users never directly access the targeted object, but through a <em>access</em> that defines allowed capabilities for it.</p>
+<p>Django-Caps provides capability based object permission system for Django applications and Django Rest Framework.</p>
+<p>This project is inspired by <a class="reference external" href="https://capnproto.org">Capn’Proto documentation</a> (<a class="reference external" href="http://www.erights.org/elib/capability/ode/ode.pdf">interesting paper</a>).</p>
+<p>A capability is a provided permission to a specific object. It can be <em>shared</em> (shared) a limited amount of time. Users never directly access the targeted object, but through a <em>access</em> that defines allowed capabilities for it.</p>
 <p>In short, why use capabilities?</p>
 <ul class="simple">
 <li><p><em>Granularity over objects permissions</em></p></li>
 <li><p><em>Reduced risk of privilege escalation</em></p></li>
 <li><p><em>Avoid direct access to database objects</em></p></li>
+<li><p><a class="reference external" href="https://oxylus-tech.github.io/django-caps/build/html/guide/90-capability-vs-acl.html">When to use capabilities (vs ACL)?</a></p></li>
 </ul>
-<p>More in the guide, <a class="reference internal" href="guide/90-capability-vs-acl.html#capability-vs-acl-permission-systems"><span class="std std-ref">Capability vs ACL permission systems</span></a>.</p>
+<p>Documentation: <a class="reference external" href="https://oxylus-tech.github.io/django-caps/">https://oxylus-tech.github.io/django-caps/</a></p>
 <section id="features">
 <h2>Features<a class="headerlink" href="#features" title="Link to this heading"></a></h2>
 <p>Here is what we provide:</p>

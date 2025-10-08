@@ -42,7 +42,17 @@ class TestOwnedViewSet:
         ser = ConcreteOwnedSerializer(
             data={"name": "Name"}, context={"request": req, "agent": user_agent, "agents": user_agents}
         )
-        ser.is_valid()
+        ser.is_valid(raise_exception=True)
+        viewset_mixin.perform_create(ser)
+
+        assert ser.instance.owner == user_agent
+
+    def test_perform_create_with_owner(self, viewset_mixin, req, user_agent, user_agents):
+        ser = ConcreteOwnedSerializer(
+            data={"name": "Name", "owner": str(user_agent.uuid)},
+            context={"request": req, "agent": user_agent, "agents": user_agents},
+        )
+        ser.is_valid(raise_exception=True)
         viewset_mixin.perform_create(ser)
 
         assert ser.instance.owner == user_agent

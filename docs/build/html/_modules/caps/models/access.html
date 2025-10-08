@@ -97,13 +97,6 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">AccessQuerySet</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">QuerySet</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;QuerySet for Access classes.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="AccessQuerySet.Meta">
-<a class="viewcode-back" href="../../../api/10_models.html#caps.models.access.AccessQuerySet.Meta">[docs]</a>
-    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
-        <span class="n">abstract</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="n">unique_together</span> <span class="o">=</span> <span class="p">((</span><span class="s2">&quot;receiver&quot;</span><span class="p">,</span> <span class="s2">&quot;target&quot;</span><span class="p">,</span> <span class="s2">&quot;emitter&quot;</span><span class="p">),)</span></div>
-
-
 <div class="viewcode-block" id="AccessQuerySet.available">
 <a class="viewcode-back" href="../../../api/10_models.html#caps.models.access.AccessQuerySet.available">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">:</span> <span class="n">Agent</span> <span class="o">|</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Agent</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AccessQuerySet</span><span class="p">:</span>
@@ -202,17 +195,17 @@
 <div class="viewcode-block" id="Access">
 <a class="viewcode-back" href="../../../api/10_models.html#caps.models.access.Access">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Access</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Access are the entry point to access an :py:class:`Object`.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Access are the entry point to access an :py:class:`Owned`.</span>
 
 <span class="sd">    Access provides a set of capabilities for specific receiver.</span>
 <span class="sd">    The concrete sub-model MUST provide the ``target`` foreign key to an</span>
-<span class="sd">    Object.</span>
+<span class="sd">    Owned.</span>
 
 <span class="sd">    There are two kind of access:</span>
 
 <span class="sd">    - root: the root access from which all other accesses to object</span>
 <span class="sd">      are derived. Created from the :py:meth:`create` class method. It has no :py:attr:`origin`</span>
-<span class="sd">      and **there can be only one root access per :py:class:`Object` instance.</span>
+<span class="sd">      and **there can be only one root access per :py:class:`Owned` instance**.</span>
 <span class="sd">    - derived: access derived from root or another derived. Created</span>
 <span class="sd">      from the :py:meth:`derive` method.</span>
 
@@ -222,12 +215,12 @@
 <span class="sd">    ------------------</span>
 
 <span class="sd">    This model is implemented as an abstract in order to have a access</span>
-<span class="sd">    specific to each model (see :py:class:`Object` abstract model). The</span>
-<span class="sd">    actual concrete class is created when :py:class:`Object` is subclassed</span>
+<span class="sd">    specific to each model (see :py:class:`Owned` abstract model). The</span>
+<span class="sd">    actual concrete class is created when :py:class:`Owned` is subclassed</span>
 <span class="sd">    by a concrete model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">uuid</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">UUIDField</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;UUID&quot;</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">uuid</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">UUIDField</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Id&quot;</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Public access id used in API.&quot;&quot;&quot;</span>
     <span class="n">origin</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span>
         <span class="s2">&quot;self&quot;</span><span class="p">,</span>
@@ -235,16 +228,12 @@
         <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">related_name</span><span class="o">=</span><span class="s2">&quot;derived&quot;</span><span class="p">,</span>
-        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Source Access&quot;</span><span class="p">),</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Origin&quot;</span><span class="p">),</span>
     <span class="p">)</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Source access in accesses chain.&quot;&quot;&quot;</span>
-    <span class="n">emitter</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span>
-        <span class="n">Agent</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span> <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Emitter&quot;</span><span class="p">),</span> <span class="n">related_name</span><span class="o">=</span><span class="s2">&quot;emit_accesses&quot;</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="kc">True</span>
-    <span class="p">)</span>
+    <span class="n">emitter</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Agent</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span> <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Emitter&quot;</span><span class="p">),</span> <span class="n">related_name</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Agent receiving capability.&quot;&quot;&quot;</span>
-    <span class="n">receiver</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span>
-        <span class="n">Agent</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span> <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Receiver&quot;</span><span class="p">),</span> <span class="n">related_name</span><span class="o">=</span><span class="s2">&quot;accesses&quot;</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="kc">True</span>
-    <span class="p">)</span>
+    <span class="n">receiver</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Agent</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span> <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Receiver&quot;</span><span class="p">),</span> <span class="n">related_name</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="n">db_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Agent receiving capability.&quot;&quot;&quot;</span>
     <span class="n">expiration</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span>
         <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Expiration&quot;</span><span class="p">),</span>
@@ -253,8 +242,8 @@
         <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Defines an expiration date after which the access is not longer valid.&quot;</span><span class="p">),</span>
     <span class="p">)</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Date of expiration.&quot;&quot;&quot;</span>
-    <span class="n">grants</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Granted capabilities&quot;</span><span class="p">),</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Allowed permissions as a dict of ``{&quot;permission&quot;: allowed_reshare}`.</span>
+    <span class="n">grants</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Granted permissions&quot;</span><span class="p">),</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Allowed permissions as a dict of ``{&quot;permission&quot;: allowed_reshare}``.</span>
 
 <span class="sd">    The integer value of ``allowed_reshare`` determines the amount of reshare can be done.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -277,7 +266,7 @@
 <a class="viewcode-back" href="../../../api/10_models.html#caps.models.access.Access.get_object_class">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_object_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return related Object class.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return related Owned class.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">field</span><span class="o">.</span><span class="n">related_model</span></div>
 
 
@@ -315,9 +304,9 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">share</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">receiver</span><span class="p">:</span> <span class="n">Agent</span><span class="p">,</span> <span class="n">grants</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new saved access shared from self.</span>
 
-<span class="sd">        See :py:meth:`get_shared` for arguments.</span>
+<span class="sd">        See :py:meth:`get_share` for arguments.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_shared</span><span class="p">(</span><span class="n">receiver</span><span class="p">,</span> <span class="n">grants</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_share</span><span class="p">(</span><span class="n">receiver</span><span class="p">,</span> <span class="n">grants</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">obj</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">obj</span></div>
 
@@ -327,16 +316,16 @@
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">ashare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">receiver</span><span class="p">:</span> <span class="n">Agent</span><span class="p">,</span> <span class="n">grants</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new saved access shared from self (async).</span>
 
-<span class="sd">        See :py:meth:`get_shared` for arguments.</span>
+<span class="sd">        See :py:meth:`get_share` for arguments.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_shared</span><span class="p">(</span><span class="n">receiver</span><span class="p">,</span> <span class="n">grants</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_share</span><span class="p">(</span><span class="n">receiver</span><span class="p">,</span> <span class="n">grants</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">await</span> <span class="n">obj</span><span class="o">.</span><span class="n">asave</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">obj</span></div>
 
 
-<div class="viewcode-block" id="Access.get_shared">
-<a class="viewcode-back" href="../../../api/10_models.html#caps.models.access.Access.get_shared">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_shared</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">receiver</span><span class="p">:</span> <span class="n">Agent</span><span class="p">,</span> <span class="n">grants</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="Access.get_share">
+<a class="viewcode-back" href="../../../api/10_models.html#caps.models.access.Access.get_share">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_share</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">receiver</span><span class="p">:</span> <span class="n">Agent</span><span class="p">,</span> <span class="n">grants</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return new access shared from self. The object is not saved.</span>
 
 <span class="sd">        :param receiver: the receiver</span>
@@ -344,16 +333,16 @@
 <span class="sd">        :param **kwargs: extra initial arguments</span>
 <span class="sd">        :yield PermissionDenied: when access expired or no grant is shareable.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">grants</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_shared_grants</span><span class="p">(</span><span class="n">grants</span><span class="p">)</span>
+        <span class="n">grants</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_share_grants</span><span class="p">(</span><span class="n">grants</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">grants</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">PermissionDenied</span><span class="p">(</span><span class="s2">&quot;Share not allowed.&quot;</span><span class="p">)</span>
-        <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_shared_kwargs</span><span class="p">(</span><span class="n">receiver</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_share_kwargs</span><span class="p">(</span><span class="n">receiver</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="n">grants</span><span class="o">=</span><span class="n">grants</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="Access.get_shared_kwargs">
-<a class="viewcode-back" href="../../../api/10_models.html#caps.models.access.Access.get_shared_kwargs">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_shared_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">receiver</span><span class="p">:</span> <span class="n">Agent</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="Access.get_share_kwargs">
+<a class="viewcode-back" href="../../../api/10_models.html#caps.models.access.Access.get_share_kwargs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_share_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">receiver</span><span class="p">:</span> <span class="n">Agent</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return initial argument for a derived access from self.&quot;&quot;&quot;</span>
         <span class="n">e_key</span><span class="p">,</span> <span class="n">emitter</span> <span class="o">=</span> <span class="n">get_lazy_relation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;receiver&quot;</span><span class="p">,</span> <span class="s2">&quot;emitter&quot;</span><span class="p">)</span>
 
@@ -375,9 +364,9 @@
         <span class="p">}</span></div>
 
 
-<div class="viewcode-block" id="Access.get_shared_grants">
-<a class="viewcode-back" href="../../../api/10_models.html#caps.models.access.Access.get_shared_grants">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_shared_grants</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grants</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<div class="viewcode-block" id="Access.get_share_grants">
+<a class="viewcode-back" href="../../../api/10_models.html#caps.models.access.Access.get_share_grants">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_share_grants</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grants</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return :py:attr:`grants` for shared access.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">grants</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">{</span>
@@ -400,7 +389,10 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_valid</span><span class="p">(</span><span class="n">raises</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span></div>
-</div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">emitter</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">receiver</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">uuid</span><span class="si">}</span><span class="s2">&quot;</span></div>
 
 </pre></div>
 

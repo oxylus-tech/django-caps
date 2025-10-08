@@ -107,6 +107,7 @@
 <dt class="sig sig-object py" id="caps.admin.AccessAdmin">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AccessAdmin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin_site</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/admin.html#AccessAdmin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.admin.AccessAdmin" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelAdmin</span></code></p>
+<p>Admin interface for an <a class="reference internal" href="10_models.html#caps.models.access.Access" title="caps.models.access.Access"><code class="xref py py-class docutils literal notranslate"><span class="pre">Access</span></code></a>.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caps.admin.AccessAdmin.fields">
 <span class="sig-name descname"><span class="pre">fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('uuid',</span> <span class="pre">'target',</span> <span class="pre">'origin',</span> <span class="pre">'emitter',</span> <span class="pre">'receiver',</span> <span class="pre">'expiration',</span> <span class="pre">'grants')</span></em><a class="headerlink" href="#caps.admin.AccessAdmin.fields" title="Link to this definition"></a></dt>
@@ -128,14 +129,15 @@
 <dt class="sig sig-object py" id="caps.admin.AgentAdmin">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AgentAdmin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin_site</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/admin.html#AgentAdmin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.admin.AgentAdmin" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelAdmin</span></code></p>
+<p>Admin interface for an <a class="reference internal" href="10_models.html#caps.models.agent.Agent" title="caps.models.agent.Agent"><code class="xref py py-class docutils literal notranslate"><span class="pre">Agent</span></code></a>.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caps.admin.AgentAdmin.fields">
-<span class="sig-name descname"><span class="pre">fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('uuid',</span> <span class="pre">'user',</span> <span class="pre">'group',</span> <span class="pre">'is_default')</span></em><a class="headerlink" href="#caps.admin.AgentAdmin.fields" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('uuid',</span> <span class="pre">'user',</span> <span class="pre">'group')</span></em><a class="headerlink" href="#caps.admin.AgentAdmin.fields" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caps.admin.AgentAdmin.list_display">
-<span class="sig-name descname"><span class="pre">list_display</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('uuid',</span> <span class="pre">'user',</span> <span class="pre">'group',</span> <span class="pre">'is_default')</span></em><a class="headerlink" href="#caps.admin.AgentAdmin.list_display" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">list_display</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('uuid',</span> <span class="pre">'user',</span> <span class="pre">'group')</span></em><a class="headerlink" href="#caps.admin.AgentAdmin.list_display" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -158,20 +160,14 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="caps.admin.register_object">
 <span class="sig-name descname"><span class="pre">register_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj_class</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin_class</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/admin.html#register_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.admin.register_object" title="Link to this definition"></a></dt>
-<dd><p>Register model admin for Object class, its Capability and Access.</p>
-<p>It uses:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCapabilityInline</span></code>: inline Capability in Access admin;</p></li>
-<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseAccessAdmin</span></code>: to register Access admin;</p></li>
-<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectAdmin</span></code> (by default): to register Object admin;</p></li>
-</ul>
-</div></blockquote>
+<dd><p>This helper function register an Owned class to a django’s ModelAdmin.
+It will register the concrete model’s <a class="reference internal" href="10_models.html#caps.models.access.Access" title="caps.models.access.Access"><code class="xref py py-class docutils literal notranslate"><span class="pre">Access</span></code></a> model
+to using <a class="reference internal" href="#caps.admin.AccessAdmin" title="caps.admin.AccessAdmin"><code class="xref py py-class docutils literal notranslate"><span class="pre">AccessAdmin</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>obj_class</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code>[<a class="reference internal" href="10_models.html#caps.models.object.Object" title="caps.models.object.Object"><code class="xref py py-class docutils literal notranslate"><span class="pre">Object</span></code></a>]</span>) – the object class</p></li>
-<li><p><strong>admin_class</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ModelAdmin</span></code>]</span>) – ObjectAdmin class to register object class.</p></li>
+<li><p><strong>obj_class</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Owned</span></code>]</span>) – the object class</p></li>
+<li><p><strong>admin_class</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ModelAdmin</span></code>]</span>) – OwnedAdmin class to register object class.</p></li>
 </ul>
 </dd>
 </dl>

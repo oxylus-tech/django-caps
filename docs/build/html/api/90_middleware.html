@@ -102,11 +102,24 @@
 <p>This middleware adds user’s agents to the request object, as:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p><cite>agent</cite>: the current agent user is acting as;</p></li>
-<li><p><cite>agents</cite>: the agents user can impersonate.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">agent</span></code>: the current agent user is acting as;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">agents</span></code>: the agents user can impersonate.</p></li>
 </ul>
 </div></blockquote>
-<p>It creates user’s default agent if there are none already present.</p>
+<p>It creates user’s default agent if none is already present.</p>
+<p>You can add it to the <code class="docutils literal notranslate"><span class="pre">MIDDLEWARE</span></code> setting, after <code class="docutils literal notranslate"><span class="pre">AuthenticationMiddleware</span></code>:</p>
+<p>..code-block:: python</p>
+<blockquote>
+<div><dl class="simple">
+<dt>MIDDLEWARE = [</dt><dd><p># …
+“django.contrib.auth.middleware.AuthenticationMiddleware”,
+# …
+“django.middleware.clickjacking.XFrameOptionsMiddleware”,
+“caps.middleware.AgentMiddleware”,</p>
+</dd>
+</dl>
+<p>]</p>
+</div></blockquote>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caps.middleware.AgentMiddleware.agent_class">
 <span class="sig-name descname"><span class="pre">agent_class</span></span><a class="headerlink" href="#caps.middleware.AgentMiddleware.agent_class" title="Link to this definition"></a></dt>
@@ -140,7 +153,7 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="caps.middleware.AgentMiddleware.get_agents">
 <span class="sig-name descname"><span class="pre">get_agents</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/middleware.html#AgentMiddleware.get_agents"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.middleware.AgentMiddleware.get_agents" title="Link to this definition"></a></dt>
-<dd><p>Return queryset for user’s agents, ordered by <code class="docutils literal notranslate"><span class="pre">-is_default</span></code>.</p>
+<dd><p>Return queryset for user’s agents, ordered by <code class="docutils literal notranslate"><span class="pre">-user_id</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="10_models.html#caps.models.agent.AgentQuerySet" title="caps.models.agent.AgentQuerySet"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentQuerySet</span></code></a></span></p>

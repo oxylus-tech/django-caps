@@ -12,7 +12,5 @@ class CapsConfig(AppConfig):
     label = "caps"
 
     def ready(self):
-        """Enforce permissions validation at boot-up."""
-        from . import signals
-
-        signals.create_group_agent
+        """Import signals."""
+        from . import signals  # noqa: F401

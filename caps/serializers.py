@@ -1,3 +1,10 @@
+"""
+This module provides serializer (and base serializers) for Django-Caps' models.
+
+** Note: we never expose internal db id to the external world as they are predictable
+for an attacker. Instead we refer to them using their UUID. **
+"""
+
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 from rest_framework.serializers import ValidationError
@@ -24,7 +31,7 @@ class UUIDSerializer(serializers.Serializer):
 
 
 class AgentSerializer(UUIDSerializer, serializers.ModelSerializer):
-    """Serializer for :py:class:`caps.models.agent.Agent`."""
+    """Serializer for :py:class:`~caps.models.agent.Agent`."""
 
     name = serializers.SerializerMethodField()
     """ Provided fields for utility """
@@ -43,7 +50,7 @@ class AgentSerializer(UUIDSerializer, serializers.ModelSerializer):
 
 class AccessSerializer(UUIDSerializer, serializers.Serializer):
     """
-    Serializer for :py:class:`caps.models.capability.Access`.
+    Serializer for :py:class:`~.models.capability.Access`.
 
     Implemented as simple Serializer, since the corresponding models are generated based on
     concrete :py:class:`.models.object.Owned`.
@@ -71,7 +78,15 @@ class AccessSerializer(UUIDSerializer, serializers.Serializer):
 
 class OwnedSerializer(UUIDSerializer, serializers.ModelSerializer):
     """
-    Base serializer for Owneds. It provides :py:attr:`uuid` field.
+    Base serializer for :py:class:`~.models.owned.Owned`.
+
+    When the owned object has ``access`` set, it will use the access' uuid
+    as id. This happens for example when it is fetched from database using
+    the :py:meth:`~.models.owned.OwnedQuerySet.access` method.
+
+    It is highly recommanded to set the user's ``agent`` and ``agents``
+    in the serializer context (implemented API view already does it for you). This
+    allows validation of the owner.
     """
 
     id = serializers.SerializerMethodField()
@@ -82,7 +97,18 @@ class OwnedSerializer(UUIDSerializer, serializers.ModelSerializer):
     """ Access """
     path = serializers.CharField(required=False, allow_null=True)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        agent = self.context.get("agent")
+        agents = self.context.get("agents")
+        if (agent and not agents) or (not agent and agents):
+            raise ValueError("Provide both or none of context `agent` and `agents`.")
+        if agents and agent not in agents:
+            raise ValueError("Context `agents` does not includes `agent`.")
+
     def get_id(self, obj):
+        """Get uuid from ``obj.access`` if present."""
         if obj.access:
             return str(obj.access.uuid)
         return str(obj.uuid)
@@ -97,12 +123,13 @@ class OwnedSerializer(UUIDSerializer, serializers.ModelSerializer):
 
         return v_data
 
-    def validate_owner(self, value):
+    def validate_owner(self, value: models.Agent):
+        # value is an Agent, as the field is a SlugRelatedField.
         if not value:
             if agent := self.context.get("agent"):
                 return agent
         elif agents := self.context.get("agents"):
-            if value in agents:
+            if value == self.context["agent"] or value in agents:
                 return value
         raise ValidationError("Invalid owner")
 

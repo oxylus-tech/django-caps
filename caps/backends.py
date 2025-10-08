@@ -7,9 +7,20 @@ __all__ = ("PermissionsBackend",)
 
 class PermissionsBackend(BaseBackend):
     """
-    Provide permission backend using capabilities system.
+    Provide object permission backend using the capabilities system.
 
-    It will only test permissions on Owned and Access subclass.
+    The check is only run on :py:class:`~.models.owned.Owned` and
+    :py:class:`~/models.access.Access` instances.
+
+    You can add it to the ``AUTHENTICATION_BACKENDS`` setting, as:
+
+    ..code-block:: python
+
+        AUTHENTICATION_BACKENDS = [
+            "django.contrib.auth.backends.ModelBackend",
+            "caps.backends.PermissionsBackend",
+        ]
+
     """
 
     def has_perm(self, user, perm, obj=None) -> bool:

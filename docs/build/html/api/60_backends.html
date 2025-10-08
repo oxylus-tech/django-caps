@@ -97,8 +97,19 @@
 <dt class="sig sig-object py" id="caps.backends.PermissionsBackend">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PermissionsBackend</span></span><a class="reference internal" href="../_modules/caps/backends.html#PermissionsBackend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.backends.PermissionsBackend" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseBackend</span></code></p>
-<p>Provide permission backend using capabilities system.</p>
-<p>It will only test permissions on Object and Access subclass.</p>
+<p>Provide object permission backend using the capabilities system.</p>
+<p>The check is only run on <code class="xref py py-class docutils literal notranslate"><span class="pre">Owned</span></code> and
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Access</span></code> instances.</p>
+<p>You can add it to the <code class="docutils literal notranslate"><span class="pre">AUTHENTICATION_BACKENDS</span></code> setting, as:</p>
+<p>..code-block:: python</p>
+<blockquote>
+<div><dl class="simple">
+<dt>AUTHENTICATION_BACKENDS = [</dt><dd><p>“django.contrib.auth.backends.ModelBackend”,
+“caps.backends.PermissionsBackend”,</p>
+</dd>
+</dl>
+<p>]</p>
+</div></blockquote>
 <dl class="py method">
 <dt class="sig sig-object py" id="caps.backends.PermissionsBackend.get_all_permissions">
 <span class="sig-name descname"><span class="pre">get_all_permissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/backends.html#PermissionsBackend.get_all_permissions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.backends.PermissionsBackend.get_all_permissions" title="Link to this definition"></a></dt>

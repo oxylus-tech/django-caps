@@ -70,41 +70,74 @@
            <div itemprop="articleBody">
 
   <h1>Source code for caps.serializers</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.core.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ObjectDoesNotExist</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module provides serializer (and base serializers) for Django-Caps&#39; models.</span>
+
+<span class="sd">** Note: we never expose internal db id to the external world as they are predictable</span>
+<span class="sd">for an attacker. Instead we refer to them using their UUID. **</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.core.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ObjectDoesNotExist</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">serializers</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.serializers</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValidationError</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gettext_lazy</span> <span class="k">as</span> <span class="n">_</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
 
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;AgentSerializer&quot;</span><span class="p">,</span> <span class="s2">&quot;AccessSerializer&quot;</span><span class="p">,</span> <span class="s2">&quot;ObjectSerializer&quot;</span><span class="p">,</span> <span class="s2">&quot;ShareSerializer&quot;</span><span class="p">)</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;AgentSerializer&quot;</span><span class="p">,</span> <span class="s2">&quot;AccessSerializer&quot;</span><span class="p">,</span> <span class="s2">&quot;OwnedSerializer&quot;</span><span class="p">,</span> <span class="s2">&quot;ShareSerializer&quot;</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">UUIDSerializer</span><span class="p">(</span><span class="n">serializers</span><span class="o">.</span><span class="n">Serializer</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Serialize uuids as id.&quot;&quot;&quot;</span>
+
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">UUIDField</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="s2">&quot;uuid&quot;</span><span class="p">,</span> <span class="n">read_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;pk&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;pk&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">&quot;uuid&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;uuid&quot;</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="AgentSerializer">
 <a class="viewcode-back" href="../../api/30_serializers.html#caps.serializers.AgentSerializer">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">AgentSerializer</span><span class="p">(</span><span class="n">serializers</span><span class="o">.</span><span class="n">ModelSerializer</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Serializer for :py:class:`caps.models.agent.Agent`.&quot;&quot;&quot;</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AgentSerializer</span><span class="p">(</span><span class="n">UUIDSerializer</span><span class="p">,</span> <span class="n">serializers</span><span class="o">.</span><span class="n">ModelSerializer</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Serializer for :py:class:`~caps.models.agent.Agent`.&quot;&quot;&quot;</span>
+
+    <span class="n">name</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">SerializerMethodField</span><span class="p">()</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Provided fields for utility &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="AgentSerializer.Meta">
 <a class="viewcode-back" href="../../api/30_serializers.html#caps.serializers.AgentSerializer.Meta">[docs]</a>
     <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
         <span class="n">model</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Agent</span>
-        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;user_id&quot;</span><span class="p">,</span> <span class="s2">&quot;group_id&quot;</span><span class="p">]</span></div>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;group&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="AgentSerializer.get_name">
+<a class="viewcode-back" href="../../api/30_serializers.html#caps.serializers.AgentSerializer.get_name">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">user</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">get_full_name</span><span class="p">()</span> <span class="ow">or</span> <span class="n">obj</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span>
+        <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">group</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">return</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Anonymous&quot;</span><span class="p">)</span></div>
 </div>
 
 
 
 <div class="viewcode-block" id="AccessSerializer">
 <a class="viewcode-back" href="../../api/30_serializers.html#caps.serializers.AccessSerializer">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">AccessSerializer</span><span class="p">(</span><span class="n">serializers</span><span class="o">.</span><span class="n">Serializer</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AccessSerializer</span><span class="p">(</span><span class="n">UUIDSerializer</span><span class="p">,</span> <span class="n">serializers</span><span class="o">.</span><span class="n">Serializer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Serializer for :py:class:`caps.models.capability.Access`.</span>
+<span class="sd">    Serializer for :py:class:`~.models.capability.Access`.</span>
 
 <span class="sd">    Implemented as simple Serializer, since the corresponding models are generated based on</span>
-<span class="sd">    concrete :py:class:`.models.object.Object`.</span>
+<span class="sd">    concrete :py:class:`.models.object.Owned`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">uuid</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">read_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">emitter</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">SerializerMethodField</span><span class="p">()</span>
     <span class="n">receiver</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">SerializerMethodField</span><span class="p">()</span>
     <span class="n">origin</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">SerializerMethodField</span><span class="p">()</span>
@@ -114,7 +147,7 @@
 <div class="viewcode-block" id="AccessSerializer.Meta">
 <a class="viewcode-back" href="../../api/30_serializers.html#caps.serializers.AccessSerializer.Meta">[docs]</a>
     <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
-        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;uuid&quot;</span><span class="p">,</span> <span class="s2">&quot;origin&quot;</span><span class="p">,</span> <span class="s2">&quot;emitter&quot;</span><span class="p">,</span> <span class="s2">&quot;receiver&quot;</span><span class="p">,</span> <span class="s2">&quot;expiration&quot;</span><span class="p">,</span> <span class="s2">&quot;grants&quot;</span><span class="p">]</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;origin&quot;</span><span class="p">,</span> <span class="s2">&quot;emitter&quot;</span><span class="p">,</span> <span class="s2">&quot;receiver&quot;</span><span class="p">,</span> <span class="s2">&quot;expiration&quot;</span><span class="p">,</span> <span class="s2">&quot;grants&quot;</span><span class="p">]</span>
         <span class="n">read_only_fields</span> <span class="o">=</span> <span class="n">fields</span></div>
 
 
@@ -138,47 +171,82 @@
 
 
 
-<div class="viewcode-block" id="ObjectSerializer">
-<a class="viewcode-back" href="../../api/30_serializers.html#caps.serializers.ObjectSerializer">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">ObjectSerializer</span><span class="p">(</span><span class="n">serializers</span><span class="o">.</span><span class="n">ModelSerializer</span><span class="p">):</span>
+<div class="viewcode-block" id="OwnedSerializer">
+<a class="viewcode-back" href="../../api/30_serializers.html#caps.serializers.OwnedSerializer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OwnedSerializer</span><span class="p">(</span><span class="n">UUIDSerializer</span><span class="p">,</span> <span class="n">serializers</span><span class="o">.</span><span class="n">ModelSerializer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Base serializer for Objects. It provides :py:attr:`uuid` field.</span>
+<span class="sd">    Base serializer for :py:class:`~.models.owned.Owned`.</span>
+
+<span class="sd">    When the owned object has ``access`` set, it will use the access&#39; uuid</span>
+<span class="sd">    as id. This happens for example when it is fetched from database using</span>
+<span class="sd">    the :py:meth:`~.models.owned.OwnedQuerySet.access` method.</span>
+
+<span class="sd">    It is highly recommanded to set the user&#39;s ``agent`` and ``agents``</span>
+<span class="sd">    in the serializer context (implemented API view already does it for you). This</span>
+<span class="sd">    allows validation of the owner.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">uuid</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">SerializerMethodField</span><span class="p">()</span>
-    <span class="n">owner</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">UUIDField</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="s2">&quot;owner__uuid&quot;</span><span class="p">,</span> <span class="n">read_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">SerializerMethodField</span><span class="p">()</span>
+    <span class="n">owner</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">SlugRelatedField</span><span class="p">(</span>
+        <span class="n">slug_field</span><span class="o">=</span><span class="s2">&quot;uuid&quot;</span><span class="p">,</span> <span class="n">allow_null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">queryset</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">Agent</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="p">)</span>
     <span class="n">access</span> <span class="o">=</span> <span class="n">AccessSerializer</span><span class="p">(</span><span class="n">read_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; Access &quot;&quot;&quot;</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">allow_null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">if</span> <span class="s2">&quot;pk&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
-            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;pk&quot;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="s2">&quot;id&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
-            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
 
-<div class="viewcode-block" id="ObjectSerializer.get_uuid">
-<a class="viewcode-back" href="../../api/30_serializers.html#caps.serializers.ObjectSerializer.get_uuid">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_uuid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="n">agent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;agent&quot;</span><span class="p">)</span>
+        <span class="n">agents</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;agents&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">agent</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">agents</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">agent</span> <span class="ow">and</span> <span class="n">agents</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Provide both or none of context `agent` and `agents`.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">agents</span> <span class="ow">and</span> <span class="n">agent</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">agents</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Context `agents` does not includes `agent`.&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OwnedSerializer.get_id">
+<a class="viewcode-back" href="../../api/30_serializers.html#caps.serializers.OwnedSerializer.get_id">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get uuid from ``obj.access`` if present.  &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">access</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">access</span><span class="o">.</span><span class="n">uuid</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">uuid</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="ObjectSerializer.validate">
-<a class="viewcode-back" href="../../api/30_serializers.html#caps.serializers.ObjectSerializer.validate">[docs]</a>
+<div class="viewcode-block" id="OwnedSerializer.validate">
+<a class="viewcode-back" href="../../api/30_serializers.html#caps.serializers.OwnedSerializer.validate">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="n">v_data</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">request</span> <span class="o">:=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;request&quot;</span><span class="p">):</span>
-            <span class="n">v_data</span><span class="p">[</span><span class="s2">&quot;owner&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">agent</span>
+        <span class="k">if</span> <span class="n">agent</span> <span class="o">:=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;agent&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">v_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;owner&quot;</span><span class="p">):</span>
+                <span class="n">v_data</span><span class="p">[</span><span class="s2">&quot;owner&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">agent</span>
+        <span class="k">if</span> <span class="s2">&quot;path&quot;</span> <span class="ow">in</span> <span class="n">v_data</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">v_data</span><span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">]</span>
+
         <span class="k">return</span> <span class="n">v_data</span></div>
 
 
-<div class="viewcode-block" id="ObjectSerializer.Meta">
-<a class="viewcode-back" href="../../api/30_serializers.html#caps.serializers.ObjectSerializer.Meta">[docs]</a>
+<div class="viewcode-block" id="OwnedSerializer.validate_owner">
+<a class="viewcode-back" href="../../api/30_serializers.html#caps.serializers.OwnedSerializer.validate_owner">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_owner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Agent</span><span class="p">):</span>
+        <span class="c1"># value is an Agent, as the field is a SlugRelatedField.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">agent</span> <span class="o">:=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;agent&quot;</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">agent</span>
+        <span class="k">elif</span> <span class="n">agents</span> <span class="o">:=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;agents&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s2">&quot;agent&quot;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">agents</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">value</span>
+        <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="s2">&quot;Invalid owner&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="OwnedSerializer.Meta">
+<a class="viewcode-back" href="../../api/30_serializers.html#caps.serializers.OwnedSerializer.Meta">[docs]</a>
     <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
         <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;access&quot;</span><span class="p">]</span>
-        <span class="n">read_only_fields</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;access&quot;</span><span class="p">,</span> <span class="s2">&quot;uuid&quot;</span><span class="p">,</span> <span class="s2">&quot;owner&quot;</span><span class="p">]</span></div>
+        <span class="n">read_only_fields</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;access&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;uuid&quot;</span><span class="p">,</span>
+        <span class="p">]</span></div>
 </div>
 
 
