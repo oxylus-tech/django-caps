@@ -7,7 +7,7 @@ build-backend = "poetry.core.masonry.api"
 name = "django-caps"
 description = "Capability based object permissions for Django."
 version = "0.0.1"
-authors = ["Thomas Baquet <thomas oxylus app>"]
+authors = ["Thomas Baquet <thomas@oxylus.app>"]
 readme = "README.rst"
 license = "MPL-2.0"
 packages = [
@@ -23,8 +23,15 @@ exclude = [
 
 classifiers = [
     "Framework :: Django",
+    "Framework :: Django :: 5.0",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3.11",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Security",
+    "Topic :: Software Development :: Object Brokering",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
 ]
 
 
