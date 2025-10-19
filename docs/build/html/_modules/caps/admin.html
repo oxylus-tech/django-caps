@@ -82,7 +82,8 @@
 <a class="viewcode-back" href="../../api/70_admin.html#caps.admin.AgentAdmin">[docs]</a>
 <span class="nd">@admin</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Agent</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">AgentAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Admin interface for an :py:class:`~.models.agent.Agent`. &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Admin interface for an :py:class:`~.models.agent.Agent`.&quot;&quot;&quot;</span>
+
     <span class="n">list_display</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;uuid&quot;</span><span class="p">,</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;group&quot;</span><span class="p">)</span>
     <span class="n">list_filter</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;group&quot;</span><span class="p">,)</span>
     <span class="n">fields</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;uuid&quot;</span><span class="p">,</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;group&quot;</span><span class="p">)</span>
@@ -93,7 +94,8 @@
 <div class="viewcode-block" id="AccessAdmin">
 <a class="viewcode-back" href="../../api/70_admin.html#caps.admin.AccessAdmin">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AccessAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Admin interface for an :py:class:`~.models.access.Access`. &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Admin interface for an :py:class:`~.models.access.Access`.&quot;&quot;&quot;</span>
+
     <span class="n">list_display</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;uuid&quot;</span><span class="p">,</span> <span class="s2">&quot;target&quot;</span><span class="p">,</span> <span class="s2">&quot;origin&quot;</span><span class="p">,</span> <span class="s2">&quot;emitter&quot;</span><span class="p">,</span> <span class="s2">&quot;receiver&quot;</span><span class="p">,</span> <span class="s2">&quot;expiration&quot;</span><span class="p">)</span>
     <span class="n">fields</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;uuid&quot;</span><span class="p">,</span> <span class="s2">&quot;target&quot;</span><span class="p">,</span> <span class="s2">&quot;origin&quot;</span><span class="p">,</span> <span class="s2">&quot;emitter&quot;</span><span class="p">,</span> <span class="s2">&quot;receiver&quot;</span><span class="p">,</span> <span class="s2">&quot;expiration&quot;</span><span class="p">,</span> <span class="s2">&quot;grants&quot;</span><span class="p">)</span></div>
 
