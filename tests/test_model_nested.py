@@ -5,8 +5,10 @@ from django.db import models
 from caps.models import nested
 
 
-class Nested:
-    pass
+class Nested(models.Model):
+    class Meta:
+        abstract = True
+        app_label = "tests"
 
 
 class ParentBase(nested.NestedModelBase):
