@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-03 13:45+0000\n"
+"POT-Creation-Date: 2026-01-10 11:01+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,51 +18,63 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: caps/models/access.py:126 caps/models/object.py:123
+#: caps/models/access.py:122 caps/models/owned.py:123
 msgid "Id"
 msgstr "Id"
 
-#: caps/models/access.py:134
+#: caps/models/access.py:130
 msgid "Origin"
 msgstr "Origine"
 
-#: caps/models/access.py:137
+#: caps/models/access.py:133
 msgid "Emitter"
 msgstr "Émetteur"
 
-#: caps/models/access.py:139
+#: caps/models/access.py:135
 msgid "Receiver"
-msgstr "Récepteur"
+msgstr "Destinataire"
 
-#: caps/models/access.py:142
+#: caps/models/access.py:138
 msgid "Expiration"
 msgstr "Expiration"
 
-#: caps/models/access.py:145
+#: caps/models/access.py:141
 msgid "Defines an expiration date after which the access is not longer valid."
 msgstr ""
 "Définit une date d'expiration après laquelle l'accès n'est plus valide."
 
-#: caps/models/access.py:148
+#: caps/models/access.py:144
 msgid "Granted permissions"
 msgstr "Permissions accordées"
 
-#: caps/models/agent.py:62
+#: caps/models/access.py:154 caps/models/agent.py:38
 msgid "Access"
 msgstr "Accès"
 
-#: caps/models/agent.py:89
+#: caps/models/access.py:155
+msgid "Accesses"
+msgstr "Accès"
+
+#: caps/models/agent.py:48
+msgid "Agent"
+msgstr "Agent"
+
+#: caps/models/agent.py:49
+msgid "Agents"
+msgstr "Agents"
+
+#: caps/models/agent.py:69
 msgid "Agent targets either a user or a group"
 msgstr "Un agent cible soit un utilisateur soit un groupe."
 
-#: caps/models/object.py:40
+#: caps/models/owned.py:40
 msgid "Target"
 msgstr "Cible"
 
-#: caps/models/object.py:124
+#: caps/models/owned.py:124
 msgid "Owner"
 msgstr "Propriétaire"
 
-#: caps/serializers.py:26
+#: caps/serializers.py:41
 msgid "Anonymous"
 msgstr "Anonyme"

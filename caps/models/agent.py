@@ -44,6 +44,10 @@ class Agent(models.Model):
 
     objects = AgentQuerySet.as_manager()
 
+    class Meta:
+        verbose_name = _("Agent")
+        verbose_name_plural = _("Agents")
+
     @property
     def is_anonymous(self) -> bool:
         """Return True when Agent targets anonymous users."""

@@ -151,6 +151,8 @@ class Access(models.Model):
 
     class Meta:
         abstract = True
+        verbose_name = _("Access")
+        verbose_name_plural = _("Accesses")
         unique_together = (("origin", "receiver", "target"),)
 
     @property
