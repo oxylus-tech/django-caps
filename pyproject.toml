@@ -6,8 +6,8 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry]
 name = "django-caps"
 description = "Capability based object permissions for Django."
-version = "0.0.1"
-authors = ["Thomas Baquet <thomas@oxylus.app>"]
+version = "0.0.2"
+authors = ["Thomas Baquet <thomas bkfox net>"]
 readme = "README.rst"
 license = "MPL-2.0"
 packages = [

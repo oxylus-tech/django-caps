@@ -2,7 +2,6 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <thomas@oxylus.app>, 2026.
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -10,12 +9,12 @@ msgstr ""
 "POT-Creation-Date: 2026-01-10 11:01+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"Language-Team: Spanish <es@li.org>\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: caps/models/access.py:122 caps/models/owned.py:123
 msgid "Id"
@@ -23,57 +22,56 @@ msgstr "Id"
 
 #: caps/models/access.py:130
 msgid "Origin"
-msgstr "Origine"
+msgstr "Origen"
 
 #: caps/models/access.py:133
 msgid "Emitter"
-msgstr "Émetteur"
+msgstr "Emisor"
 
 #: caps/models/access.py:135
 msgid "Receiver"
-msgstr "Destinataire"
+msgstr "Receptor"
 
 #: caps/models/access.py:138
 msgid "Expiration"
-msgstr "Expiration"
+msgstr "Vencimiento"
 
 #: caps/models/access.py:141
 msgid "Defines an expiration date after which the access is not longer valid."
-msgstr ""
-"Définit une date d'expiration après laquelle l'accès n'est plus valide."
+msgstr "Define una fecha de vencimiento después de la cual el acceso ya no es válido."
 
 #: caps/models/access.py:144
 msgid "Granted permissions"
-msgstr "Permissions accordées"
+msgstr "Permisos concedidos"
 
 #: caps/models/access.py:154 caps/models/agent.py:38
 msgid "Access"
-msgstr "Accès"
+msgstr "Acceso"
 
 #: caps/models/access.py:155
 msgid "Accesses"
-msgstr "Accès"
+msgstr "Accesos"
 
 #: caps/models/agent.py:48
 msgid "Agent"
-msgstr "Agent"
+msgstr "Agente"
 
 #: caps/models/agent.py:49
 msgid "Agents"
-msgstr "Agents"
+msgstr "Agentes"
 
 #: caps/models/agent.py:69
 msgid "Agent targets either a user or a group"
-msgstr "Un agent cible soit un utilisateur soit un groupe."
+msgstr "Un agente se dirige a un usuario o a un grupo"
 
 #: caps/models/owned.py:40
 msgid "Target"
-msgstr "Cible"
+msgstr "Objetivo"
 
 #: caps/models/owned.py:124
 msgid "Owner"
-msgstr "Propriétaire"
+msgstr "Propietario"
 
 #: caps/serializers.py:41
 msgid "Anonymous"
-msgstr "Anonyme"
+msgstr "Anónimo"
