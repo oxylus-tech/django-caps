@@ -120,7 +120,7 @@ class Owned(models.Model, metaclass=OwnedBase):
 
     """
 
-    uuid = models.UUIDField(_("Id"), default=uuid4)
+    uuid = models.UUIDField(_("Id"), default=uuid4, db_index=True, editable=False, unique=True)
     owner = models.ForeignKey(Agent, models.CASCADE, verbose_name=_("Owner"))
 
     objects = OwnedQuerySet.as_manager()
