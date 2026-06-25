@@ -114,6 +114,23 @@ An agent who received access to an object can reshare it, as long as the reshare
 
     # reshared_access allows agent_c to view the object and possibly reshare it once more
 
+
+Get object using Access
+-----------------------
+
+You can get the object using using Owned queryset's methods :py:meth:`~caps.models.owned.OwnedQuerySet.available` or :py:meth:`~caps.models.owned.OwnedQuerySet.access`. The first one filters objects available for agents, while the
+other prefetches objects for the provided access queryset.
+
+Those two methods annotate the model, making you access to the actual `Access` instance used for prefetching:
+
+.. code-block:: python
+
+    posts = Post.objects.available(agent) # or (agent, agent_b, ...)
+
+    post = posts[0]
+    print(post.access)
+
+
 Permission Check
 ................
 

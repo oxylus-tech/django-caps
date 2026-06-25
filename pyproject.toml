@@ -1,31 +1,14 @@
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
-
-
-[tool.poetry]
+[project]
 name = "django-caps"
 description = "Capability based object permissions for Django."
 version = "0.0.3"
-authors = ["Thomas Baquet <thomas@oxylus.app>"]
+authors = [{ name="Thomas Baquet", email="thomas@oxylus.app" }]
 readme = "README.rst"
 license = "MPL-2.0"
-packages = [
-    { include = "caps" },
-]
-include = [
-    {path="docs", format="sdist"},
-    {path="tests", format="sdist"},
-    {path="instance", format="sdist"},
-]
-exclude = [
-]
 
 classifiers = [
     "Framework :: Django",
     "Framework :: Django :: 5.0",
-    "Programming Language :: Python",
-    "Programming Language :: Python :: 3.11",
     "Topic :: Software Development :: Libraries",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Security",
@@ -34,27 +17,40 @@ classifiers = [
 ]
 
 
-[tool.poetry.dependencies]
-python = "^3.13"
-Django = "^5"
-djangorestframework = "^3"
-django-filter = "^25.2"
+dependencies = [
+    "Django>=5",
+    "djangorestframework>=3",
+    "django-filter>=25",
+]
+
+[dependency-groups]
+dev = [
+    "ipython==8.29.0.*",
+    "pre-commit==3.1.*",
+    "black==23.3.*",
+    "ruff==0.0.*",
+    "pytest==8.*",
+    "pytest-django==4.*",
+    "pytest-asyncio==0.25.3.*",
+]
+
+docs = [
+    "Sphinx==8.*",
+    "sphinx-rtd-theme==3.*",
+    "sphinx-autodoc-typehints==3.*",
+]
 
 
-[tool.poetry.group.dev.dependencies]
-ipython = "^8.29.0"
-pre-commit = "^3.1"
-black = "^23.3"
-ruff = "^0.0"
+[tool.setuptools]
+packages = ["caps"]
 
-pytest = "^8"
-pytest-django = "^4"
-pytest-asyncio = "^0.25.3"
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.poetry.group.docs.dependencies]
-Sphinx = "^8"
-sphinx-rtd-theme = "^3"
-sphinx-autodoc-typehints = "^3"
+[tool.hatch.build.targets.wheel]
+packages = ["caps"]
+
 
 
 [tool.pytest.ini_options]

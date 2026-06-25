@@ -132,7 +132,7 @@ class Owned(models.Model, metaclass=OwnedBase):
         abstract = True
 
     @cached_property
-    def access(self) -> Access:
+    def access(self) -> Access | None:
         """Return Access to this object for receiver provided to
         OwnedQuerySet's `access()` or `accesses()`."""
         access_set = getattr(self, "agent_accesses", None)
