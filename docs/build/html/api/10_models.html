@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>caps.models &mdash; Django-Caps 1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
 
       <script src="../_static/jquery.js?v=5d32c60e"></script>
@@ -128,28 +128,20 @@ a specific user (anonymous included) or group.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">MultipleObjectsReturned</span></code></p>
 </dd></dl>
 
+<dl class="py exception">
+<dt class="sig sig-object py" id="caps.models.agent.Agent.NotUpdated">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NotUpdated</span></span><a class="headerlink" href="#caps.models.agent.Agent.NotUpdated" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectNotUpdated</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DatabaseError</span></code></p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="caps.models.agent.Agent.clean">
 <span class="sig-name descname"><span class="pre">clean</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/caps/models/agent.html#Agent.clean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#caps.models.agent.Agent.clean" title="Link to this definition"></a></dt>
 <dd><p>Hook for doing any extra model-wide validation after clean() has been
 called on every field by self.clean_fields. Any ValidationError raised
 by this method will not be associated with a particular field; it will
-have a special-case association with the field defined by NON_FIELD_ERRORS.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="caps.models.agent.Agent.concreteowned_set">
-<span class="sig-name descname"><span class="pre">concreteowned_set</span></span><a class="headerlink" href="#caps.models.agent.Agent.concreteowned_set" title="Link to this definition"></a></dt>
-<dd><p>Accessor to the related objects manager on the reverse side of a
-many-to-one relation.</p>
-<p>In the example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
-    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
-<p>Most of the implementation is delegated to a dynamically defined manager
-class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+have a special-case association with the field defined by
+NON_FIELD_ERRORS.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -287,6 +279,16 @@ by a concrete model.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="caps.models.access.Access.Meta.unique_together">
 <span class="sig-name descname"><span class="pre">unique_together</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(('origin',</span> <span class="pre">'receiver',</span> <span class="pre">'target'),)</span></em><a class="headerlink" href="#caps.models.access.Access.Meta.unique_together" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.access.Access.Meta.verbose_name">
+<span class="sig-name descname"><span class="pre">verbose_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Access'</span></em><a class="headerlink" href="#caps.models.access.Access.Meta.verbose_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="caps.models.access.Access.Meta.verbose_name_plural">
+<span class="sig-name descname"><span class="pre">verbose_name_plural</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Accesses'</span></em><a class="headerlink" href="#caps.models.access.Access.Meta.verbose_name_plural" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -876,7 +878,7 @@ object the first time, the query is executed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>agents</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<a class="reference internal" href="#caps.models.agent.Agent" title="caps.models.agent.Agent"><code class="xref py py-class docutils literal notranslate"><span class="pre">Agent</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<a class="reference internal" href="#caps.models.agent.Agent" title="caps.models.agent.Agent"><code class="xref py py-class docutils literal notranslate"><span class="pre">Agent</span></code></a>]]</span>) – for the provided agent</p></li>
+<li><p><strong>agents</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#caps.models.agent.Agent" title="caps.models.agent.Agent"><code class="xref py py-class docutils literal notranslate"><span class="pre">Agent</span></code></a> | <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<a class="reference internal" href="#caps.models.agent.Agent" title="caps.models.agent.Agent"><code class="xref py py-class docutils literal notranslate"><span class="pre">Agent</span></code></a>]</span>) – for the provided agent</p></li>
 <li><p><strong>accesses</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#caps.models.access.AccessQuerySet" title="caps.models.access.AccessQuerySet"><code class="xref py py-class docutils literal notranslate"><span class="pre">AccessQuerySet</span></code></a> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – use this queryset for accesses</p></li>
 </ul>
 </dd>

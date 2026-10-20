@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Django-Caps &mdash; Django-Caps 1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
 
 
       <script src="_static/jquery.js?v=5d32c60e"></script>
@@ -75,7 +75,7 @@
 <h1>Django-Caps<a class="headerlink" href="#django-caps" title="Link to this heading"></a></h1>
 <p>Django-Caps provides capability based object permission system for Django applications and Django Rest Framework.</p>
 <p>This project is inspired by <a class="reference external" href="https://capnproto.org">Capn’Proto documentation</a> (<a class="reference external" href="http://www.erights.org/elib/capability/ode/ode.pdf">interesting paper</a>).</p>
-<p>A capability is a provided permission to a specific object. It can be <em>shared</em> (shared) a limited amount of time. Users never directly access the targeted object, but through a <em>access</em> that defines allowed capabilities for it.</p>
+<p>A capability is a provided permission to a specific object. It can be <em>shared</em> a limited amount of time. Users never directly access the targeted object, but through a <em>access</em> that defines allowed capabilities for it.</p>
 <p>In short, why use capabilities?</p>
 <ul class="simple">
 <li><p><em>Granularity over objects permissions</em></p></li>
@@ -97,6 +97,58 @@
 <ul class="simple">
 <li><p><strong>Database id obfuscation</strong>: object internal id are never exposed to the outside world. Instead uuid are used to reference them in API and urls. This mitigate attacks on predictive id.</p></li>
 </ul>
+</section>
+<section id="short-example">
+<h2>Short example<a class="headerlink" href="#short-example" title="Link to this heading"></a></h2>
+<p>Lets create an object:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># models.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gettext_lazy</span> <span class="k">as</span> <span class="n">_</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">caps.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Owned</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Post&quot;</span><span class="p">,)</span>
+
+<span class="c1"># Create our example model.</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Post</span><span class="p">(</span><span class="n">Owned</span><span class="p">):</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Title&quot;</span><span class="p">),</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">64</span><span class="p">)</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Content&quot;</span><span class="p">))</span>
+    <span class="c1"># ... other fields</span>
+
+    <span class="c1"># Allowed permissions with allowed reshare depth</span>
+    <span class="n">root_grants</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;app.view_post&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="c1"># can be shared then reshared</span>
+        <span class="s2">&quot;app.change_post&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="c1"># can be shared once</span>
+        <span class="s2">&quot;app.delete_post&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="c1"># can not be shared</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+<p>Small examples of Django-Caps’ API usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">timedelta</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span><span class="p">,</span> <span class="n">Permission</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">timezone</span> <span class="k">as</span> <span class="n">tz</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">caps.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Agent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Post</span>
+
+<span class="c1"># User has 1-1 relation with an agent</span>
+<span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">user_1</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="c1"># Create the post</span>
+<span class="n">post</span> <span class="o">=</span> <span class="n">Post</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">owner</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">agent</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Some title&quot;</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="s2">&quot;Some content&quot;</span><span class="p">)</span>
+
+<span class="c1"># Share the post to agent 1 with default grants</span>
+<span class="n">access</span> <span class="o">=</span> <span class="n">post</span><span class="o">.</span><span class="n">share</span><span class="p">(</span><span class="n">user_1</span><span class="o">.</span><span class="n">agent</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">access</span><span class="o">.</span><span class="n">grants</span> <span class="o">==</span> <span class="p">{</span><span class="s2">&quot;app.view_post&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;app.change_post&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+
+<span class="c1"># Get objects for user_1</span>
+<span class="n">objs</span> <span class="o">=</span> <span class="n">Post</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">available</span><span class="p">(</span><span class="n">user_1</span><span class="o">.</span><span class="n">agent</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The views/viewsets will handle permission check depending on the action being requested.</p>
+<p>For concrete usage, see the docs! 😉</p>
 </section>
 <section id="documentation">
 <h2>Documentation<a class="headerlink" href="#documentation" title="Link to this heading"></a></h2>
