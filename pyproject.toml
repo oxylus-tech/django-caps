@@ -1,7 +1,7 @@
 [project]
 name = "django-caps"
 description = "Capability based object permissions for Django."
-version = "0.0.3"
+version = "0.0.4"
 authors = [{ name="Thomas Baquet", email="thomas@oxylus.app" }]
 readme = "README.rst"
 license = "MPL-2.0"
@@ -21,6 +21,7 @@ dependencies = [
     "Django>=5",
     "djangorestframework>=3",
     "django-filter>=25",
+    "oxylus-utils[django,jwt]>=0.0.2",
 ]
 
 [dependency-groups]
@@ -54,7 +55,7 @@ packages = ["caps"]
 
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "instance.settings"
+DJANGO_SETTINGS_MODULE = "instance.test_settings"
 python_files = ["tests.py", "test_*.py", "*_tests.py"]
 
 

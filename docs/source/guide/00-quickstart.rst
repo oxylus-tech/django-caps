@@ -75,9 +75,9 @@ Using views provided by caps, example of ``urls.py`` file:
     from . import models
 
     urlpatterns = [
-        path("/post/", views.OwnedOwnedistView.as_view(model=models.Post), name="post-list"),
-        path("/post/<uuid:uuid>/", views.OwnedOwnedetailView.as_view(model=models.Post), name="post-detail"),
-        path("/post/create/", views.OwnedOwnedreateView.as_view(model=models.Post), name="post-create"),
+        path("/post/", views.OwnedListView.as_view(model=models.Post), name="post-list"),
+        path("/post/<uuid:uuid>/", views.OwnedDetailView.as_view(model=models.Post), name="post-detail"),
+        path("/post/create/", views.OwnedCreateView.as_view(model=models.Post), name="post-create"),
         path(
             "/post/update/<uuid:uuid>",
             views.OwnedUpdateView.as_view(model=models.Post),

@@ -16,6 +16,11 @@ caps.models.owned
 
 .. automodule:: caps.models.owned
 
+caps.models.hierarchy
+---------------------
+
+.. automodule:: caps.models.hierarchy
+
 caps.models.nested
 ------------------
 

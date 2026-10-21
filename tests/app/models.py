@@ -1,8 +1,9 @@
 from django.db import models
 
-from caps.models import Owned
+from caps.models import Owned, OwnedTreeNode as _OwnedTreeNode
 
-__all__ = ("ConcreteOwned", "Access")
+
+__all__ = ("ConcreteOwned", "Access", "OwnedTreeNode")
 
 
 class ConcreteOwned(Owned):
@@ -21,14 +22,5 @@ class ConcreteOwned(Owned):
 Access = ConcreteOwned.Access
 
 
-# class AbstractOwned(Owned):
-#     name = models.CharField(max_length=16)
-#
-#     class Access(Access):
-#         target = models.ForeignKey(ConcreteOwned, models.CASCADE, related_name="_abstract")
-#
-#     class Meta:
-#         abstract = True
-#
-#
-# AbstractAccess = AbstractOwned.Access
+class OwnedTreeNode(_OwnedTreeNode):
+    name = models.CharField(max_length=32, default="")

@@ -7,8 +7,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/access/settings/
 """
 
-import sys
-
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -35,8 +33,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 ]
-if "pytest" in sys.modules:
-    INSTALLED_APPS.insert(1, "tests.app")
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
