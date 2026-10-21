@@ -6,7 +6,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
 ]
 
-if settings.TEST:
+if getattr(settings, "TEST", False):
     urlpatterns.append(
         path("test/", include("tests.app.urls")),
     )
