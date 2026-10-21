@@ -5,6 +5,9 @@ build:
   os: ubuntu-24.04
   tools:
     python: "3.14"
+  html:
+    - uv run python -c "import django; import os; os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'instance.test_settings'); django.setup(); from django.db import connection; print('caps_agent exists:', 'caps_agent' in connection.introspection.table_names())"
+    - uv run --no-sync --no-dev sphinx-build -T -j 1 -b html -d _build/doctrees -D language=en docs/source "$READTHEDOCS_OUTPUT/html"
 
 sphinx:
    configuration: docs/source/conf.py
