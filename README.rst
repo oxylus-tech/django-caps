@@ -1,7 +1,7 @@
 Django-Caps
 ===========
 
-`Pypi <https://pypi.org/project/django-caps/>`_ | `Read the doc <https://django-caps.readthedocs.io/en/latest/>_`
+`Pypi <https://pypi.org/project/django-caps/>`_ | `Read the doc <https://django-caps.readthedocs.io/en/latest/>`_
 
 Django-Caps provides capability based object permission system for Django applications and Django Rest Framework.
 
